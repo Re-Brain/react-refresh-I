@@ -1,4 +1,5 @@
 import Card from './components/Card.tsx'
+import horses from './data/horse.tsx'
 
 function App() {
   return (
@@ -7,13 +8,12 @@ function App() {
         <header className="text-center border-2 border-gray-100 p-6 rounded-lg bg-amber-500">
           <h1 className="text-3xl font-bold">List of Japan Race Horses</h1>
         </header>
-        
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card />
-          <Card />
-          <Card />
-        </div>
 
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {horses.map((horse) => (
+            <Card key={horse.id} name={horse.name} title={horse.title} age={horse.age} />
+          ))}
+        </div>
       </div>
     </div>
   )
