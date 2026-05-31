@@ -1,1 +1,28 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@theme {
+  --font-title: 'Bebas Neue', sans-serif;
+  --font-subtitle: 'Inter', sans-serif;
+  --font-caption: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-subtitle);
+}
+
+h1 {
+  font-family: var(--font-title);
+}
+
+h2, h3 {
+  font-family: var(--font-title);
+}
+
+h4, h5, h6 {
+  font-family: var(--font-caption);
+}
+
+.text-stroke {
+  /* -webkit-text-stroke: 0.1px black; */
+}
+
