@@ -88,7 +88,11 @@ function App() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {searchedHorses.map((horse) => (
+          { searchedHorses.length === 0 ? (
+            <p className="text-center col-span-full text-gray-400">No horses found.</p>
+          ) : (
+            
+          searchedHorses.map((horse) => (
             <Card 
               key={horse.id} 
               name={horse.name} 
@@ -102,7 +106,7 @@ function App() {
               fav={bookmarks[horse.id] ?? false}
               onBookmark={() => handleBookmark(horse.id)}
             />
-          ))}
+          )))}
         </div>
       </div>
     </div>
