@@ -12,9 +12,9 @@ function App() {
           <h1 className="font-heading text-3xl font-bold">List of Japan Race Horses</h1>
         </header>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {horses.map((horse) => (
-            <Card key={horse.id} name={horse.name} title={horse.title} img={horse.img} />
+            <Card key={horse.id} name={horse.name} title={horse.title} img={horse.img} age={horse.age} record={horse.record} trainer={horse.trainer} />
           ))}
         </div>
       </div>

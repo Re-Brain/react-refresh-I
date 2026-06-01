@@ -22,5 +22,9 @@ h4, h5, h6 {
   font-family: var(--font-caption);
 }
 
+p, span, a, li, button {
+  font-family: var(--font-caption);
+}
+
 
 
