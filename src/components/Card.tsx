@@ -9,11 +9,13 @@ type CardProps = {
   age: number
   record: string
   trainer: string
+  like: number
+  onLike: (amount: number) => void
 }
 
-function Card({ name, title, img, age, record, trainer }: CardProps) {
+function Card({ name, title, img, age, record, trainer, like, onLike }: CardProps) {
 
-  const [like, setLike] = useState(0)
+  // const [like, setLike] = useState(0)
   const [fav, setFav] = useState(false)
   const [expand, setExpand] = useState(false)
 
@@ -44,7 +46,7 @@ function Card({ name, title, img, age, record, trainer }: CardProps) {
 
         <div className="flex justify-center gap-4 m-1 items-center">
           <button 
-            onClick={() => setLike(like + 1)}
+            onClick={() => onLike(1)}
             disabled={like >= 10}
             className=
               {`${like >= 10 ? "text-gray-400" : "text-white"} 
@@ -53,7 +55,7 @@ function Card({ name, title, img, age, record, trainer }: CardProps) {
             <FaHeart size={20}/>
           </button>
           <button 
-            onClick={() => setLike(like - 1)}
+            onClick={() => onLike(-1)}
             disabled={like <= 0}
             className=
               {`${like <= 0 ? "text-gray-400" : "text-white"} 
