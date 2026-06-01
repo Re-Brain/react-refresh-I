@@ -4,10 +4,20 @@ import horses from './data/horse.tsx'
 
 function App() {
 
-  const [likes, setLikes] = useState<Record<number, number>>({})
   const [sortByLikes, setSortByLikes] = useState(false)
-  const [filterByAge, setFilterByAge] = useState<number | null>(null)
+  const [likes, setLikes] = useState<Record<number, number>>({})
   
+  const [bookmarks, setBookmarks] = useState<Record<number, boolean>>({})
+  const [showBookmarked, setShowBookmarked] = useState(false)
+
+  const [query, setQuery] = useState("")
+
+  const handleBookmark = (id: number) => {
+    setBookmarks(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+ 
+  const [filterByAge, setFilterByAge] = useState<number | null>(null)
+
   const handleLike = (id: number, amount: number) => {
     setLikes(prev => ({ ...prev, [id]: (prev[id] ?? 0) + amount }))
   }
@@ -19,6 +29,16 @@ function App() {
   const fileteredHorsesByAge = filterByAge !== null
     ? sortedHorses.filter(horse => horse.age === filterByAge)
     : sortedHorses
+
+  const filteredHorseByBookmark = showBookmarked
+    ? fileteredHorsesByAge.filter(horse => bookmarks[horse.id])
+    : fileteredHorsesByAge
+
+  const searchedHorses = query
+  ? filteredHorseByBookmark.filter(horse =>
+      horse.name.toLowerCase().includes(query.toLowerCase())
+    )
+  : filteredHorseByBookmark
 
   const totalLikes = Object.values(likes).reduce((sum, n) => sum + n, 0)
 
@@ -40,6 +60,12 @@ function App() {
           >
             {sortByLikes ? "Default Order" : "Sort by Likes"}
           </button>
+          <button
+            onClick={() => setShowBookmarked(!showBookmarked)}
+            className="border px-4 py-2 rounded-lg text-sm font-bold hover:bg-white hover:text-black transition"
+          >
+            {showBookmarked ? "Show All" : "Show Bookmarked Only"}
+          </button>
           <select
             value={filterByAge ?? ""}
             onChange={e => setFilterByAge(e.target.value === "" ? null : Number(e.target.value))}
@@ -51,10 +77,18 @@ function App() {
             <option value="5">Age 5</option>
             <option value="6">Age 6</option>
           </select>
+
+          <input
+            type="text"
+            placeholder="Search horse..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="border px-4 py-2 rounded-lg text-sm bg-black text-white"
+          />
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {fileteredHorsesByAge.map((horse) => (
+          {searchedHorses.map((horse) => (
             <Card 
               key={horse.id} 
               name={horse.name} 
@@ -63,8 +97,10 @@ function App() {
               age={horse.age} 
               record={horse.record} 
               trainer={horse.trainer} 
-              like={likes[horse.id] ?? 0} 
-              onLike={(amount) => handleLike(horse.id, amount)} 
+              like={likes[horse.id] ?? 0}
+              onLike={(amount) => handleLike(horse.id, amount)}
+              fav={bookmarks[horse.id] ?? false}
+              onBookmark={() => handleBookmark(horse.id)}
             />
           ))}
         </div>

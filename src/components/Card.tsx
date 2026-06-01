@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { FaBookmark, FaHeart, FaRegBookmark } from 'react-icons/fa'
 import { FaHeartCrack } from 'react-icons/fa6';
 
@@ -11,12 +12,12 @@ type CardProps = {
   trainer: string
   like: number
   onLike: (amount: number) => void
+  fav: boolean
+  onBookmark: () => void
 }
 
-function Card({ name, title, img, age, record, trainer, like, onLike }: CardProps) {
+function Card({ name, title, img, age, record, trainer, like, onLike, fav, onBookmark }: CardProps) {
 
-  // const [like, setLike] = useState(0)
-  const [fav, setFav] = useState(false)
   const [expand, setExpand] = useState(false)
 
   return (
@@ -64,8 +65,8 @@ function Card({ name, title, img, age, record, trainer, like, onLike }: CardProp
             <FaHeartCrack size={20}/>
           </button>
           <span className="text-lg font-bold">{like}</span>
-          <button 
-            onClick={() => setFav(!fav)}
+          <button
+            onClick={onBookmark}
             >
             {fav ? <FaBookmark className="text-white" size={20} /> : <FaRegBookmark className="text-gray-400" size={20} />}
           </button>
