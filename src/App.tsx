@@ -2,6 +2,9 @@ import Card from './components/Card.tsx'
 import horses from './data/horse.tsx'
 
 function App() {
+
+
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-6xl mx-auto p-4">
