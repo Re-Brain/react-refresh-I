@@ -43,33 +43,33 @@ function HomePage() {
   const totalLikes = Object.values(likes).reduce((sum, n) => sum + n, 0)
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-brand-bg text-brand-text">
       <div className="max-w-6xl mx-auto p-4">
-        <header className="text-center border-2 border-gray-100 p-6 rounded-lg bg-amber-500">
-          <h1 className="font-heading text-3xl font-bold">List of Japan Race Horses</h1>
+        <header className="text-center border border-brand-gold p-6 rounded-lg bg-brand-surface">
+          <h1 className="text-3xl font-bold text-brand-gold">List of Japan Race Horses</h1>
         </header>
 
         <div className="text-center my-4 text-lg font-bold">
-          <h2 className="text-3xl">Total Likes: {totalLikes}</h2>
+          <h2 className="text-3xl text-brand-gold">Total Likes: {totalLikes}</h2>
         </div>
 
         <div className="flex justify-center items-center gap-4 mb-4">
           <button
             onClick={() => setSortByLikes(!sortByLikes)}
-            className="border px-4 py-2 rounded-lg text-sm font-bold hover:bg-white hover:text-black transition"
+            className="border border-brand-border px-4 py-2 rounded-lg text-sm font-bold text-brand-text hover:bg-brand-gold hover:text-brand-bg hover:border-brand-gold transition"
           >
             {sortByLikes ? "Default Order" : "Sort by Likes"}
           </button>
           <button
             onClick={() => setShowBookmarked(!showBookmarked)}
-            className="border px-4 py-2 rounded-lg text-sm font-bold hover:bg-white hover:text-black transition"
+            className="border border-brand-border px-4 py-2 rounded-lg text-sm font-bold text-brand-text hover:bg-brand-gold hover:text-brand-bg hover:border-brand-gold transition"
           >
             {showBookmarked ? "Show All" : "Show Bookmarked Only"}
           </button>
           <select
             value={filterByAge ?? ""}
             onChange={e => setFilterByAge(e.target.value === "" ? null : Number(e.target.value))}
-            className="border px-4 py-2 rounded-lg text-sm font-bold bg-black text-white"
+            className="border border-brand-border px-4 py-2 rounded-lg text-sm font-bold bg-brand-surface text-brand-text"
           >
             <option value="">All Ages</option>
             <option value="3">Age 3</option>
@@ -83,13 +83,13 @@ function HomePage() {
             placeholder="Search horse..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="border px-4 py-2 rounded-lg text-sm bg-black text-white"
+            className="border border-brand-border px-4 py-2 rounded-lg text-sm bg-brand-surface text-brand-text placeholder:text-brand-muted"
           />
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           { searchedHorses.length === 0 ? (
-            <p className="text-center col-span-full text-gray-400">No horses found.</p>
+            <p className="text-center col-span-full text-brand-muted">No horses found.</p>
           ) : (
 
           searchedHorses.map((horse) => (

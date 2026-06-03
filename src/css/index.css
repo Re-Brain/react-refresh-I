@@ -4,10 +4,21 @@
   --font-title: 'Bebas Neue', sans-serif;
   --font-subtitle: 'Inter', sans-serif;
   --font-caption: 'Inter', sans-serif;
+
+  /* Premium Elegant Theme */
+  --color-brand-bg: #0f1117;
+  --color-brand-surface: #1a1d27;
+  --color-brand-border: #2e3142;
+  --color-brand-gold: #c9a84c;
+  --color-brand-gold-light: #e2c97e;
+  --color-brand-text: #f0ece4;
+  --color-brand-muted: #8a8fa8;
 }
 
 body {
   font-family: var(--font-subtitle);
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-text);
 }
 
 h1 {
