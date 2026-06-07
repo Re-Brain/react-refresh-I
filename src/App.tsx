@@ -3,6 +3,8 @@ import HomePage from './pages/HomePage.tsx'
 import ApiHorsesPage from './pages/ApiHorsesPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
+import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
+import RegisterFarmerPage from './pages/RegisterFarmerPage.tsx'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/api/horses" element={<ApiHorsesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register/visitor" element={<RegisterVisitorPage />} />
+        <Route path="/register/farmer" element={<RegisterFarmerPage />} />
       </Routes>
     </>
   )
