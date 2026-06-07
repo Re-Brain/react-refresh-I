@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
 import RegisterFarmerPage from './pages/RegisterFarmerPage.tsx'
+import DashboardPage from './pages/DashboardPage.tsx'
 import { useAuth } from './context/useAuth'
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
           <Link to="/api/horses" className="hover:text-brand-gold transition">API Horses</Link>
         </div>
         <div className="flex items-center gap-3">
-          {user?.role === 'visitor' ? (
+          {user ? (
             <>
               <Link to="/dashboard" className="hover:text-brand-gold transition">Dashboard</Link>
               <button
@@ -43,6 +44,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/visitor" element={<RegisterVisitorPage />} />
         <Route path="/register/farmer" element={<RegisterFarmerPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </>
   )
