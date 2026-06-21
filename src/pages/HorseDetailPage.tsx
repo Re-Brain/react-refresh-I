@@ -48,8 +48,8 @@ function HorseDetailPage() {
     if (!horse) return
     setFormData({
       name: horse.name,
-      breed: horse.breed ?? '',
-      age: horse.age ?? undefined,
+      date_of_birth: horse.date_of_birth ?? '',
+      color: horse.color ?? '',
       gender: horse.gender ?? undefined,
       sire: horse.sire ?? '',
       dam: horse.dam ?? '',
@@ -252,7 +252,7 @@ function HorseDetailPage() {
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
           {isEditing ? (
             <div className="grid grid-cols-2 gap-4">
-              {([['name', 'Name'], ['breed', 'Breed']] as const).map(([key, label]) => (
+              {([['name', 'Name'], ['color', 'Color']] as const).map(([key, label]) => (
                 <div key={key} className="flex flex-col gap-1">
                   <label className="text-xs text-brand-muted">{label}</label>
                   <input
@@ -263,13 +263,12 @@ function HorseDetailPage() {
                 </div>
               ))}
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-brand-muted">Age</label>
+                <label className="text-xs text-brand-muted">Date of Birth</label>
                 <input
-                  type="number"
-                  min={0}
+                  type="date"
                   className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-                  value={formData.age ?? ''}
-                  onChange={e => setFormData(p => ({ ...p, age: Number(e.target.value) }))}
+                  value={formData.date_of_birth ?? ''}
+                  onChange={e => setFormData(p => ({ ...p, date_of_birth: e.target.value }))}
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -280,15 +279,17 @@ function HorseDetailPage() {
                   onChange={e => setFormData(p => ({ ...p, gender: e.target.value as Horse['gender'] }))}
                 >
                   <option value="">—</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="colt">Colt</option>
+                  <option value="stallion">Stallion</option>
                   <option value="gelding">Gelding</option>
+                  <option value="filly">Filly</option>
+                  <option value="mare">Mare</option>
                 </select>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              {([['Name', horse.name], ['Breed', horse.breed], ['Age', horse.age], ['Gender', horse.gender]] as const).map(([label, value]) => (
+              {([['Name', horse.name], ['Color', horse.color], ['Date of Birth', horse.date_of_birth], ['Gender', horse.gender]] as const).map(([label, value]) => (
                 <div key={label} className="flex flex-col gap-1">
                   <span className="text-xs text-brand-muted">{label}</span>
                   <span className="text-brand-text font-bold capitalize">{value ?? '—'}</span>
@@ -315,14 +316,42 @@ function HorseDetailPage() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {PEDIGREE_FIELDS.map(({ key, label }) => (
-                <div key={key} className="flex flex-col gap-1">
-                  <span className="text-xs text-brand-muted">{label}</span>
-                  <span className="text-brand-text font-bold">{(horse[key as keyof Horse] as string) ?? '—'}</span>
-                </div>
-              ))}
-            </div>
+            <table className="w-full text-sm border-collapse">
+              <tbody>
+                <tr>
+                  <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-300 px-3 w-16 align-middle">
+                    Sire
+                  </td>
+                  <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                    {horse.sire || '—'}
+                  </td>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                    {horse.sires_sire || '—'}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                    {horse.sires_dam || '—'}
+                  </td>
+                </tr>
+                <tr>
+                  <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-300 px-3 w-16 align-middle">
+                    Dam
+                  </td>
+                  <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                    {horse.dam || '—'}
+                  </td>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                    {horse.dams_sire || '—'}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                    {horse.dams_dam || '—'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           )}
         </div>
 

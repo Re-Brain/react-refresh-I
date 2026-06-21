@@ -50,11 +50,6 @@ function HorsePublicPage() {
       </button>
 
       <h1 className="text-3xl font-bold text-brand-gold mb-2">{horse.name}</h1>
-      <p className="text-brand-muted text-sm mb-8 capitalize">
-        {[horse.breed, horse.gender, horse.age ? `${horse.age} years old` : null]
-          .filter(Boolean)
-          .join(' · ')}
-      </p>
 
       <div className="flex flex-col gap-6">
 
@@ -105,9 +100,9 @@ function HorsePublicPage() {
         )}
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
+          <p className="text-xs font-bold text-brand-muted uppercase">Profile</p>
           <div className="grid grid-cols-2 gap-4">
-            {([['Name', horse.name], ['Breed', horse.breed], ['Age', horse.age ? `${horse.age} years` : null], ['Gender', horse.gender]] as const).map(([label, value]) => (
+            {([['Name', horse.name], ['Color', horse.color], ['Date of Birth', horse.date_of_birth], ['Gender', horse.gender]] as const).map(([label, value]) => (
               <div key={label} className="flex flex-col gap-1">
                 <span className="text-xs text-brand-muted">{label}</span>
                 <span className="text-brand-text font-bold capitalize">{value ?? '—'}</span>
@@ -118,14 +113,42 @@ function HorsePublicPage() {
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Pedigree</p>
-          <div className="grid grid-cols-2 gap-4">
-            {PEDIGREE_FIELDS.map(({ key, label }) => (
-              <div key={key} className="flex flex-col gap-1">
-                <span className="text-xs text-brand-muted">{label}</span>
-                <span className="text-brand-text font-bold">{(horse[key] as string) ?? '—'}</span>
-              </div>
-            ))}
-          </div>
+          <table className="w-full text-sm border-collapse">
+            <tbody>
+              <tr>
+                <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-300 px-3 w-16 align-middle">
+                  Sire
+                </td>
+                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                  {horse.sire || '—'}
+                </td>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                  {horse.sires_sire || '—'}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                  {horse.sires_dam || '—'}
+                </td>
+              </tr>
+              <tr>
+                <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-300 px-3 w-16 align-middle">
+                  Dam
+                </td>
+                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                  {horse.dam || '—'}
+                </td>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                  {horse.dams_sire || '—'}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">
+                  {horse.dams_dam || '—'}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

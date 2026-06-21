@@ -8,9 +8,9 @@ export type HorseImage = {
 export type Horse = {
   id: number
   name: string
-  breed: string | null
-  age: number | null
-  gender: 'male' | 'female' | 'gelding' | null
+  date_of_birth: string | null
+  color: string | null
+  gender: 'colt' | 'stallion' | 'gelding' | 'filly' | 'mare' | null
   sire: string | null
   dam: string | null
   sires_sire: string | null

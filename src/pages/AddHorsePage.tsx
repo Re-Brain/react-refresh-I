@@ -100,9 +100,11 @@ function AddHorsePage() {
                 onChange={e => setForm(p => ({ ...p, gender: e.target.value as HorseCreate['gender'] || null }))}
               >
                 <option value="">—</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="colt">Colt</option>
+                <option value="stallion">Stallion</option>
                 <option value="gelding">Gelding</option>
+                <option value="filly">Filly</option>
+                <option value="mare">Mare</option>
               </select>
             </div>
           </div>
