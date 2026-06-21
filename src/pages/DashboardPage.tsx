@@ -1,15 +1,17 @@
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 
 function DashboardPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
-  return (
-    <div className="min-h-screen bg-brand-bg text-brand-text p-8">
-      <h1 className="text-3xl font-bold text-brand-gold">
-        Welcome, {user?.role === 'farmer' ? 'Farmer' : 'Visitor'} {user?.name}
-      </h1>
-    </div>
-  )
+  useEffect(() => {
+    if (user?.role === 'farmer') navigate('/dashboard/farmer', { replace: true })
+    else if (user?.role === 'visitor') navigate('/dashboard/visitor', { replace: true })
+  }, [user, navigate])
+
+  return null
 }
 
 export default DashboardPage

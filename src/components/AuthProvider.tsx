@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserMe | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('access_token')
@@ -12,6 +13,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getMe(token)
         .then(setUser)
         .catch(() => localStorage.removeItem('access_token'))
+        .finally(() => setLoading(false))
+    } else {
+      setLoading(false)
     }
   }, [])
 
@@ -19,6 +23,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('access_token')
     setUser(null)
   }
+
+  if (loading) return null
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>

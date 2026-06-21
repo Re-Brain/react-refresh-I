@@ -18,7 +18,7 @@ function LoginPage() {
       localStorage.setItem('access_token', token.access_token)
       const user = await getMe(token.access_token)
       setUser(user)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message)
     }
