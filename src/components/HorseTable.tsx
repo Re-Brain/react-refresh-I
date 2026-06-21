@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pencil, Trash2, X, ChevronUp } from 'lucide-react'
+import { Pencil, Trash2, X, ChevronUp, Eye } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { updateHorse, deleteHorse, type Horse, type HorseUpdate } from '../api/horse'
 
 type Props = {
@@ -17,6 +18,7 @@ const PEDIGREE_FIELDS: { key: keyof HorseUpdate; label: string }[] = [
 ]
 
 function HorseTable({ horses, onChange }: Props) {
+  const navigate = useNavigate()
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [formData, setFormData] = useState<HorseUpdate>({})
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
@@ -89,6 +91,7 @@ function HorseTable({ horses, onChange }: Props) {
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
+            <th className="text-left px-4 py-3 font-bold">ID</th>
             <th className="text-left px-4 py-3 font-bold">Name</th>
             <th className="text-left px-4 py-3 font-bold">Breed</th>
             <th className="text-left px-4 py-3 font-bold">Age</th>
@@ -103,6 +106,7 @@ function HorseTable({ horses, onChange }: Props) {
                 key={horse.id}
                 className="border-b border-brand-border hover:bg-brand-surface/50 transition"
               >
+                <td className="px-4 py-3 text-brand-muted">{horse.id}</td>
                 <td className="px-4 py-3 font-bold text-brand-text">{horse.name}</td>
                 <td className="px-4 py-3 text-brand-muted">{horse.breed ?? '—'}</td>
                 <td className="px-4 py-3 text-brand-muted">{horse.age ?? '—'}</td>
@@ -129,6 +133,13 @@ function HorseTable({ horses, onChange }: Props) {
                     ) : (
                       <>
                         <button
+                          onClick={() => navigate(`/dashboard/farmer/horses/${horse.id}`)}
+                          className="text-brand-muted hover:text-brand-gold transition"
+                          title="View"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
                           onClick={() => handleEditClick(horse)}
                           className="text-brand-muted hover:text-brand-gold transition"
                           title="Edit"
@@ -150,7 +161,7 @@ function HorseTable({ horses, onChange }: Props) {
 
               {expandedId === horse.id && (
                 <tr key={`${horse.id}-edit`} className="bg-brand-surface/30 border-b border-brand-border">
-                  <td colSpan={5} className="px-6 py-5">
+                  <td colSpan={6} className="px-6 py-5">
                     <div className="flex flex-col gap-5">
                       <div>
                         <p className="text-xs font-bold text-brand-muted uppercase mb-3">Basic Info</p>

@@ -16,7 +16,9 @@ const navItems: { key: Section; label: string; icon: React.ReactNode }[] = [
 
 function FarmerDashboardPage() {
   useAuth()
-  const [activeSection, setActiveSection] = useState<Section>('farm-info')
+  const [activeSection, setActiveSection] = useState<Section>(
+    (sessionStorage.getItem('dashboardSection') as Section) ?? 'farm-info'
+  )
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [farm, setFarm] = useState<Farm | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -68,6 +70,7 @@ function FarmerDashboardPage() {
 
   function handleNavClick(key: Section) {
     if (key === 'horse-management' && !profileComplete) return
+    sessionStorage.setItem('dashboardSection', key)
     setActiveSection(key)
   }
 

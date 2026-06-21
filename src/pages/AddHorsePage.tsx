@@ -43,7 +43,7 @@ function AddHorsePage() {
     setError(null)
     try {
       await createHorse(token, form)
-      navigate('/dashboard/farmer')
+      navigate(-1)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add horse')
     } finally {
@@ -52,12 +52,12 @@ function AddHorsePage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-4xl mx-auto">
       <button
         onClick={() => navigate('/dashboard/farmer')}
         className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition"
       >
-        <ArrowLeft size={16} /> Back to Dashboard
+        <ArrowLeft size={16} /> Back to Horse Management
       </button>
 
       <h1 className="text-2xl font-bold text-brand-gold mb-8">Add New Horse</h1>
@@ -136,7 +136,7 @@ function AddHorsePage() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/dashboard/farmer')}
+            onClick={() => navigate(-1)}
             className="text-brand-muted hover:text-brand-text font-bold px-6 py-2 rounded-lg border border-brand-border transition text-sm"
           >
             Cancel
