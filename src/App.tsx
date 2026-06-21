@@ -10,6 +10,8 @@ import DashboardPage from './pages/DashboardPage.tsx'
 import FarmerDashboardPage from './pages/FarmerDashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
 import AddHorsePage from './pages/AddHorsePage.tsx'
+import HorseDetailPage from './pages/HorseDetailPage.tsx'
+import HorsePublicPage from './pages/HorsePublicPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
 
@@ -54,6 +56,8 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer" element={<ProtectedRoute><FarmerDashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><AddHorsePage /></ProtectedRoute>} />
+        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><HorseDetailPage /></ProtectedRoute>} />
+        <Route path="/horses/:id" element={<HorsePublicPage />} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
       </Routes>
     </>
