@@ -3,6 +3,7 @@ const API_BASE_URL = 'http://127.0.0.1:8000'
 export type HorseImage = {
   id: number
   image_url: string
+  position: number
 }
 
 export type RaceRecord = {
@@ -118,6 +119,16 @@ export async function updateRaceRecord(token: string, horseId: number, recordId:
     body: JSON.stringify(data),
   })
   if (!res.ok) throw new Error('Failed to update race record')
+  return res.json()
+}
+
+export async function reorderHorseImages(token: string, horseId: number, imageIds: number[]): Promise<Horse> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/images/order`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_ids: imageIds }),
+  })
+  if (!res.ok) throw new Error('Failed to reorder images')
   return res.json()
 }
 

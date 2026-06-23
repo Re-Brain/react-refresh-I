@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Pencil, X, Upload, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getHorse, updateHorse, uploadHorseImage, deleteHorseImage, updateRaceRecord, type Horse, type HorseUpdate, type RaceRecord, type RaceRecordUpdate } from '../api/horse'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeft, Pencil, X, Upload, Trash2, ChevronLeft, ChevronRight, MoveLeft, MoveRight, Loader2 } from 'lucide-react'
+import { getHorse, updateHorse, uploadHorseImage, deleteHorseImage, reorderHorseImages, updateRaceRecord, type Horse, type HorseUpdate, type RaceRecord, type RaceRecordUpdate } from '../api/horse'
 
 // JRA race classes, lowest to highest
 const GRADES = ['Debut', 'Maiden', '1-Win', '2-Win', '3-Win', 'Open', 'Listed', 'G3', 'G2', 'G1'] as const
@@ -62,6 +62,7 @@ const PEDIGREE_FIELDS: { key: keyof HorseUpdate; label: string }[] = [
 function HorseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [horse, setHorse] = useState<Horse | null>(null)
@@ -74,7 +75,9 @@ function HorseDetailPage() {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imageError, setImageError] = useState<string | null>(null)
   const [deleteImageConfirmId, setDeleteImageConfirmId] = useState<number | null>(null)
+  const [deletingImage, setDeletingImage] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [reordering, setReordering] = useState(false)
 
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null)
   const [recordForm, setRecordForm] = useState<RaceRecordUpdate>({})
@@ -95,6 +98,15 @@ function HorseDetailPage() {
       setActiveImageIndex(Math.max(0, horse.images.length - 1))
     }
   }, [horse?.images.length])
+
+  // Auto-open edit mode when arriving via the table's edit shortcut (?edit=1)
+  useEffect(() => {
+    if (horse && searchParams.get('edit') === '1') {
+      handleEditClick()
+      searchParams.delete('edit')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, [horse])
 
   function handleEditClick() {
     if (!horse) return
@@ -161,12 +173,35 @@ function HorseDetailPage() {
     const token = localStorage.getItem('access_token')
     if (!token || !horse) return
     setImageError(null)
+    setDeletingImage(true)
     try {
       const updated = await deleteHorseImage(token, horse.id, imageId)
       setHorse(updated)
       setDeleteImageConfirmId(null)
     } catch (err) {
       setImageError(err instanceof Error ? err.message : 'Failed to delete image')
+    } finally {
+      setDeletingImage(false)
+    }
+  }
+
+  async function handleReorderImage(direction: -1 | 1) {
+    const token = localStorage.getItem('access_token')
+    if (!token || !horse) return
+    const target = activeImageIndex + direction
+    if (target < 0 || target >= horse.images.length) return
+    const ids = horse.images.map(img => img.id)
+    ;[ids[activeImageIndex], ids[target]] = [ids[target], ids[activeImageIndex]]
+    setReordering(true)
+    setImageError(null)
+    try {
+      const updated = await reorderHorseImages(token, horse.id, ids)
+      setHorse(updated)
+      setActiveImageIndex(target)
+    } catch (err) {
+      setImageError(err instanceof Error ? err.message : 'Failed to reorder image')
+    } finally {
+      setReordering(false)
     }
   }
 
@@ -229,7 +264,7 @@ function HorseDetailPage() {
             onClick={handleEditClick}
             className="flex items-center gap-2 bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm"
           >
-            <Pencil size={14} /> Edit
+            <Pencil size={14} /> Edit Horse Details
           </button>
         )}
       </div>
@@ -277,21 +312,30 @@ function HorseDetailPage() {
               {/* Delete confirm overlay */}
               {deleteImageConfirmId === activeImage.id ? (
                 <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-2">
-                  <p className="text-white text-xs font-bold">Delete this image?</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleImageDelete(activeImage.id)}
-                      className="text-xs font-bold bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded transition"
-                    >
-                      Yes
-                    </button>
-                    <button
-                      onClick={() => setDeleteImageConfirmId(null)}
-                      className="text-xs font-bold bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded transition"
-                    >
-                      No
-                    </button>
-                  </div>
+                  {deletingImage ? (
+                    <>
+                      <Loader2 size={24} className="text-white animate-spin" />
+                      <p className="text-white text-xs font-bold">Deleting...</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-white text-xs font-bold">Delete this image?</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleImageDelete(activeImage.id)}
+                          className="text-xs font-bold bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded transition"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => setDeleteImageConfirmId(null)}
+                          className="text-xs font-bold bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded transition"
+                        >
+                          No
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <button
@@ -336,6 +380,31 @@ function HorseDetailPage() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Reorder controls */}
+          {imageCount > 1 && (
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleReorderImage(-1)}
+                disabled={reordering || activeImageIndex === 0}
+                className="flex items-center gap-1 text-xs font-bold text-brand-muted hover:text-brand-gold px-3 py-1.5 rounded-lg border border-brand-border transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
+                title="Move image earlier"
+              >
+                <MoveLeft size={13} /> Move earlier
+              </button>
+              <span className="text-xs text-brand-muted">{activeImageIndex + 1} / {imageCount}</span>
+              <button
+                type="button"
+                onClick={() => handleReorderImage(1)}
+                disabled={reordering || activeImageIndex === imageCount - 1}
+                className="flex items-center gap-1 text-xs font-bold text-brand-muted hover:text-brand-gold px-3 py-1.5 rounded-lg border border-brand-border transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
+                title="Move image later"
+              >
+                Move later <MoveRight size={13} />
+              </button>
             </div>
           )}
 
