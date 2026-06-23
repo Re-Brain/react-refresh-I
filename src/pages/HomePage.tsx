@@ -4,31 +4,48 @@ import { getAllHorses, type Horse } from '../api/horse'
 
 function HorseCard({ horse }: { horse: Horse }) {
   const navigate = useNavigate()
+  const firstImage = horse.images[0]
+
   return (
     <div
       onClick={() => navigate(`/horses/${horse.id}`)}
-      className="bg-brand-surface border border-brand-border rounded-lg p-5 flex flex-col gap-3 cursor-pointer hover:border-brand-gold transition"
+      className="bg-brand-surface border border-brand-border rounded-lg overflow-hidden flex flex-col cursor-pointer hover:border-brand-gold transition"
     >
-      <div className="flex items-center justify-between">
-        <h3 className="text-brand-gold font-bold text-lg">{horse.name}</h3>
-        <span className="text-xs text-brand-muted capitalize">{horse.gender ?? '—'}</span>
+      <div className="w-full aspect-video bg-brand-bg flex items-center justify-center overflow-hidden">
+        {firstImage ? (
+          <img
+            src={firstImage.image_url}
+            alt={horse.name}
+            className="w-full h-full object-contain"
+            decoding="async"
+          />
+        ) : (
+          <span className="text-brand-muted text-xs">No image</span>
+        )}
       </div>
-      <div className="flex flex-col gap-1 text-sm">
-        <div className="flex justify-between">
-          <span className="text-brand-muted">Breed</span>
-          <span className="text-brand-text font-bold">{horse.breed ?? '—'}</span>
+
+      <div className="p-4 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-brand-gold font-bold text-base">{horse.name}</h3>
+          <span className="text-xs text-brand-muted capitalize">{horse.gender ?? '—'}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-brand-muted">Age</span>
-          <span className="text-brand-text font-bold">{horse.age ? `${horse.age} years` : '—'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-brand-muted">Sire</span>
-          <span className="text-brand-text font-bold">{horse.sire ?? '—'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-brand-muted">Dam</span>
-          <span className="text-brand-text font-bold">{horse.dam ?? '—'}</span>
+        <div className="flex flex-col gap-1 text-sm">
+          <div className="flex justify-between">
+            <span className="text-brand-muted">Color</span>
+            <span className="text-brand-text font-bold">{horse.color ?? '—'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-brand-muted">Date of Birth</span>
+            <span className="text-brand-text font-bold">{horse.date_of_birth ?? '—'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-brand-muted">Sire</span>
+            <span className="text-brand-text font-bold">{horse.sire ?? '—'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-brand-muted">Dam</span>
+            <span className="text-brand-text font-bold">{horse.dam ?? '—'}</span>
+          </div>
         </div>
       </div>
     </div>

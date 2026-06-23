@@ -19,6 +19,30 @@ body {
   font-family: var(--font-subtitle);
   background-color: var(--color-brand-bg);
   color: var(--color-brand-text);
+  /* Render native controls (date picker, <select> dropdowns, scrollbars) in dark mode */
+  color-scheme: dark;
+}
+
+/* Remove the up/down spinner arrows on number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Make the date input's calendar button visible and gold-tinted on the dark theme */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  filter: invert(64%) sepia(38%) saturate(540%) hue-rotate(2deg) brightness(92%);
+  transition: opacity 0.15s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 h1 {

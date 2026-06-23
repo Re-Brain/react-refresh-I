@@ -5,6 +5,21 @@ export type HorseImage = {
   image_url: string
 }
 
+export type RaceRecord = {
+  id: number
+  race_date: string
+  course: string
+  race_name: string
+  grade: string
+  finish_position: number
+  track: string
+  distance: number
+  condition: string
+  horse_id: number
+}
+
+export type RaceRecordUpdate = Partial<Omit<RaceRecord, 'id' | 'horse_id'>>
+
 export type Horse = {
   id: number
   name: string
@@ -19,6 +34,7 @@ export type Horse = {
   dams_dam: string | null
   farm_id: number | null
   images: HorseImage[]
+  race_records: RaceRecord[]
 }
 
 export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id'>
@@ -92,6 +108,16 @@ export async function uploadHorseImage(token: string, horseId: number, file: Fil
     const err = await res.json().catch(() => ({}))
     throw new Error(err.detail ?? 'Failed to upload image')
   }
+  return res.json()
+}
+
+export async function updateRaceRecord(token: string, horseId: number, recordId: number, data: RaceRecordUpdate): Promise<RaceRecord> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error('Failed to update race record')
   return res.json()
 }
 

@@ -33,8 +33,8 @@ function HorseTable({ horses, onChange }: Props) {
     }
     setFormData({
       name: horse.name,
-      breed: horse.breed ?? '',
-      age: horse.age ?? undefined,
+      date_of_birth: horse.date_of_birth ?? '',
+      color: horse.color ?? '',
       gender: horse.gender ?? undefined,
       sire: horse.sire ?? '',
       dam: horse.dam ?? '',
@@ -93,8 +93,8 @@ function HorseTable({ horses, onChange }: Props) {
           <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
             <th className="text-left px-4 py-3 font-bold">ID</th>
             <th className="text-left px-4 py-3 font-bold">Name</th>
-            <th className="text-left px-4 py-3 font-bold">Breed</th>
-            <th className="text-left px-4 py-3 font-bold">Age</th>
+            <th className="text-left px-4 py-3 font-bold">Color</th>
+            <th className="text-left px-4 py-3 font-bold">Date of Birth</th>
             <th className="text-left px-4 py-3 font-bold">Gender</th>
             <th className="px-4 py-3" />
           </tr>
@@ -108,8 +108,8 @@ function HorseTable({ horses, onChange }: Props) {
               >
                 <td className="px-4 py-3 text-brand-muted">{horse.id}</td>
                 <td className="px-4 py-3 font-bold text-brand-text">{horse.name}</td>
-                <td className="px-4 py-3 text-brand-muted">{horse.breed ?? '—'}</td>
-                <td className="px-4 py-3 text-brand-muted">{horse.age ?? '—'}</td>
+                <td className="px-4 py-3 text-brand-muted">{horse.color ?? '—'}</td>
+                <td className="px-4 py-3 text-brand-muted">{horse.date_of_birth ?? '—'}</td>
                 <td className="px-4 py-3 text-brand-muted capitalize">{horse.gender ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
@@ -175,21 +175,20 @@ function HorseTable({ horses, onChange }: Props) {
                             />
                           </div>
                           <div className="flex flex-col gap-1">
-                            <label className="text-xs text-brand-muted">Breed</label>
+                            <label className="text-xs text-brand-muted">Color</label>
                             <input
                               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-                              value={formData.breed ?? ''}
-                              onChange={e => setFormData(p => ({ ...p, breed: e.target.value }))}
+                              value={formData.color ?? ''}
+                              onChange={e => setFormData(p => ({ ...p, color: e.target.value }))}
                             />
                           </div>
                           <div className="flex flex-col gap-1">
-                            <label className="text-xs text-brand-muted">Age</label>
+                            <label className="text-xs text-brand-muted">Date of Birth</label>
                             <input
-                              type="number"
-                              min={0}
+                              type="date"
                               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-                              value={formData.age ?? ''}
-                              onChange={e => setFormData(p => ({ ...p, age: Number(e.target.value) }))}
+                              value={formData.date_of_birth ?? ''}
+                              onChange={e => setFormData(p => ({ ...p, date_of_birth: e.target.value }))}
                             />
                           </div>
                           <div className="flex flex-col gap-1">
@@ -200,9 +199,11 @@ function HorseTable({ horses, onChange }: Props) {
                               onChange={e => setFormData(p => ({ ...p, gender: e.target.value as Horse['gender'] }))}
                             >
                               <option value="">—</option>
-                              <option value="male">Male</option>
-                              <option value="female">Female</option>
+                              <option value="colt">Colt</option>
+                              <option value="stallion">Stallion</option>
                               <option value="gelding">Gelding</option>
+                              <option value="filly">Filly</option>
+                              <option value="mare">Mare</option>
                             </select>
                           </div>
                         </div>

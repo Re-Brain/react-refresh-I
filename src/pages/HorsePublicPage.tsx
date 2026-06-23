@@ -1,7 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getHorsePublic, type Horse } from '../api/horse'
+import { getHorsePublic, type Horse, type RaceRecord } from '../api/horse'
+
+const GRADE_COLORS: Record<string, string> = {
+  G1: 'bg-red-500',
+  G2: 'bg-blue-500',
+  G3: 'bg-green-600',
+}
+
+function GradeBadge({ grade }: { grade: string | null }) {
+  if (!grade) return null
+  const color = GRADE_COLORS[grade] ?? 'bg-brand-muted'
+  return (
+    <span className={`${color} text-white text-[10px] font-bold px-1.5 py-0.5 rounded ml-1`}>
+      {grade}
+    </span>
+  )
+}
+
+function FinishPos({ pos }: { pos: number }) {
+  const color = pos === 1 ? 'text-brand-gold font-bold' : pos === 2 ? 'text-slate-300 font-bold' : pos === 3 ? 'text-amber-600 font-bold' : 'text-brand-muted'
+  return <span className={color}>{pos}</span>
+}
 
 const PEDIGREE_FIELDS: { key: keyof Horse; label: string }[] = [
   { key: 'sire', label: "Sire" },
@@ -150,6 +171,43 @@ function HorsePublicPage() {
             </tbody>
           </table>
         </div>
+
+        {horse.race_records.length > 0 && (
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+            <p className="text-xs font-bold text-brand-muted uppercase">Race Record</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
+                    <th className="text-left px-3 py-2 font-bold">Date</th>
+                    <th className="text-left px-3 py-2 font-bold">Course</th>
+                    <th className="text-left px-3 py-2 font-bold">Race</th>
+                    <th className="text-center px-3 py-2 font-bold">FP</th>
+                    <th className="text-left px-3 py-2 font-bold">Track</th>
+                    <th className="text-left px-3 py-2 font-bold">Dist.</th>
+                    <th className="text-left px-3 py-2 font-bold">Cond.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {horse.race_records.map((r: RaceRecord) => (
+                    <tr key={r.id} className="border-b border-brand-border hover:bg-brand-bg/40 transition">
+                      <td className="px-3 py-2 text-brand-muted whitespace-nowrap">{r.race_date}</td>
+                      <td className="px-3 py-2 text-brand-text">{r.course}</td>
+                      <td className="px-3 py-2 text-brand-text whitespace-nowrap">
+                        {r.race_name}
+                        <GradeBadge grade={r.grade} />
+                      </td>
+                      <td className="px-3 py-2 text-center"><FinishPos pos={r.finish_position} /></td>
+                      <td className="px-3 py-2 text-brand-muted">{r.track}</td>
+                      <td className="px-3 py-2 text-brand-muted">{r.distance}M</td>
+                      <td className="px-3 py-2 text-brand-muted">{r.condition}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
