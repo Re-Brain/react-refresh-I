@@ -19,7 +19,8 @@ function GradeBadge({ grade }: { grade: string | null }) {
   )
 }
 
-function FinishPos({ pos }: { pos: number }) {
+function FinishPos({ pos }: { pos: number | null }) {
+  if (pos == null) return <span className="text-brand-muted">—</span>
   const color = pos === 1 ? 'text-brand-gold font-bold' : pos === 2 ? 'text-slate-300 font-bold' : pos === 3 ? 'text-amber-600 font-bold' : 'text-brand-muted'
   return <span className={color}>{pos}</span>
 }

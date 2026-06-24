@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2, Eye } from 'lucide-react'
+import { Trash2, SquarePen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { deleteHorse, type Horse } from '../api/horse'
 
@@ -83,16 +83,9 @@ function HorseTable({ horses, onChange }: Props) {
                         <button
                           onClick={() => navigate(`/dashboard/farmer/horses/${horse.id}`)}
                           className="text-brand-muted hover:text-brand-gold transition"
-                          title="View"
+                          title="View & edit"
                         >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          onClick={() => navigate(`/dashboard/farmer/horses/${horse.id}?edit=1`)}
-                          className="text-brand-muted hover:text-brand-gold transition"
-                          title="Edit"
-                        >
-                          <Pencil size={16} />
+                          <SquarePen size={16} />
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(horse.id)}
