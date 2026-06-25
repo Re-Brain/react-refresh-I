@@ -16,6 +16,7 @@ function LoginPage() {
     try {
       const token = await login(email, password)
       localStorage.setItem('access_token', token.access_token)
+      sessionStorage.removeItem('dashboardSection')
       const user = await getMe(token.access_token)
       setUser(user)
       navigate('/dashboard')
