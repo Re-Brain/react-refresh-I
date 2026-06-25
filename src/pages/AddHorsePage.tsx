@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
-import { createHorse, createRaceRecord, type HorseCreate, type RaceRecordCreate, type RaceRecordUpdate } from '../api/horse'
+import { ArrowLeft, Plus, Trash2, Upload, MoveLeft, MoveRight } from 'lucide-react'
+import { createHorse, createRaceRecord, uploadHorseImage, type HorseCreate, type RaceRecordCreate, type RaceRecordUpdate } from '../api/horse'
 import { GradeBadge, FinishPos, RecordInputCells, recordFormIsValid, EMPTY_RECORD_FORM } from '../components/raceRecordFields'
 import { NAME_MAX, COLOR_MAX, validateName, validateColor, validateDob } from '../horseValidation'
 
@@ -40,6 +40,40 @@ function AddHorsePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Images are collected locally and uploaded after the horse exists (upload needs a horse id).
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [images, setImages] = useState<{ file: File; url: string }[]>([])
+  const [imageError, setImageError] = useState<string | null>(null)
+
+  function handleSelectImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    if (!file) return
+    if (images.length >= 3) {
+      setImageError('You can upload up to 3 images.')
+      return
+    }
+    setImages(prev => [...prev, { file, url: URL.createObjectURL(file) }])
+    setImageError(null)
+  }
+
+  function handleRemoveImage(index: number) {
+    setImages(prev => {
+      URL.revokeObjectURL(prev[index].url)
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
+  function handleMoveImage(index: number, direction: -1 | 1) {
+    const target = index + direction
+    setImages(prev => {
+      if (target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
+
   // Race records are collected locally and created after the horse exists.
   const [records, setRecords] = useState<RaceRecordUpdate[]>([])
   const [recordForm, setRecordForm] = useState<RaceRecordUpdate>(EMPTY_RECORD_FORM)
@@ -75,6 +109,10 @@ function AddHorsePage() {
       setError(validationError)
       return
     }
+    if (images.length === 0) {
+      setError('At least one image is required.')
+      return
+    }
     const token = localStorage.getItem('access_token')
     if (!token) return
     // Include a fully-filled-but-not-yet-added draft row so it isn't silently lost.
@@ -99,6 +137,10 @@ function AddHorsePage() {
         dams_dam: (form.dams_dam ?? '').trim(),
         race_records: [],
       })
+      // Upload images in the order they were added so their positions match the preview.
+      for (const img of images) {
+        await uploadHorseImage(token, horse.id, img.file)
+      }
       for (const record of allRecords) {
         await createRaceRecord(token, horse.id, toRecordCreate(record))
       }
@@ -122,6 +164,83 @@ function AddHorsePage() {
       <h1 className="text-2xl font-bold text-brand-gold mb-8">Add New Horse</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="text-red-400">*</span> <span className="normal-case font-normal">({images.length}/3)</span></p>
+            {images.length < 3 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 text-xs font-bold bg-brand-gold text-brand-bg px-3 py-1.5 rounded-lg hover:bg-brand-gold-light transition"
+                >
+                  <Upload size={13} /> Upload
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleSelectImage}
+                />
+              </>
+            )}
+          </div>
+
+          <p className="text-[12px] text-brand-muted normal-case">At least one image is required. You can add up to 3 and use the arrows to set their order.</p>
+
+          {images.length === 0 ? (
+            <div className="flex items-center justify-center h-40 rounded-lg border border-dashed border-brand-border text-brand-muted text-sm">
+              No images added yet
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4">
+              {images.map((img, i) => (
+                <div key={img.url} className="flex flex-col gap-2">
+                  <div className="group relative rounded-xl overflow-hidden h-40 bg-brand-bg">
+                    <img src={img.url} alt={`Preview ${i + 1}`} className="w-full h-full object-contain" />
+                    <span className="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      {i + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(i)}
+                      className="absolute top-2 right-2 bg-black/50 hover:bg-black/80 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:opacity-100 transition"
+                      title="Remove image"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  {images.length > 1 && (
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleMoveImage(i, -1)}
+                        disabled={i === 0}
+                        className="flex items-center gap-1 text-xs font-bold text-brand-muted hover:text-brand-gold px-2 py-1 rounded-lg border border-brand-border transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
+                        title="Move image earlier"
+                      >
+                        <MoveLeft size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveImage(i, 1)}
+                        disabled={i === images.length - 1}
+                        className="flex items-center gap-1 text-xs font-bold text-brand-muted hover:text-brand-gold px-2 py-1 rounded-lg border border-brand-border transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
+                        title="Move image later"
+                      >
+                        <MoveRight size={13} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {imageError && <p className="text-red-400 text-sm normal-case">{imageError}</p>}
+        </div>
+
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -189,6 +308,7 @@ function AddHorsePage() {
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Race Records <span className="text-red-400">*</span></p>
+          <p className="text-[12px] text-brand-muted normal-case">At least one race record is required. Fill in a row and click Add. Grade and FP are optional.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse uppercase">
               <thead>
