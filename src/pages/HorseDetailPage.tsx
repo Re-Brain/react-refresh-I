@@ -194,6 +194,11 @@ function HorseDetailPage() {
     }
   }
 
+  function handleCancelRecord() {
+    setEditingRecordId(null)
+    setRecordError(null)
+  }
+
   function handleAddRecord() {
     setEditingRecordId('new')
     setRecordForm({ race_date: '', course: '', race_name: '', grade: '', finish_position: undefined, track: '', distance: undefined, condition: '' })
@@ -611,7 +616,7 @@ function HorseDetailPage() {
                                   className="text-xs font-bold bg-brand-gold text-brand-bg px-2 py-1 rounded hover:bg-brand-gold-light transition disabled:opacity-50">
                                   {savingRecord ? '...' : 'Save'}
                                 </button>
-                                <button type="button" onClick={() => setEditingRecordId(null)}
+                                <button type="button" onClick={handleCancelRecord}
                                   className="text-xs font-bold text-brand-muted hover:text-brand-text px-2 py-1 rounded border border-brand-border transition">
                                   Cancel
                                 </button>
@@ -673,7 +678,7 @@ function HorseDetailPage() {
                             className="text-xs font-bold bg-brand-gold text-brand-bg px-2 py-1 rounded hover:bg-brand-gold-light transition disabled:opacity-50">
                             {savingRecord ? '...' : 'Add'}
                           </button>
-                          <button type="button" onClick={() => setEditingRecordId(null)}
+                          <button type="button" onClick={handleCancelRecord}
                             className="text-xs font-bold text-brand-muted hover:text-brand-text px-2 py-1 rounded border border-brand-border transition">
                             Cancel
                           </button>
