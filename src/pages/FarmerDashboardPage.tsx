@@ -98,9 +98,17 @@ function FarmerDashboardPage() {
     setSaving(true)
     setSaveError(null)
     try {
-      const payload = Object.fromEntries(
-        Object.entries(formData).filter(([k, v]) => v !== farm![k as keyof Farm])
-      ) as FarmUpdate
+      // Only send fields the user actually changed. Treat '' / undefined / null
+      // as the same "empty" on both sides so untouched empty fields aren't sent,
+      // and send an explicit null (not '' or 0) when clearing a field.
+      const payload: FarmUpdate = {}
+      if (formData.name && formData.name !== farm!.name) payload.name = formData.name
+      if ((formData.location ?? '') !== (farm!.location ?? ''))
+        payload.location = formData.location || null
+      if ((formData.description ?? '') !== (farm!.description ?? ''))
+        payload.description = formData.description || null
+      if ((formData.capacity ?? null) !== (farm!.capacity ?? null))
+        payload.capacity = formData.capacity || null
       const updated = await updateMyFarm(token, payload)
       setFarm(updated)
       setIsEditing(false)
@@ -253,7 +261,7 @@ function FarmerDashboardPage() {
                         min={1}
                         className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
                         value={formData.capacity ?? ''}
-                        onChange={e => setFormData(p => ({ ...p, capacity: Number(e.target.value) }))}
+                        onChange={e => setFormData(p => ({ ...p, capacity: e.target.value === '' ? undefined : Number(e.target.value) }))}
                       />
                     </div>
                     <div className="flex flex-col gap-1">

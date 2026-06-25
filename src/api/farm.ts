@@ -10,9 +10,9 @@ export type Farm = {
 
 export type FarmUpdate = {
   name?: string
-  location?: string
-  description?: string
-  capacity?: number
+  location?: string | null
+  description?: string | null
+  capacity?: number | null
 }
 
 export function isFarmComplete(farm: Farm): boolean {
