@@ -22,6 +22,7 @@ function FarmerDashboardPage() {
   )
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [farm, setFarm] = useState<Farm | null>(null)
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<FarmUpdate>({})
   const [saving, setSaving] = useState(false)
@@ -43,7 +44,7 @@ function FarmerDashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token) return
-    getMyFarm(token).then(setFarm).catch(console.error)
+    getMyFarm(token).then(setFarm).catch(console.error).finally(() => setLoading(false))
     getMyHorses(token).then(setHorses).catch(console.error)
   }, [])
 
@@ -165,6 +166,10 @@ function FarmerDashboardPage() {
       </aside>
 
       <main className="flex-1 p-8">
+        {loading ? (
+          <p className="text-brand-muted text-sm">Loading…</p>
+        ) : (
+        <>
         {!profileComplete && (
           <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/40 text-yellow-400 rounded-lg px-4 py-3 mb-6 text-sm font-medium">
             <AlertTriangle size={18} className="mt-0.5 shrink-0" />
@@ -371,6 +376,8 @@ function FarmerDashboardPage() {
               )}
             </div>
           </div>
+        )}
+        </>
         )}
       </main>
     </div>
