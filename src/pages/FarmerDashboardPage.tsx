@@ -23,6 +23,8 @@ function FarmerDashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [farm, setFarm] = useState<Farm | null>(null)
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [horsesError, setHorsesError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<FarmUpdate>({})
   const [saving, setSaving] = useState(false)
@@ -41,12 +43,40 @@ function FarmerDashboardPage() {
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  function loadFarm(token: string) {
+    getMyFarm(token)
+      .then(setFarm)
+      .catch(err => setLoadError(err instanceof Error ? err.message : 'Failed to load your farm.'))
+      .finally(() => setLoading(false))
+  }
+
+  function loadHorses(token: string) {
+    getMyHorses(token)
+      .then(setHorses)
+      .catch(err => setHorsesError(err instanceof Error ? err.message : 'Failed to load your horses.'))
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token) return
-    getMyFarm(token).then(setFarm).catch(console.error).finally(() => setLoading(false))
-    getMyHorses(token).then(setHorses).catch(console.error)
+    loadFarm(token)
+    loadHorses(token)
   }, [])
+
+  function handleRetryFarm() {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setLoading(true)
+    setLoadError(null)
+    loadFarm(token)
+  }
+
+  function handleRetryHorses() {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setHorsesError(null)
+    loadHorses(token)
+  }
 
   const profileComplete = farm ? isFarmComplete(farm) : false
 
@@ -168,6 +198,19 @@ function FarmerDashboardPage() {
       <main className="flex-1 p-8">
         {loading ? (
           <p className="text-brand-muted text-sm">Loading…</p>
+        ) : loadError ? (
+          <div className="flex flex-col items-start gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+              <p>{loadError}</p>
+            </div>
+            <button
+              onClick={handleRetryFarm}
+              className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
+            >
+              Retry
+            </button>
+          </div>
         ) : (
         <>
         {!profileComplete && (
@@ -280,7 +323,22 @@ function FarmerDashboardPage() {
                 <Plus size={16} /> Add Horse
               </button>
             </div>
-            <HorseTable horses={horses} onChange={setHorses} />
+            {horsesError ? (
+              <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle size={18} className="shrink-0" />
+                  <p>{horsesError}</p>
+                </div>
+                <button
+                  onClick={handleRetryHorses}
+                  className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm shrink-0"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <HorseTable horses={horses} onChange={setHorses} />
+            )}
           </div>
         )}
 
