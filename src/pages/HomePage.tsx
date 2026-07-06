@@ -1,83 +1,64 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getAllHorses, type Horse } from '../api/horse'
+import { Link } from 'react-router-dom'
+import { getActiveFarms, type ActiveFarm } from '../api/farm'
 
-function HorseCard({ horse }: { horse: Horse }) {
-  const navigate = useNavigate()
-  const firstImage = horse.images[0]
-
+function FarmCard({ farm }: { farm: ActiveFarm }) {
   return (
-    <div
-      onClick={() => navigate(`/horses/${horse.id}`)}
+    <Link
+      to={`/farms/${farm.id}`}
       className="bg-brand-surface border border-brand-border rounded-lg overflow-hidden flex flex-col cursor-pointer hover:border-brand-gold transition"
     >
-      <div className="w-full aspect-video bg-brand-bg flex items-center justify-center overflow-hidden">
-        {firstImage ? (
+      <div className="p-4 flex flex-col gap-3">
+        <h3 className="text-brand-gold font-bold text-xl">{farm.name}</h3>
+
+        <div className="w-full aspect-video bg-brand-bg rounded-md overflow-hidden">
           <img
-            src={firstImage.image_url}
-            alt={horse.name}
-            className="w-full h-full object-contain"
+            src={`https://picsum.photos/seed/farm-${farm.id}/400/225`}
+            alt={farm.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
             decoding="async"
           />
-        ) : (
-          <span className="text-brand-muted text-xs">No image</span>
-        )}
-      </div>
+        </div>
 
-      <div className="p-4 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-brand-gold font-bold text-base">{horse.name}</h3>
-          <span className="text-xs text-brand-muted capitalize">{horse.gender ?? '—'}</span>
-        </div>
-        <div className="flex flex-col gap-1 text-sm">
-          <div className="flex justify-between">
-            <span className="text-brand-muted">Color</span>
-            <span className="text-brand-text font-bold">{horse.color ?? '—'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-brand-muted">Date of Birth</span>
-            <span className="text-brand-text font-bold">{horse.date_of_birth ?? '—'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-brand-muted">Sire</span>
-            <span className="text-brand-text font-bold">{horse.sire ?? '—'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-brand-muted">Dam</span>
-            <span className="text-brand-text font-bold">{horse.dam ?? '—'}</span>
-          </div>
-        </div>
+        <p className="text-sm text-brand-muted">
+          {farm.location ?? 'Location not specified'}
+        </p>
+
+        <p className="text-sm text-brand-text">
+          {farm.description ?? 'No description provided.'}
+        </p>
       </div>
-    </div>
+    </Link>
   )
 }
 
 function HomePage() {
-  const [horses, setHorses] = useState<Horse[]>([])
+  const [farms, setFarms] = useState<ActiveFarm[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    getAllHorses()
-      .then(setHorses)
-      .catch(() => setError('Failed to load horses'))
+    getActiveFarms()
+      .then(setFarms)
+      .catch(() => setError('Failed to load farms. Please try again later.'))
       .finally(() => setLoading(false))
   }, [])
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-brand-gold mb-2">Horses</h1>
-        <p className="text-brand-muted text-sm mb-8">Browse all available horses</p>
+        <h1 className="text-3xl font-bold text-brand-gold mb-2">Farms</h1>
+        <p className="text-brand-muted text-sm mb-8">Browse all active farms</p>
 
         {loading && <p className="text-brand-muted text-sm">Loading...</p>}
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        {!loading && !error && horses.length === 0 && (
-          <p className="text-brand-muted text-sm">No horses listed yet.</p>
+        {!loading && !error && farms.length === 0 && (
+          <p className="text-brand-muted text-sm">No active farms yet.</p>
         )}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {horses.map(horse => (
-            <HorseCard key={horse.id} horse={horse} />
+          {farms.map(farm => (
+            <FarmCard key={farm.id} farm={farm} />
           ))}
         </div>
       </div>

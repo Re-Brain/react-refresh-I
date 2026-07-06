@@ -12,6 +12,7 @@ import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
 import AddHorsePage from './pages/AddHorsePage.tsx'
 import HorseDetailPage from './pages/HorseDetailPage.tsx'
 import HorsePublicPage from './pages/HorsePublicPage.tsx'
+import FarmDetailPage from './pages/FarmDetailPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
 
@@ -47,6 +48,7 @@ function App() {
       </nav>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/farms/:id" element={<FarmDetailPage />} />
         <Route path="/local-data" element={<LocalHorsesPage />} />
         <Route path="/api/horses" element={<ApiHorsesPage />} />
         <Route path="/login" element={<LoginPage />} />
