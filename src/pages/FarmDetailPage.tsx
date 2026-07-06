@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getFarm, type ActiveFarm } from '../api/farm'
 import { getAllHorses, type Horse } from '../api/horse'
+import OverlayCard from '../components/OverlayCard'
 
 type LoadState =
   | { status: 'loading' }
@@ -96,53 +97,17 @@ function FarmDetailPage() {
                   No horses listed for this farm yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {horses.map(horse => (
-                    <Link
+                    <OverlayCard
                       key={horse.id}
                       to={`/horses/${horse.id}`}
-                      className="self-start bg-brand-surface border border-brand-border rounded-lg overflow-hidden flex flex-col hover:border-brand-gold transition"
-                    >
-                      <div className="w-full aspect-3/2 bg-brand-bg flex items-center justify-center overflow-hidden">
-                        {horse.images[0] ? (
-                          <img
-                            src={horse.images[0].image_url}
-                            alt={horse.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <span className="text-brand-muted text-xs">No image</span>
-                        )}
-                      </div>
-                      <div className="p-4 flex flex-col gap-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="text-brand-gold font-bold text-base">{horse.name}</h3>
-                          <span className="text-xs text-brand-muted capitalize shrink-0">
-                            {horse.gender ?? '—'}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-1 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-brand-muted">Color</span>
-                            <span className="text-brand-text font-bold">{horse.color ?? '—'}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-brand-muted">Date of Birth</span>
-                            <span className="text-brand-text font-bold">{horse.date_of_birth ?? '—'}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-brand-muted">Sire</span>
-                            <span className="text-brand-text font-bold">{horse.sire ?? '—'}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-brand-muted">Dam</span>
-                            <span className="text-brand-text font-bold">{horse.dam ?? '—'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                      imageUrl={
+                        horse.images[0]?.image_url ??
+                        `https://picsum.photos/seed/horse-${horse.id}/600/600`
+                      }
+                      title={horse.name}
+                    />
                   ))}
                 </div>
               )}
