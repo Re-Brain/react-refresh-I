@@ -3,14 +3,31 @@ const API_BASE_URL = 'http://127.0.0.1:8000'
 export type HorseImage = {
   id: number
   image_url: string
+  position: number
 }
+
+export type RaceRecord = {
+  id: number
+  race_date: string
+  course: string
+  race_name: string
+  grade: string
+  finish_position: number | null
+  track: string
+  distance: number
+  condition: string
+  horse_id: number
+}
+
+export type RaceRecordUpdate = Partial<Omit<RaceRecord, 'id' | 'horse_id'>>
+export type RaceRecordCreate = Omit<RaceRecord, 'id' | 'horse_id' | 'grade'> & { grade?: string | null }
 
 export type Horse = {
   id: number
   name: string
-  breed: string | null
-  age: number | null
-  gender: 'male' | 'female' | 'gelding' | null
+  date_of_birth: string | null
+  color: string | null
+  gender: 'colt' | 'stallion' | 'gelding' | 'filly' | 'mare' | null
   sire: string | null
   dam: string | null
   sires_sire: string | null
@@ -19,6 +36,7 @@ export type Horse = {
   dams_dam: string | null
   farm_id: number | null
   images: HorseImage[]
+  race_records: RaceRecord[]
 }
 
 export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id'>
@@ -92,6 +110,45 @@ export async function uploadHorseImage(token: string, horseId: number, file: Fil
     const err = await res.json().catch(() => ({}))
     throw new Error(err.detail ?? 'Failed to upload image')
   }
+  return res.json()
+}
+
+export async function createRaceRecord(token: string, horseId: number, data: RaceRecordCreate): Promise<Horse> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error('Failed to create race record')
+  return res.json()
+}
+
+export async function deleteRaceRecord(token: string, horseId: number, recordId: number): Promise<Horse> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) throw new Error('Failed to delete race record')
+  return res.json()
+}
+
+export async function updateRaceRecord(token: string, horseId: number, recordId: number, data: RaceRecordUpdate): Promise<RaceRecord> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error('Failed to update race record')
+  return res.json()
+}
+
+export async function reorderHorseImages(token: string, horseId: number, imageIds: number[]): Promise<Horse> {
+  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/images/order`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_ids: imageIds }),
+  })
+  if (!res.ok) throw new Error('Failed to reorder images')
   return res.json()
 }
 

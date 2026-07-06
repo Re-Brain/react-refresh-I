@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { getMyFarm, updateMyFarm, isFarmComplete, type Farm, type FarmUpdate } from '../api/farm'
 import { getMyHorses, type Horse } from '../api/horse'
+import { changePassword, deleteAccount } from '../api/auth'
 import HorseTable from '../components/HorseTable'
 
 type Section = 'farm-info' | 'horse-management' | 'settings'
@@ -15,12 +16,15 @@ const navItems: { key: Section; label: string; icon: React.ReactNode }[] = [
 ]
 
 function FarmerDashboardPage() {
-  useAuth()
+  const { logout } = useAuth()
   const [activeSection, setActiveSection] = useState<Section>(
     (sessionStorage.getItem('dashboardSection') as Section) ?? 'farm-info'
   )
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [farm, setFarm] = useState<Farm | null>(null)
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [horsesError, setHorsesError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<FarmUpdate>({})
   const [saving, setSaving] = useState(false)
@@ -28,12 +32,51 @@ function FarmerDashboardPage() {
   const [horses, setHorses] = useState<Horse[]>([])
   const navigate = useNavigate()
 
+  // Change password form
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwError, setPwError] = useState<string | null>(null)
+  const [pwSuccess, setPwSuccess] = useState(false)
+
+  // Delete account
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  function loadFarm(token: string) {
+    getMyFarm(token)
+      .then(setFarm)
+      .catch(err => setLoadError(err instanceof Error ? err.message : 'Failed to load your farm.'))
+      .finally(() => setLoading(false))
+  }
+
+  function loadHorses(token: string) {
+    getMyHorses(token)
+      .then(setHorses)
+      .catch(err => setHorsesError(err instanceof Error ? err.message : 'Failed to load your horses.'))
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token) return
-    getMyFarm(token).then(setFarm).catch(console.error)
-    getMyHorses(token).then(setHorses).catch(console.error)
+    loadFarm(token)
+    loadHorses(token)
   }, [])
+
+  function handleRetryFarm() {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setLoading(true)
+    setLoadError(null)
+    loadFarm(token)
+  }
+
+  function handleRetryHorses() {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setHorsesError(null)
+    loadHorses(token)
+  }
 
   const profileComplete = farm ? isFarmComplete(farm) : false
 
@@ -55,9 +98,17 @@ function FarmerDashboardPage() {
     setSaving(true)
     setSaveError(null)
     try {
-      const payload = Object.fromEntries(
-        Object.entries(formData).filter(([k, v]) => v !== farm![k as keyof Farm])
-      ) as FarmUpdate
+      // Only send fields the user actually changed. Treat '' / undefined / null
+      // as the same "empty" on both sides so untouched empty fields aren't sent,
+      // and send an explicit null (not '' or 0) when clearing a field.
+      const payload: FarmUpdate = {}
+      if (formData.name && formData.name !== farm!.name) payload.name = formData.name
+      if ((formData.location ?? '') !== (farm!.location ?? ''))
+        payload.location = formData.location || null
+      if ((formData.description ?? '') !== (farm!.description ?? ''))
+        payload.description = formData.description || null
+      if ((formData.capacity ?? null) !== (farm!.capacity ?? null))
+        payload.capacity = formData.capacity || null
       const updated = await updateMyFarm(token, payload)
       setFarm(updated)
       setIsEditing(false)
@@ -72,6 +123,46 @@ function FarmerDashboardPage() {
     if (key === 'horse-management' && !profileComplete) return
     sessionStorage.setItem('dashboardSection', key)
     setActiveSection(key)
+  }
+
+  async function handleChangePassword() {
+    setPwError(null)
+    setPwSuccess(false)
+    if (pwForm.next.length < 8) {
+      setPwError('New password must be at least 8 characters.')
+      return
+    }
+    if (pwForm.next !== pwForm.confirm) {
+      setPwError('New password and confirmation do not match.')
+      return
+    }
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setPwSaving(true)
+    try {
+      await changePassword(token, pwForm.current, pwForm.next)
+      setPwForm({ current: '', next: '', confirm: '' })
+      setPwSuccess(true)
+    } catch (err) {
+      setPwError(err instanceof Error ? err.message : 'Failed to change password')
+    } finally {
+      setPwSaving(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await deleteAccount(token)
+      logout()
+      navigate('/')
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete account')
+      setDeleting(false)
+    }
   }
 
   return (
@@ -113,6 +204,23 @@ function FarmerDashboardPage() {
       </aside>
 
       <main className="flex-1 p-8">
+        {loading ? (
+          <p className="text-brand-muted text-sm">Loading…</p>
+        ) : loadError ? (
+          <div className="flex flex-col items-start gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+              <p>{loadError}</p>
+            </div>
+            <button
+              onClick={handleRetryFarm}
+              className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+        <>
         {!profileComplete && (
           <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/40 text-yellow-400 rounded-lg px-4 py-3 mb-6 text-sm font-medium">
             <AlertTriangle size={18} className="mt-0.5 shrink-0" />
@@ -153,7 +261,7 @@ function FarmerDashboardPage() {
                         min={1}
                         className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
                         value={formData.capacity ?? ''}
-                        onChange={e => setFormData(p => ({ ...p, capacity: Number(e.target.value) }))}
+                        onChange={e => setFormData(p => ({ ...p, capacity: e.target.value === '' ? undefined : Number(e.target.value) }))}
                       />
                     </div>
                     <div className="flex flex-col gap-1">
@@ -223,15 +331,119 @@ function FarmerDashboardPage() {
                 <Plus size={16} /> Add Horse
               </button>
             </div>
-            <HorseTable horses={horses} onChange={setHorses} />
+            {horsesError ? (
+              <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle size={18} className="shrink-0" />
+                  <p>{horsesError}</p>
+                </div>
+                <button
+                  onClick={handleRetryHorses}
+                  className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm shrink-0"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <HorseTable horses={horses} onChange={setHorses} />
+            )}
           </div>
         )}
 
         {activeSection === 'settings' && (
-          <div>
+          <div className="max-w-3xl">
             <h2 className="text-2xl font-bold text-brand-gold mb-6">Settings</h2>
-            <p className="text-brand-muted">Change password and delete account will go here.</p>
+
+            <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4 mb-6">
+              <h3 className="text-lg font-bold text-brand-text flex items-center gap-2">
+                <Lock size={18} /> Change Password
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1 sm:col-span-2">
+                  <label className="text-xs font-bold text-brand-muted uppercase">Current Password</label>
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
+                    value={pwForm.current}
+                    onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-muted uppercase">New Password</label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
+                    value={pwForm.next}
+                    onChange={e => setPwForm(p => ({ ...p, next: e.target.value }))}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-brand-muted uppercase">Confirm New Password</label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
+                    value={pwForm.confirm}
+                    onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))}
+                  />
+                </div>
+              </div>
+              {pwError && <p className="text-red-400 text-sm">{pwError}</p>}
+              {pwSuccess && <p className="text-green-400 text-sm">Password changed successfully.</p>}
+              <button
+                onClick={handleChangePassword}
+                disabled={pwSaving || !pwForm.current || !pwForm.next || !pwForm.confirm}
+                className="self-start bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
+              >
+                {pwSaving ? 'Saving...' : 'Update Password'}
+              </button>
+            </div>
+
+            <div className="bg-brand-surface border border-red-500/40 rounded-lg p-6 flex flex-col gap-4">
+              <h3 className="text-lg font-bold text-red-400 flex items-center gap-2">
+                <AlertTriangle size={18} /> Delete Account
+              </h3>
+              <p className="text-brand-muted text-sm">
+                Permanently delete your account, your farm, and all associated horses. This action
+                cannot be undone.
+              </p>
+              {deleteError && <p className="text-red-400 text-sm">{deleteError}</p>}
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => { setDeleteError(null); setShowDeleteConfirm(true) }}
+                  className="self-start bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
+                >
+                  Delete Account
+                </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-brand-text text-sm font-bold">
+                    Are you absolutely sure? This cannot be undone.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting}
+                      className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm disabled:opacity-50"
+                    >
+                      {deleting ? 'Deleting...' : 'Yes, delete my account'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={deleting}
+                      className="flex items-center gap-1 text-brand-muted hover:text-brand-text text-sm font-bold px-4 py-2 rounded-lg border border-brand-border transition"
+                    >
+                      <X size={14} /> Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+        )}
+        </>
         )}
       </main>
     </div>
