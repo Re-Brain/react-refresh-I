@@ -166,7 +166,7 @@ function AddHorsePage() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-8">
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="text-red-400">*</span> <span className="normal-case font-normal">({images.length}/3)</span></p>
+            <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="text-red-600">*</span> <span className="normal-case font-normal">({images.length}/3)</span></p>
             {images.length < 3 && (
               <>
                 <button
@@ -238,14 +238,14 @@ function AddHorsePage() {
             </div>
           )}
 
-          {imageError && <p className="text-red-400 text-sm normal-case">{imageError}</p>}
+          {imageError && <p className="text-red-600 text-sm normal-case">{imageError}</p>}
         </div>
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-brand-muted">Name <span className="text-red-400">*</span></label>
+              <label className="text-xs text-brand-muted">Name <span className="text-red-600">*</span></label>
               <input
                 maxLength={NAME_MAX}
                 className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -254,7 +254,7 @@ function AddHorsePage() {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-brand-muted">Color <span className="text-red-400">*</span></label>
+              <label className="text-xs text-brand-muted">Color <span className="text-red-600">*</span></label>
               <input
                 maxLength={COLOR_MAX}
                 className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -263,7 +263,7 @@ function AddHorsePage() {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-brand-muted">Date of Birth <span className="text-red-400">*</span></label>
+              <label className="text-xs text-brand-muted">Date of Birth <span className="text-red-600">*</span></label>
               <input
                 type="date"
                 className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -272,7 +272,7 @@ function AddHorsePage() {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-brand-muted">Gender <span className="text-red-400">*</span></label>
+              <label className="text-xs text-brand-muted">Gender <span className="text-red-600">*</span></label>
               <select
                 className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
                 value={form.gender ?? ''}
@@ -294,7 +294,7 @@ function AddHorsePage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {PEDIGREE_FIELDS.map(({ key, label }) => (
               <div key={key} className="flex flex-col gap-1">
-                <label className="text-xs text-brand-muted">{label} <span className="text-red-400">*</span></label>
+                <label className="text-xs text-brand-muted">{label} <span className="text-red-600">*</span></label>
                 <input
                   maxLength={NAME_MAX}
                   className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -307,7 +307,7 @@ function AddHorsePage() {
         </div>
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-          <p className="text-xs font-bold text-brand-muted uppercase">Race Records <span className="text-red-400">*</span></p>
+          <p className="text-xs font-bold text-brand-muted uppercase">Race Records <span className="text-red-600">*</span></p>
           <p className="text-[12px] text-brand-muted normal-case">At least one race record is required. Fill in a row and click Add. Grade and FP are optional.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse uppercase">
@@ -337,7 +337,7 @@ function AddHorsePage() {
                     <td className="px-2 py-1.5"><span className="text-brand-muted">{r.distance}M</span></td>
                     <td className="px-2 py-1.5">
                       <button type="button" onClick={() => setRecords(prev => prev.filter((_, j) => j !== i))}
-                        className="text-brand-muted hover:text-red-400 transition" title="Remove record">
+                        className="text-brand-muted hover:text-red-700 transition" title="Remove record">
                         <Trash2 size={13} />
                       </button>
                     </td>
@@ -357,10 +357,10 @@ function AddHorsePage() {
               </tbody>
             </table>
           </div>
-          {recordError && <p className="text-red-400 text-sm normal-case">{recordError}</p>}
+          {recordError && <p className="text-red-600 text-sm normal-case">{recordError}</p>}
         </div>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-red-600 text-sm">{error}</p>}
 
         <div className="flex gap-3">
           <button

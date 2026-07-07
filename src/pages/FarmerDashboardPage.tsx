@@ -207,14 +207,14 @@ function FarmerDashboardPage() {
         {loading ? (
           <p className="text-brand-muted text-sm">Loading…</p>
         ) : loadError ? (
-          <div className="flex flex-col items-start gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+          <div className="flex flex-col items-start gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
             <div className="flex items-start gap-3">
               <AlertTriangle size={18} className="mt-0.5 shrink-0" />
               <p>{loadError}</p>
             </div>
             <button
               onClick={handleRetryFarm}
-              className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
+              className="bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
             >
               Retry
             </button>
@@ -272,7 +272,7 @@ function FarmerDashboardPage() {
                         onChange={e => setFormData(p => ({ ...p, location: e.target.value }))}
                       />
                     </div>
-                    {saveError && <p className="text-red-400 text-sm">{saveError}</p>}
+                    {saveError && <p className="text-red-600 text-sm">{saveError}</p>}
                     <div className="flex gap-3">
                       <button
                         onClick={handleSave}
@@ -332,14 +332,14 @@ function FarmerDashboardPage() {
               </button>
             </div>
             {horsesError ? (
-              <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm font-medium">
+              <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
                 <div className="flex items-center gap-3">
                   <AlertTriangle size={18} className="shrink-0" />
                   <p>{horsesError}</p>
                 </div>
                 <button
                   onClick={handleRetryHorses}
-                  className="bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm shrink-0"
+                  className="bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm shrink-0"
                 >
                   Retry
                 </button>
@@ -390,7 +390,7 @@ function FarmerDashboardPage() {
                   />
                 </div>
               </div>
-              {pwError && <p className="text-red-400 text-sm">{pwError}</p>}
+              {pwError && <p className="text-red-600 text-sm">{pwError}</p>}
               {pwSuccess && <p className="text-green-400 text-sm">Password changed successfully.</p>}
               <button
                 onClick={handleChangePassword}
@@ -402,18 +402,18 @@ function FarmerDashboardPage() {
             </div>
 
             <div className="bg-brand-surface border border-red-500/40 rounded-lg p-6 flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-red-400 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-red-600 flex items-center gap-2">
                 <AlertTriangle size={18} /> Delete Account
               </h3>
               <p className="text-brand-muted text-sm">
                 Permanently delete your account, your farm, and all associated horses. This action
                 cannot be undone.
               </p>
-              {deleteError && <p className="text-red-400 text-sm">{deleteError}</p>}
+              {deleteError && <p className="text-red-600 text-sm">{deleteError}</p>}
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => { setDeleteError(null); setShowDeleteConfirm(true) }}
-                  className="self-start bg-red-500/10 text-red-400 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
+                  className="self-start bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm"
                 >
                   Delete Account
                 </button>

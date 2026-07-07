@@ -50,7 +50,7 @@ function FarmDetailPage() {
         )}
 
         {state.status === 'error' && (
-          <p className="text-red-400 text-sm mt-8">
+          <p className="text-red-600 text-sm mt-8">
             Failed to load this farm. Please try again later.
           </p>
         )}
@@ -91,7 +91,7 @@ function FarmDetailPage() {
               <h2 className="text-xl font-bold text-brand-gold mb-4">Horses</h2>
 
               {horsesError ? (
-                <p className="text-red-400 text-sm">Failed to load horses.</p>
+                <p className="text-red-600 text-sm">Failed to load horses.</p>
               ) : horses.length === 0 ? (
                 <p className="text-brand-muted text-sm">
                   No horses listed for this farm yet.

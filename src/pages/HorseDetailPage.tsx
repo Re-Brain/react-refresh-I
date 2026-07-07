@@ -242,7 +242,7 @@ function HorseDetailPage() {
   }
 
   if (loading) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-muted">Loading...</div>
-  if (!horse) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-400">{error ?? 'Horse not found'}</div>
+  if (!horse) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">{error ?? 'Horse not found'}</div>
 
   const imageCount = horse.images.length
   // Clamp during render: after deleting the active (e.g. last) image, activeImageIndex can
@@ -415,7 +415,7 @@ function HorseDetailPage() {
             </div>
           )}
 
-          {imageError && <p className="text-red-400 text-sm">{imageError}</p>}
+          {imageError && <p className="text-red-600 text-sm">{imageError}</p>}
         </div>
 
         {/* Basic Info + Pedigree */}
@@ -502,7 +502,7 @@ function HorseDetailPage() {
             <table className="w-full text-sm border-collapse">
               <tbody>
                 <tr>
-                  <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-300 px-3 w-16 align-middle">
+                  <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle">
                     Sire
                   </td>
                   <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
@@ -518,7 +518,7 @@ function HorseDetailPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-300 px-3 w-16 align-middle">
+                  <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle">
                     Dam
                   </td>
                   <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
@@ -539,7 +539,7 @@ function HorseDetailPage() {
 
           {isEditing && (
             <div className="flex flex-col gap-3">
-              {error && <p className="text-red-400 text-sm">{error}</p>}
+              {error && <p className="text-red-600 text-sm">{error}</p>}
               <div className="flex gap-3">
                 <button
                   onClick={handleSave}
@@ -639,7 +639,7 @@ function HorseDetailPage() {
                                   <div className="flex items-center gap-2">
                                     <span className="text-brand-muted text-[10px] normal-case">Delete?</span>
                                     <button type="button" onClick={() => handleDeleteRecord(r.id)} disabled={savingRecord}
-                                      className="text-xs font-bold text-red-400 hover:text-red-300 disabled:opacity-50">
+                                      className="text-xs font-bold text-red-600 hover:text-red-700 disabled:opacity-50">
                                       {savingRecord ? '...' : 'Yes'}
                                     </button>
                                     <button type="button" onClick={() => setDeleteRecordConfirmId(null)}
@@ -655,7 +655,7 @@ function HorseDetailPage() {
                                     </button>
                                     <button type="button" onClick={() => setDeleteRecordConfirmId(r.id)}
                                       disabled={editingRecordId !== null}
-                                      className="text-brand-muted hover:text-red-400 transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
+                                      className="text-brand-muted hover:text-red-700 transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-brand-muted"
                                       title="Delete record">
                                       <Trash2 size={13} />
                                     </button>
@@ -698,7 +698,7 @@ function HorseDetailPage() {
               </table>
             </div>
 
-            {recordError && <p className="text-red-400 text-sm normal-case">{recordError}</p>}
+            {recordError && <p className="text-red-600 text-sm normal-case">{recordError}</p>}
 
             {isEditingRaces && (
               <button type="button" onClick={handleAddRecord} disabled={editingRecordId !== null}

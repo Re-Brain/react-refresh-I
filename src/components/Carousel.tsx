@@ -150,7 +150,7 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
       onDragStart={e => e.preventDefault()}
       onPointerEnter={() => { hovering.current = true }}
       onPointerLeave={() => { hovering.current = false }}
-      className="flex gap-3 overflow-x-auto pb-2 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex gap-3 overflow-x-auto py-2 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <div ref={track1Ref} className="flex gap-3 shrink-0">
         {children}

@@ -25,11 +25,11 @@ function FinishPos({ pos }: { pos: number | null }) {
   if (pos == null) return <span className="text-brand-muted">—</span>
   const color =
     pos === 1
-      ? 'text-brand-gold font-bold'
+      ? 'text-amber-600 font-bold'
       : pos === 2
-        ? 'text-slate-300 font-bold'
+        ? 'text-slate-500 font-bold'
         : pos === 3
-          ? 'text-amber-600 font-bold'
+          ? 'text-orange-800 font-bold'
           : 'text-brand-muted'
   return <span className={color}>{pos}</span>
 }
@@ -68,7 +68,7 @@ function HorsePublicPage() {
 
   if (error || !horse)
     return (
-      <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-400">
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">
         {error ?? 'Horse not found'}
       </div>
     )
@@ -173,7 +173,7 @@ function HorsePublicPage() {
                 <tr>
                   <td
                     rowSpan={2}
-                    className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-300 px-3 w-16 align-middle"
+                    className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle"
                   >
                     Sire
                   </td>
@@ -195,7 +195,7 @@ function HorsePublicPage() {
                 <tr>
                   <td
                     rowSpan={2}
-                    className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-300 px-3 w-16 align-middle"
+                    className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle"
                   >
                     Dam
                   </td>

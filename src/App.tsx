@@ -1,7 +1,7 @@
-import { Routes, Route, Link } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import Lenis from 'lenis'
 import HomePage from './pages/HomePage.tsx'
-import LocalHorsesPage from './pages/LocalHorsesPage.tsx'
-import ApiHorsesPage from './pages/ApiHorsesPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
@@ -18,14 +18,48 @@ import { useAuth } from './context/useAuth'
 
 function App() {
   const { user, logout } = useAuth()
+  const lenisRef = useRef<Lenis | null>(null)
+  const { pathname } = useLocation()
+
+  // Smooth inertia scrolling: the page eases toward the target instead of
+  // snapping, giving that gentle "glide" feel. Disabled for users who ask
+  // for reduced motion.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const lenis = new Lenis({
+      lerp: 0.08, // lower = more glide/delay; higher = snappier
+      wheelMultiplier: 1,
+    })
+    lenisRef.current = lenis
+
+    let rafId = requestAnimationFrame(function raf(time) {
+      lenis.raf(time)
+      rafId = requestAnimationFrame(raf)
+    })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis.destroy()
+      lenisRef.current = null
+    }
+  }, [])
+
+  // Reset scroll to the top on every route change (React Router keeps the old
+  // position by default). Go through Lenis so it doesn't fight the smooth scroll.
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true })
+    } else {
+      window.scrollTo(0, 0)
+    }
+  }, [pathname])
 
   return (
     <>
       <nav className="bg-brand-surface text-brand-text flex items-center justify-between gap-6 px-8 py-3 text-sm font-bold border-b border-brand-border">
         <div className="flex items-center gap-3">
           <Link to="/" className="hover:text-brand-gold transition">Home</Link>
-          <Link to="/local-data" className="hover:text-brand-gold transition">Local Data</Link>
-          <Link to="/api/horses" className="hover:text-brand-gold transition">API Horses</Link>
         </div>
         <div className="flex items-center gap-3">
           {user ? (
@@ -49,8 +83,6 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/farms/:id" element={<FarmDetailPage />} />
-        <Route path="/local-data" element={<LocalHorsesPage />} />
-        <Route path="/api/horses" element={<ApiHorsesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/visitor" element={<RegisterVisitorPage />} />

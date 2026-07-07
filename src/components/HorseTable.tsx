@@ -67,7 +67,7 @@ function HorseTable({ horses, onChange }: Props) {
                         <button
                           onClick={() => handleDelete(horse.id)}
                           disabled={deleting}
-                          className="text-xs font-bold text-red-400 hover:text-red-300 disabled:opacity-50"
+                          className="text-xs font-bold text-red-600 hover:text-red-700 disabled:opacity-50"
                         >
                           {deleting ? 'Deleting...' : 'Yes'}
                         </button>
@@ -89,7 +89,7 @@ function HorseTable({ horses, onChange }: Props) {
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(horse.id)}
-                          className="text-brand-muted hover:text-red-400 transition"
+                          className="text-brand-muted hover:text-red-700 transition"
                           title="Delete"
                         >
                           <Trash2 size={16} />
@@ -103,7 +103,7 @@ function HorseTable({ horses, onChange }: Props) {
           </tbody>
         </table>
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
     </div>
   )
 }
