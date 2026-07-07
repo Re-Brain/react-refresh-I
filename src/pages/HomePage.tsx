@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getActiveFarms, type ActiveFarm } from '../api/farm'
 import { getAllHorses, type Horse } from '../api/horse'
 import OverlayCard from '../components/OverlayCard'
+import Carousel from '../components/Carousel'
 
 function HomePage() {
   const [farms, setFarms] = useState<ActiveFarm[]>([])
@@ -32,16 +33,17 @@ function HomePage() {
         {!loading && !farmsError && farms.length === 0 && (
           <p className="text-brand-muted text-sm">No active farms yet.</p>
         )}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <Carousel>
           {farms.map(farm => (
-            <OverlayCard
-              key={farm.id}
-              to={`/farms/${farm.id}`}
-              imageUrl={`https://picsum.photos/seed/farm-${farm.id}/600/600`}
-              title={farm.name}
-            />
+            <div key={farm.id} className="flex-none w-40 sm:w-48">
+              <OverlayCard
+                to={`/farms/${farm.id}`}
+                imageUrl={`https://picsum.photos/seed/farm-${farm.id}/600/600`}
+                title={farm.name}
+              />
+            </div>
           ))}
-        </div>
+        </Carousel>
 
         <h1 className="text-3xl font-bold text-brand-gold mb-2 mt-12">Horses</h1>
         <p className="text-brand-muted text-sm mb-8">Browse all available horses</p>
@@ -50,19 +52,20 @@ function HomePage() {
         {!loading && !horsesError && horses.length === 0 && (
           <p className="text-brand-muted text-sm">No horses listed yet.</p>
         )}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <Carousel direction="right">
           {horses.map(horse => (
-            <OverlayCard
-              key={horse.id}
-              to={`/horses/${horse.id}`}
-              imageUrl={
-                horse.images[0]?.image_url ??
-                `https://picsum.photos/seed/horse-${horse.id}/600/600`
-              }
-              title={horse.name}
-            />
+            <div key={horse.id} className="flex-none w-40 sm:w-48">
+              <OverlayCard
+                to={`/horses/${horse.id}`}
+                imageUrl={
+                  horse.images[0]?.image_url ??
+                  `https://picsum.photos/seed/horse-${horse.id}/600/600`
+                }
+                title={horse.name}
+              />
+            </div>
           ))}
-        </div>
+        </Carousel>
       </div>
     </div>
   )

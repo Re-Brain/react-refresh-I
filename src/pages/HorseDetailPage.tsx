@@ -9,8 +9,8 @@ const PEDIGREE_FIELDS: { key: keyof HorseUpdate; label: string }[] = [
   { key: 'sire', label: "Sire" },
   { key: 'dam', label: "Dam" },
   { key: 'sires_sire', label: "Sire's Sire" },
-  { key: 'sires_dam', label: "Sire's Dam" },
   { key: 'dams_sire', label: "Dam's Sire" },
+  { key: 'sires_dam', label: "Sire's Dam" },
   { key: 'dams_dam', label: "Dam's Dam" },
 ]
 
@@ -60,8 +60,8 @@ function HorseDetailPage() {
       sire: horse.sire ?? '',
       dam: horse.dam ?? '',
       sires_sire: horse.sires_sire ?? '',
-      sires_dam: horse.sires_dam ?? '',
       dams_sire: horse.dams_sire ?? '',
+      sires_dam: horse.sires_dam ?? '',
       dams_dam: horse.dams_dam ?? '',
     })
     setError(null)

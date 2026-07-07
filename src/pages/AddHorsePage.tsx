@@ -9,8 +9,8 @@ const PEDIGREE_FIELDS: { key: keyof HorseForm; label: string }[] = [
   { key: 'sire', label: "Sire" },
   { key: 'dam', label: "Dam" },
   { key: 'sires_sire', label: "Sire's Sire" },
-  { key: 'sires_dam', label: "Sire's Dam" },
   { key: 'dams_sire', label: "Dam's Sire" },
+  { key: 'sires_dam', label: "Sire's Dam" },
   { key: 'dams_dam', label: "Dam's Dam" },
 ]
 
@@ -132,8 +132,8 @@ function AddHorsePage() {
         sire: (form.sire ?? '').trim(),
         dam: (form.dam ?? '').trim(),
         sires_sire: (form.sires_sire ?? '').trim(),
-        sires_dam: (form.sires_dam ?? '').trim(),
         dams_sire: (form.dams_sire ?? '').trim(),
+        sires_dam: (form.sires_dam ?? '').trim(),
         dams_dam: (form.dams_dam ?? '').trim(),
         race_records: [],
       })
