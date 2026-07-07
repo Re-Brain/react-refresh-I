@@ -63,7 +63,7 @@ function HomePage() {
           ))}
         </Carousel>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8 mt-12 text-right">Retired Race Horses to Visit</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8 mt-12 text-right">Retired Race Horses to Meet</h1>
 
         {horsesError && <p className="text-red-600 text-sm">{horsesError}</p>}
         {!loading && !horsesError && horses.length === 0 && (
