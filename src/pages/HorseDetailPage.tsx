@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Pencil, X, Upload, Trash2, ChevronLeft, ChevronRight, MoveLeft, MoveRight, Loader2, Plus } from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { ArrowLeft, Pencil, X, Upload, Trash2, ChevronLeft, ChevronRight, MoveLeft, MoveRight, Loader2, Plus, Eye } from 'lucide-react'
 import { getHorse, updateHorse, uploadHorseImage, deleteHorseImage, reorderHorseImages, updateRaceRecord, createRaceRecord, deleteRaceRecord, type Horse, type HorseUpdate, type RaceRecord, type RaceRecordCreate, type RaceRecordUpdate } from '../api/horse'
 import { GradeBadge, FinishPos, RecordInputCells, recordFormIsValid } from '../components/raceRecordFields'
 import { NAME_MAX, COLOR_MAX, validateName, validateColor, validateDob } from '../horseValidation'
@@ -271,8 +271,15 @@ function HorseDetailPage() {
         <ArrowLeft size={16} /> Back to Horse Management
       </button>
 
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-brand-gold">{horse.name}</h1>
+        <Link
+          to={`/horses/${horse.id}`}
+          className="flex items-center gap-2 text-xs font-bold bg-brand-gold text-brand-bg px-4 py-2 rounded-lg hover:bg-brand-gold-light transition whitespace-nowrap"
+          title="See the public visitor page (use Back to return)"
+        >
+          <Eye size={14} /> Preview public page
+        </Link>
       </div>
 
       <div className="flex flex-col gap-6">
