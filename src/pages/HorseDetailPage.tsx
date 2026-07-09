@@ -54,6 +54,7 @@ function HorseDetailPage() {
     if (!horse) return
     setFormData({
       name: horse.name,
+      story: horse.story ?? '',
       date_of_birth: horse.date_of_birth ?? '',
       color: horse.color ?? '',
       gender: horse.gender ?? undefined,
@@ -488,6 +489,21 @@ function HorseDetailPage() {
                 </div>
               ))}
             </div>
+          )}
+
+          <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">Story</p>
+          {isEditing ? (
+            <textarea
+              rows={6}
+              placeholder="Tell this horse's life story..."
+              className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm leading-relaxed focus:outline-none focus:border-brand-gold resize-y"
+              value={formData.story ?? ''}
+              onChange={e => setFormData(p => ({ ...p, story: e.target.value }))}
+            />
+          ) : horse.story ? (
+            <p className="text-sm text-brand-text leading-relaxed whitespace-pre-wrap">{horse.story}</p>
+          ) : (
+            <p className="text-sm text-brand-muted italic">No story yet.</p>
           )}
 
           <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">Pedigree</p>

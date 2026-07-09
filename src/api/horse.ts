@@ -25,6 +25,7 @@ export type RaceRecordCreate = Omit<RaceRecord, 'id' | 'horse_id' | 'grade'> & {
 export type Horse = {
   id: number
   name: string
+  story: string | null
   date_of_birth: string | null
   color: string | null
   gender: 'colt' | 'stallion' | 'gelding' | 'filly' | 'mare' | null

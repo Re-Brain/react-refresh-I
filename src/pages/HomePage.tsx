@@ -36,10 +36,10 @@ function HomePage() {
         <div className="absolute inset-0 bg-linear-to-t from-[#0f2a1f]/85 via-[#1f4d3a]/45 to-[#1f4d3a]/25" />
         <div className="relative z-10 px-6 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg max-w-4xl mx-auto">
-            Top Horse Retirement Visit Booking System
+            Where Champions Come to Rest
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-white/90 drop-shadow">
-            Meet retired racehorses. Book your farm visit today.
+            Meet the racehorses who once ruled the track — and book a visit to their farm.
           </p>
         </div>
       </section>

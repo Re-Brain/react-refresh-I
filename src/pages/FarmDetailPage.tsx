@@ -36,7 +36,7 @@ function FarmDetailPage() {
       : ''
 
   return (
-    <div className="bg-brand-bg text-brand-text">
+    <div className="bg-brand-bg text-brand-text overflow-x-hidden">
       {state.status === 'loading' && (
         <div className="min-h-[calc(100vh-3.25rem)] flex items-center justify-center text-brand-muted text-sm">
           Loading...
@@ -72,7 +72,7 @@ function FarmDetailPage() {
           <section className="relative grid lg:grid-cols-[1fr_1.4fr] min-h-[calc(100vh-3.25rem)]">
             <Link
               to="/"
-              className="absolute top-5 left-5 z-20 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition"
+              className="fixed top-20 left-2 z-40 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition"
             >
               <ArrowLeft size={16} /> Back
             </Link>
@@ -125,17 +125,49 @@ function FarmDetailPage() {
           <div className="max-w-6xl mx-auto px-8 py-10 flex flex-col gap-12">
             {state.farm.description && (
               <section className="flex flex-col gap-6">
-                <h2 className="text-2xl lg:text-3xl font-extrabold tracking-wide text-brand-gold text-center uppercase">
+                <h2
+                  style={{ fontFamily: 'var(--font-story-title)' }}
+                  className="text-3xl lg:text-4xl font-semibold tracking-wide text-brand-gold text-left"
+                >
                   Our Story
                 </h2>
-                <p className="text-brand-text/90 leading-relaxed max-w-3xl mx-auto text-center">
+                <p
+                  style={{ fontFamily: 'var(--font-story-body)' }}
+                  className="text-brand-text text-lg lg:text-xl leading-relaxed whitespace-pre-wrap text-left first-letter:float-left first-letter:text-5xl lg:first-letter:text-6xl first-letter:font-semibold first-letter:text-brand-gold first-letter:mr-2 first-letter:leading-none"
+                >
                   {state.farm.description}
                 </p>
               </section>
             )}
 
+            {state.farm.location && (
+              <section className="relative left-1/2 right-1/2 mx-[-50vw] w-screen bg-brand-gold py-16 lg:py-20">
+                <div className="max-w-6xl mx-auto px-8 flex flex-col gap-6">
+                  <h2
+                    style={{ fontFamily: 'var(--font-story-title)' }}
+                    className="text-3xl lg:text-4xl font-semibold tracking-wide text-white text-right"
+                  >
+                    Find Us
+                  </h2>
+                  <div className="overflow-hidden rounded-xl border-4 border-brand-border shadow-xl">
+                    <iframe
+                      title={`Map showing ${state.farm.name}`}
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(state.farm.location)}&output=embed`}
+                      className="w-full h-80 lg:h-96 border-0"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+
             <section className="flex flex-col gap-6">
-              <h2 className="text-2xl lg:text-3xl font-extrabold tracking-wide text-brand-gold text-center uppercase">
+              <h2
+                style={{ fontFamily: 'var(--font-story-title)' }}
+                className="text-3xl lg:text-4xl font-semibold tracking-wide text-brand-gold text-left"
+              >
                 Our Residents
               </h2>
 

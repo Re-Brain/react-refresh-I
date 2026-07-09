@@ -18,6 +18,7 @@ type HorseForm = Omit<HorseCreate, 'race_records'>
 
 const empty: HorseForm = {
   name: '',
+  story: '',
   date_of_birth: '',
   color: '',
   gender: null,
@@ -128,6 +129,7 @@ function AddHorsePage() {
       const horse = await createHorse(token, {
         ...form,
         name: form.name.trim(),
+        story: (form.story ?? '').trim(),
         color: (form.color ?? '').trim(),
         sire: (form.sire ?? '').trim(),
         dam: (form.dam ?? '').trim(),
@@ -287,6 +289,18 @@ function AddHorsePage() {
               </select>
             </div>
           </div>
+        </div>
+
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+          <p className="text-xs font-bold text-brand-muted uppercase">Story</p>
+          <p className="text-[12px] text-brand-muted normal-case">Optional. Share this horse's life story — it appears on the public page.</p>
+          <textarea
+            rows={6}
+            placeholder="Tell this horse's life story..."
+            className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm leading-relaxed focus:outline-none focus:border-brand-gold resize-y"
+            value={form.story ?? ''}
+            onChange={e => setForm(p => ({ ...p, story: e.target.value }))}
+          />
         </div>
 
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
