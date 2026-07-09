@@ -26,7 +26,7 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text flex items-center justify-center">
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
       <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-brand-gold mb-6 text-center">Login</h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>

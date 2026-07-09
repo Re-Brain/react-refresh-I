@@ -4,7 +4,7 @@ function RegisterPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text flex items-center justify-center">
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
       <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-brand-gold mb-2 text-center">Create Account</h1>
         <p className="text-brand-muted text-center mb-8">Who are you registering as?</p>
