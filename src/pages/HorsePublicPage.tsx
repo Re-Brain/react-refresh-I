@@ -173,7 +173,7 @@ function HorsePublicPage() {
               type="button"
               className="mt-2 bg-white text-brand-gold text-sm font-bold uppercase tracking-[0.2em] px-12 py-3.5 rounded-full shadow-md hover:bg-brand-bg hover:scale-[1.03] transition"
             >
-              Book a Visit
+              Book
             </button>
 
             {/* Image carousel — click a thumbnail to change the main photo. */}
@@ -312,7 +312,7 @@ function HorsePublicPage() {
               type="button"
               className="bg-brand-gold text-white text-sm font-bold uppercase tracking-[0.2em] px-12 py-3.5 rounded-full shadow-md hover:bg-brand-gold-light hover:scale-[1.03] transition"
             >
-              Book a Visit
+              Book
             </button>
           </div>
         </div>
