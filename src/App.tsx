@@ -13,6 +13,8 @@ import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
 import AddHorsePage from './pages/AddHorsePage.tsx'
 import HorseDetailPage from './pages/HorseDetailPage.tsx'
 import HorsePublicPage from './pages/HorsePublicPage.tsx'
+import HorsesListPage from './pages/HorsesListPage.tsx'
+import FarmsListPage from './pages/FarmsListPage.tsx'
 import FarmDetailPage from './pages/FarmDetailPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
@@ -142,6 +144,8 @@ function App() {
       >
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-16 gap-y-4 px-8 pt-28 pb-16 md:grid-cols-2">
           <MenuItem to="/">Home</MenuItem>
+          <MenuItem to="/horses">Champions</MenuItem>
+          <MenuItem to="/farms">Farms</MenuItem>
           {user ? (
             <>
               <MenuItem to="/dashboard">Dashboard</MenuItem>
@@ -164,6 +168,8 @@ function App() {
       </div>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/horses" element={<HorsesListPage />} />
+        <Route path="/farms" element={<FarmsListPage />} />
         <Route path="/farms/:id" element={<FarmDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

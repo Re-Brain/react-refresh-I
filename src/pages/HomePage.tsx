@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getActiveFarms, type ActiveFarm } from '../api/farm'
 import { getAllHorses, type Horse } from '../api/horse'
+import { Link } from 'react-router-dom'
 import OverlayCard from '../components/OverlayCard'
 import Carousel from '../components/Carousel'
 
@@ -44,7 +45,10 @@ function HomePage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-8 py-10">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">Farms Open to Visitors</h1>
+        <div className="flex items-baseline justify-between mb-8">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold">Farms Open to Visitors</h1>
+          <Link to="/farms" className="text-xs sm:text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-4 py-1.5 hover:bg-brand-gold hover:text-brand-bg transition shrink-0">Browse all farms</Link>
+        </div>
 
         {loading && <p className="text-brand-muted text-sm">Loading...</p>}
         {farmsError && <p className="text-red-600 text-sm">{farmsError}</p>}
@@ -52,7 +56,7 @@ function HomePage() {
           <p className="text-brand-muted text-sm">No active farms yet.</p>
         )}
         <Carousel>
-          {farms.map(farm => (
+          {farms.slice(0, 12).map(farm => (
             <div key={farm.id} className="flex-none w-40 sm:w-48">
               <OverlayCard
                 to={`/farms/${farm.id}`}
@@ -63,14 +67,17 @@ function HomePage() {
           ))}
         </Carousel>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8 mt-12 text-right">Champions in Retirement</h1>
+        <div className="flex items-baseline justify-between mb-8 mt-12">
+          <Link to="/horses" className="text-xs sm:text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-4 py-1.5 hover:bg-brand-gold hover:text-brand-bg transition shrink-0">Meet every champion</Link>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold">Champions in Retirement</h1>
+        </div>
 
         {horsesError && <p className="text-red-600 text-sm">{horsesError}</p>}
         {!loading && !horsesError && horses.length === 0 && (
           <p className="text-brand-muted text-sm">No horses listed yet.</p>
         )}
         <Carousel direction="right">
-          {horses.map(horse => (
+          {horses.slice(0, 12).map(horse => (
             <div key={horse.id} className="flex-none w-40 sm:w-48">
               <OverlayCard
                 to={`/horses/${horse.id}`}
