@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { getHorsePublic, type Horse, type RaceRecord } from '../api/horse'
+
+// Placeholder images (Picsum) are served at whatever size the URL requests.
+// The full-page hero is large, so ask for a high-res version to keep it crisp
+// on hi-DPI/retina screens. Real uploaded image URLs are returned unchanged.
+function hiRes(url: string): string {
+  return url.replace(
+    /(picsum\.photos\/(?:seed\/[^/]+\/)?)\d+\/\d+/,
+    '$11600/1600',
+  )
+}
 
 const GRADE_COLORS: Record<string, string> = {
   G1: 'bg-red-500',
@@ -73,164 +83,189 @@ function HorsePublicPage() {
       </div>
     )
 
+  const metaLine = [horse.color, horse.date_of_birth, horse.gender]
+    .filter(Boolean)
+    .join('  ·  ')
+
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition"
-        >
-          <ArrowLeft size={16} /> Back
-        </button>
-
-        <h1 className="text-3xl font-bold text-brand-gold mb-2">
-          {horse.name}
-        </h1>
-
-        <div className="flex flex-col gap-6">
+    <div className="bg-brand-bg text-brand-text">
+      {/* Hero: sharp framed photo on the left (shown at natural size so it never
+          upscales), details panel on the right. */}
+      <section className="grid lg:grid-cols-[1.4fr_1fr] min-h-[calc(100vh-3.25rem)]">
+        <div className="relative bg-brand-bg flex items-center justify-center min-h-[45vh] lg:min-h-0 overflow-hidden p-6 lg:p-10">
+          {/* Blurred, zoomed copy of the photo fills the space instead of black
+              bars, so the empty area picks up the image's own colours. */}
           {horse.images.length > 0 && (
-            <div className="relative rounded-xl overflow-hidden h-96">
-              <img
-                key={horse.images[activeImageIndex].id}
-                src={horse.images[activeImageIndex].image_url}
-                alt={horse.name}
-                className="w-full h-full object-contain"
-                decoding="async"
-              />
-
-              {/* Prev / Next arrows */}
-              {horse.images.length > 1 && (
-                <>
-                  <button
-                    onClick={() =>
-                      setActiveImageIndex(
-                        (i) =>
-                          (i - 1 + horse.images.length) % horse.images.length
-                      )
-                    }
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full transition backdrop-blur-sm"
-                    aria-label="Previous image"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setActiveImageIndex((i) => (i + 1) % horse.images.length)
-                    }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full transition backdrop-blur-sm"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </>
-              )}
-
-              {/* Dot indicators */}
-              {horse.images.length > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-                  {horse.images.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImageIndex(i)}
-                      aria-label={`Go to image ${i + 1}`}
-                      className={`rounded-full transition-all duration-200 ${i === activeImageIndex ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/50 hover:bg-white/80'}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-cover bg-center scale-125 blur-3xl brightness-90"
+              style={{
+                backgroundImage: `url(${hiRes(horse.images[activeImageIndex].image_url)})`,
+              }}
+            />
           )}
 
-          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-            <p className="text-xs font-bold text-brand-muted uppercase">
-              Profile
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {(
-                [
-                  ['Name', horse.name],
-                  ['Color', horse.color],
-                  ['Date of Birth', horse.date_of_birth],
-                  ['Gender', horse.gender],
-                ] as const
-              ).map(([label, value]) => (
-                <div key={label} className="flex flex-col gap-1">
-                  <span className="text-xs text-brand-muted">{label}</span>
-                  <span className="text-brand-text font-bold capitalize">
-                    {value ?? '—'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-5 left-5 z-10 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition"
+          >
+            <ArrowLeft size={16} /> Back
+          </button>
 
-          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-            <p className="text-xs font-bold text-brand-muted uppercase">
-              Pedigree
-            </p>
-            <table className="w-full text-sm border-collapse">
-              <tbody>
-                <tr>
-                  <td
-                    rowSpan={2}
-                    className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle"
+          {horse.images.length > 0 ? (
+            <img
+              key={horse.images[activeImageIndex].id}
+              src={hiRes(horse.images[activeImageIndex].image_url)}
+              alt={horse.name}
+              className="relative z-1 w-full max-w-2xl aspect-4/3 object-cover rounded-lg border-4 border-white shadow-2xl"
+              decoding="async"
+            />
+          ) : (
+            <div className="relative z-1 text-brand-muted text-sm">
+              No image available
+            </div>
+          )}
+        </div>
+
+        {/* Details panel */}
+        <div className="relative flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-10 lg:p-16 overflow-hidden">
+          {/* The photo bleeds in, heavily blurred, then fades into the panel. */}
+          {horse.images.length > 0 && (
+            <>
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-cover bg-center blur-3xl scale-150 brightness-50"
+                style={{
+                  backgroundImage: `url(${hiRes(horse.images[activeImageIndex].image_url)})`,
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-linear-to-b from-brand-gold/40 via-brand-gold/70 to-brand-gold"
+              />
+            </>
+          )}
+
+          <div className="relative z-1 flex flex-col items-center gap-7">
+            <div className="flex flex-col items-center gap-4">
+              <h1 className="text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
+                <span className="text-amber-300">{horse.name.charAt(0)}</span>
+                {horse.name.slice(1)}
+              </h1>
+              <span className="block w-14 h-px bg-white/40" />
+              {metaLine && (
+                <p className="text-xs lg:text-sm uppercase tracking-[0.2em] text-white/75">
+                  {metaLine}
+                </p>
+              )}
+            </div>
+
+            <div className="text-lg lg:text-xl leading-relaxed">
+              <p className="font-semibold">{horse.sire || '—'}</p>
+              <p className="text-white/50 text-base my-1">×</p>
+              <p className="font-semibold">{horse.dam || '—'}</p>
+              {horse.dams_sire && (
+                <p className="text-white/60 text-sm mt-1">(by {horse.dams_sire})</p>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="mt-2 bg-white text-brand-gold text-sm font-bold uppercase tracking-[0.2em] px-12 py-3.5 rounded-full shadow-md hover:bg-brand-bg hover:scale-[1.03] transition"
+            >
+              Book a Visit
+            </button>
+
+            {/* Image carousel — click a thumbnail to change the main photo. */}
+            {horse.images.length > 1 && (
+              <div className="flex flex-wrap justify-center gap-3 max-w-xl mt-2">
+                {horse.images.map((img, i) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setActiveImageIndex(i)}
+                    aria-label={`View image ${i + 1}`}
+                    className={`flex-none w-40 h-28 rounded-md overflow-hidden border-2 transition ${
+                      i === activeImageIndex
+                        ? 'border-white'
+                        : 'border-white/30 opacity-70 hover:opacity-100'
+                    }`}
                   >
-                    Sire
-                  </td>
-                  <td
-                    rowSpan={2}
-                    className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3"
-                  >
-                    {horse.sire || '—'}
-                  </td>
-                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
-                    {horse.sires_sire || '—'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
-                    {horse.sires_dam || '—'}
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    rowSpan={2}
-                    className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle"
-                  >
-                    Dam
-                  </td>
-                  <td
-                    rowSpan={2}
-                    className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3"
-                  >
-                    {horse.dam || '—'}
-                  </td>
-                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
-                    {horse.dams_sire || '—'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-brand-border px-4 py-2 text-brand-muted">
-                    {horse.dams_dam || '—'}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <img
+                      src={img.image_url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      decoding="async"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
+      </section>
+
+      {/* Everything below the hero */}
+      <div className="max-w-6xl mx-auto px-8 py-10">
+        <div className="flex flex-col gap-6">
+          <section className="flex flex-col gap-6 py-4">
+            <h2 className="text-2xl lg:text-3xl font-extrabold tracking-wide text-brand-gold text-center uppercase">
+              Pedigree
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm bg-brand-surface border border-brand-border">
+                <tbody>
+                  {/* Sire side (top), Dam side (bottom). Parents span the left
+                      column; grandparents sit in the right column. */}
+                  <tr>
+                    <td
+                      rowSpan={2}
+                      className="border border-brand-border px-5 py-4 font-bold text-brand-text align-middle w-1/2"
+                    >
+                      {horse.sire || '—'}
+                    </td>
+                    <td className="border border-brand-border px-5 py-4 text-brand-text">
+                      {horse.sires_sire || '—'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-brand-border px-5 py-4 text-brand-text">
+                      {horse.sires_dam || '—'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      rowSpan={2}
+                      className="border border-brand-border px-5 py-4 font-bold text-brand-text align-middle w-1/2"
+                    >
+                      {horse.dam || '—'}
+                    </td>
+                    <td className="border border-brand-border px-5 py-4 text-brand-text">
+                      {horse.dams_sire || '—'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-brand-border px-5 py-4 text-brand-text">
+                      {horse.dams_dam || '—'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
           {horse.race_records.length > 0 && (
-            <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-              <p className="text-xs font-bold text-brand-muted uppercase">
+            <section className="flex flex-col gap-6 py-4">
+              <h2 className="text-2xl lg:text-3xl font-extrabold tracking-wide text-brand-gold text-center uppercase">
                 Race Record
-              </p>
-              <div className="overflow-x-auto">
+              </h2>
+              <div className="bg-brand-surface border border-brand-border rounded-lg p-6 overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
                       <th className="text-left px-3 py-2 font-bold">Date</th>
                       <th className="text-left px-3 py-2 font-bold">Course</th>
                       <th className="text-left px-3 py-2 font-bold">Race</th>
-                      <th className="text-center px-3 py-2 font-bold">FP</th>
+                      <th className="text-left px-3 py-2 font-bold">FP</th>
                       <th className="text-left px-3 py-2 font-bold">Track</th>
                       <th className="text-left px-3 py-2 font-bold">Dist.</th>
                       <th className="text-left px-3 py-2 font-bold">Cond.</th>
@@ -269,8 +304,17 @@ function HorsePublicPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </section>
           )}
+
+          <div className="flex justify-center py-4">
+            <button
+              type="button"
+              className="bg-brand-gold text-white text-sm font-bold uppercase tracking-[0.2em] px-12 py-3.5 rounded-full shadow-md hover:bg-brand-gold-light hover:scale-[1.03] transition"
+            >
+              Book a Visit
+            </button>
+          </div>
         </div>
       </div>
     </div>

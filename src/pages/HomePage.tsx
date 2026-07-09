@@ -44,7 +44,7 @@ function HomePage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-8 py-10">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">Available Farms to Visit</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">Farms Open to Visitors</h1>
 
         {loading && <p className="text-brand-muted text-sm">Loading...</p>}
         {farmsError && <p className="text-red-600 text-sm">{farmsError}</p>}
@@ -63,7 +63,7 @@ function HomePage() {
           ))}
         </Carousel>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8 mt-12 text-right">Retired Race Horses to Meet</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8 mt-12 text-right">Champions in Retirement</h1>
 
         {horsesError && <p className="text-red-600 text-sm">{horsesError}</p>}
         {!loading && !horsesError && horses.length === 0 && (

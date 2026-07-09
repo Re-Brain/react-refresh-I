@@ -42,7 +42,7 @@ function FarmDetailPage() {
     <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10">
       <div className="max-w-4xl mx-auto">
         <Link to="/" className="text-sm text-brand-muted hover:text-brand-gold transition">
-          ← Back to farms
+          ← Back
         </Link>
 
         {state.status === 'loading' && (
