@@ -6,6 +6,7 @@ import { getMyFarm, updateMyFarm, isFarmComplete, type Farm, type FarmUpdate } f
 import { getMyHorses, type Horse } from '../api/horse'
 import { changePassword, deleteAccount } from '../api/auth'
 import HorseTable from '../components/HorseTable'
+import FarmImageManager from '../components/FarmImageManager'
 
 type Section = 'farm-info' | 'horse-management' | 'settings'
 
@@ -316,6 +317,7 @@ function FarmerDashboardPage() {
                   </>
                 )}
               </div>
+              {farm && <FarmImageManager farm={farm} onChange={setFarm} disabled={isEditing} />}
             </div>
           </div>
         )}

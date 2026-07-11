@@ -36,7 +36,7 @@ function HomePage() {
         <div className="absolute inset-0 bg-linear-to-t from-[#0f2a1f]/85 via-[#1f4d3a]/45 to-[#1f4d3a]/25" />
         <div className="relative z-10 px-6 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg max-w-4xl mx-auto">
-            Where Champions Come to Rest
+            Life After the Finish Line
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-white/90 drop-shadow">
             Meet the racehorses who once ruled the track — and book a visit to their farm.
@@ -60,7 +60,7 @@ function HomePage() {
             <div key={farm.id} className="flex-none w-40 sm:w-48">
               <OverlayCard
                 to={`/farms/${farm.id}`}
-                imageUrl={`https://picsum.photos/seed/farm-${farm.id}/600/600`}
+                imageUrl={farm.images?.[0]?.image_url}
                 title={farm.name}
               />
             </div>
@@ -81,10 +81,7 @@ function HomePage() {
             <div key={horse.id} className="flex-none w-40 sm:w-48">
               <OverlayCard
                 to={`/horses/${horse.id}`}
-                imageUrl={
-                  horse.images[0]?.image_url ??
-                  `https://picsum.photos/seed/horse-${horse.id}/600/600`
-                }
+                imageUrl={horse.images[0]?.image_url}
                 title={horse.name}
               />
             </div>

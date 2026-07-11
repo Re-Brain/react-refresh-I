@@ -40,10 +40,7 @@ function HorsesListPage() {
             <OverlayCard
               key={horse.id}
               to={`/horses/${horse.id}`}
-              imageUrl={
-                horse.images[0]?.image_url ??
-                `https://picsum.photos/seed/horse-${horse.id}/600/600`
-              }
+              imageUrl={horse.images[0]?.image_url}
               title={horse.name}
             />
           ))}

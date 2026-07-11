@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ImageOff } from 'lucide-react'
 import { getHorsePublic, type Horse, type RaceRecord } from '../api/horse'
 
 // Placeholder images (Picsum) are served at whatever size the URL requests.
@@ -78,6 +78,17 @@ function HorsePublicPage() {
     .filter(Boolean)
     .join('  ·  ')
 
+  // Hide the pedigree section entirely when no ancestry has been recorded, so
+  // it degrades like Story instead of rendering a table full of dashes.
+  const hasPedigree = [
+    horse.sire,
+    horse.dam,
+    horse.sires_sire,
+    horse.sires_dam,
+    horse.dams_sire,
+    horse.dams_dam,
+  ].some(Boolean)
+
   return (
     <div className="bg-brand-bg text-brand-text overflow-x-hidden">
       {/* Pinned back button — stays in the viewport while scrolling the whole page. */}
@@ -113,8 +124,14 @@ function HorsePublicPage() {
               decoding="async"
             />
           ) : (
-            <div className="relative z-1 text-brand-muted text-sm">
-              No image available
+            <div className="relative z-1 w-full max-w-2xl aspect-4/3 rounded-lg border-4 border-dashed border-brand-border bg-brand-surface/40 flex flex-col items-center justify-center gap-4 text-center px-6">
+              <ImageOff size={56} strokeWidth={1.25} className="text-brand-gold/70" />
+              <p className="text-lg font-bold uppercase tracking-[0.2em] text-brand-text">
+                No photos yet
+              </p>
+              <p className="text-sm text-brand-muted max-w-xs">
+                No photos of {horse.name} have been added yet — check back soon.
+              </p>
             </div>
           )}
         </div>
@@ -216,6 +233,7 @@ function HorsePublicPage() {
             </section>
           )}
 
+          {hasPedigree && (
           <section className="relative left-1/2 right-1/2 mx-[-50vw] w-screen bg-brand-gold py-20 lg:py-28">
             <div className="max-w-6xl mx-auto px-8 flex flex-col gap-6">
             <h2
@@ -269,6 +287,7 @@ function HorsePublicPage() {
             </div>
             </div>
           </section>
+          )}
 
           {horse.race_records.length > 0 && (
             <section className="flex flex-col gap-6 py-4">
@@ -292,7 +311,9 @@ function HorsePublicPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {horse.race_records.map((r: RaceRecord) => (
+                    {[...horse.race_records]
+                      .sort((a, b) => b.race_date.localeCompare(a.race_date) || b.id - a.id)
+                      .map((r: RaceRecord) => (
                       <tr
                         key={r.id}
                         className="border-b border-brand-border hover:bg-brand-bg/40 transition"
