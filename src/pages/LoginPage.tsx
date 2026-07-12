@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { login, getMe } from '../api/auth'
 import { useAuth } from '../context/useAuth'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  // Only round-trip the user back to a booking page. Any other protected route
+  // (or a direct visit to /login) falls through to the dashboard.
+  const rawFrom = (location.state as { from?: string } | null)?.from
+  const from = rawFrom?.startsWith('/book/') ? rawFrom : undefined
   const { setUser } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,7 +24,7 @@ function LoginPage() {
       sessionStorage.removeItem('dashboardSection')
       const user = await getMe(token.access_token)
       setUser(user)
-      navigate('/dashboard')
+      navigate(from ?? '/dashboard', { replace: true })
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message)
     }

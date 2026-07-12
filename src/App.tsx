@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import Lenis from 'lenis'
 import HomePage from './pages/HomePage.tsx'
@@ -16,8 +16,10 @@ import HorsePublicPage from './pages/HorsePublicPage.tsx'
 import HorsesListPage from './pages/HorsesListPage.tsx'
 import FarmsListPage from './pages/FarmsListPage.tsx'
 import FarmDetailPage from './pages/FarmDetailPage.tsx'
+import BookVisitPage from './pages/BookVisitPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
+import { LenisContext } from './context/LenisContext'
 
 // Shared styling for the big, uppercase headings inside the full-screen menu.
 const menuItemClass =
@@ -49,6 +51,7 @@ function App() {
   const { user, logout } = useAuth()
   const lenisRef = useRef<Lenis | null>(null)
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
   // Smooth inertia scrolling: the page eases toward the target instead of
@@ -88,7 +91,7 @@ function App() {
   }, [pathname])
 
   return (
-    <>
+    <LenisContext.Provider value={lenisRef}>
       <nav
         className={`sticky top-0 z-50 flex items-center justify-between gap-6 px-8 py-3 text-sm font-bold transition-colors duration-300 ${
           menuOpen
@@ -153,6 +156,7 @@ function App() {
                 onClick={() => {
                   setMenuOpen(false)
                   logout()
+                  navigate('/')
                 }}
               >
                 Logout
@@ -180,9 +184,10 @@ function App() {
         <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><AddHorsePage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><HorseDetailPage /></ProtectedRoute>} />
         <Route path="/horses/:id" element={<HorsePublicPage />} />
+        <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
       </Routes>
-    </>
+    </LenisContext.Provider>
   )
 }
 
