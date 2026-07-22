@@ -9,6 +9,7 @@ export type FarmImage = {
 export const FARM_IMAGE_LIMIT = 3
 
 export type Farm = {
+  id: number
   name: string
   location: string | null
   description: string | null
@@ -29,6 +30,7 @@ export type ActiveFarm = {
   images: FarmImage[]
 }
 
+// Return all active farms, or throw an error if the request fails. This is used on the home page to show a carousel of farms.
 export async function getActiveFarms(): Promise<ActiveFarm[]> {
   const res = await fetch(`${API_BASE_URL}/farms`)
   if (!res.ok) throw new Error('Failed to fetch farms')

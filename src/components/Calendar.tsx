@@ -16,9 +16,13 @@ function isoDate(year: number, month: number, day: number): string {
 function Calendar({
   value,
   onSelect,
+  availableWeekdays,
 }: {
   value: string | null
   onSelect: (date: string) => void
+  // Weekdays (0=Sun … 6=Sat) the farm is open. Days on other weekdays are
+  // disabled. Omit to allow every day.
+  availableWeekdays?: number[]
 }) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -94,17 +98,20 @@ function Calendar({
           const iso = isoDate(view.year, view.month, day)
           const cellDate = new Date(view.year, view.month, day)
           const isPast = cellDate < today
+          const isClosed = availableWeekdays != null && !availableWeekdays.includes(cellDate.getDay())
+          const disabled = isPast || isClosed
           const isSelected = value === iso
           return (
             <button
               key={iso}
               type="button"
-              disabled={isPast}
+              disabled={disabled}
               onClick={() => onSelect(iso)}
+              title={isClosed && !isPast ? 'Closed for visits' : undefined}
               className={`h-14 rounded-lg text-base font-bold transition ${
                 isSelected
                   ? 'bg-brand-gold text-white'
-                  : isPast
+                  : disabled
                   ? 'text-brand-muted/40 cursor-not-allowed'
                   : 'text-brand-text hover:bg-brand-bg'
               }`}

@@ -8,12 +8,24 @@ type CarouselProps = {
   direction?: 'left' | 'right'
 }
 
-// Horizontal, click-and-drag carousel with a seamless auto-scrolling marquee.
-// Click anywhere on the strip and move the mouse left/right to scroll it. The
-// track is duplicated so scrolling can loop without a visible jump; the
-// auto-scroll pauses while hovering or dragging and respects reduced-motion.
-// Touch devices use native momentum scrolling; a drag past a small threshold
-// suppresses the trailing click so dragging over a card doesn't navigate.
+// Horizontal carousel that continuously auto-scrolls (marquee) and can also be
+// dragged by hand.
+//
+// Behaviour:
+//   • Auto-scroll — drifts at `speed` px/s toward `direction`, pausing while the
+//     pointer hovers or drags, and disabled entirely under prefers-reduced-motion.
+//   • Mouse drag — click and move left/right to scroll; a drag past a ~5px
+//     threshold suppresses the trailing click so dragging over a card doesn't
+//     navigate its Link.
+//   • Touch/pen — left to the browser's native momentum scrolling; only mouse
+//     drags are hijacked.
+//
+// Looping: only kicks in when the content overflows. The children are rendered
+// three times so there's a full copy of runway on each side of the middle one;
+// we keep the scroll position parked in that middle copy and snap it back by one
+// copy-width before it can hit either edge, giving a seamless, jump-free loop.
+// (See `wrap` — the browser clamps scrollLeft at 0 and at max, so we never let
+// it reach either boundary.)
 function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const track1Ref = useRef<HTMLDivElement>(null)
@@ -26,6 +38,10 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
   const startX = useRef(0)
   const startScroll = useRef(0)
   const pointerId = useRef<number | null>(null)
+  // Authoritative scroll position kept as a float. Reading it back from
+  // el.scrollLeft each frame loses sub-pixel steps to browser rounding, which
+  // at ~0.6px/frame stalls the marquee entirely — so we accumulate here.
+  const pos = useRef(0)
 
   // Only enable the duplicated track + auto-scroll when content overflows.
   useEffect(() => {
@@ -58,15 +74,17 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
     if (d <= 0) return
     const max = el.scrollWidth - el.clientWidth
     const center = (max - d) / 2
-    if (el.scrollLeft < center) el.scrollLeft += d
-    else if (el.scrollLeft >= center + d) el.scrollLeft -= d
+    if (pos.current < center) pos.current += d
+    else if (pos.current >= center + d) pos.current -= d
+    el.scrollLeft = pos.current
   }
 
   // Start in the middle copy once the loop (and its extra tracks) exist.
   useEffect(() => {
     const el = scrollRef.current
     if (!loop || !el) return
-    el.scrollLeft = loopDistance()
+    pos.current = loopDistance()
+    el.scrollLeft = pos.current
   }, [loop])
 
   useEffect(() => {
@@ -81,7 +99,8 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
       last = now
       const el = scrollRef.current
       if (el && !dragging.current && !hovering.current) {
-        el.scrollLeft += dir * speed * dt
+        pos.current += dir * speed * dt
+        el.scrollLeft = pos.current
         wrap(el)
       }
       raf = requestAnimationFrame(tick)
@@ -116,7 +135,8 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
       moved.current = true
       el.setPointerCapture(e.pointerId)
     }
-    el.scrollLeft = startScroll.current - dx
+    pos.current = startScroll.current - dx
+    el.scrollLeft = pos.current
     if (loop) wrap(el)
   }
 
@@ -152,6 +172,11 @@ function Carousel({ children, speed = 40, direction = 'left' }: CarouselProps) {
       onPointerLeave={() => { hovering.current = false }}
       className="flex gap-3 overflow-x-auto py-2 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
+      {/* Three identical copies when looping: the first is the "real" content;
+          the middle (track2) is where we park the scroll position; the third
+          provides runway on the right so a rightward drift never runs out of
+          content before wrap() snaps back. Copies 2 and 3 are aria-hidden so
+          screen readers announce the children only once. */}
       <div ref={track1Ref} className="flex gap-3 shrink-0">
         {children}
       </div>

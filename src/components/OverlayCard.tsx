@@ -2,11 +2,14 @@ import { Link } from 'react-router-dom'
 
 type OverlayCardProps = {
   to: string
-  // Omit / null when there's no photo — a branded monogram tile is shown instead.
+  /** Card image; when omitted or null, a branded monogram tile is shown instead. */
   imageUrl?: string | null
   title: string
 }
 
+// A square image card linking to `to`, with the title overlaid on a dark
+// gradient. Falls back to a monogram tile (the title's first letter) when
+// there's no image.
 function OverlayCard({ to, imageUrl, title }: OverlayCardProps) {
   return (
     <Link
