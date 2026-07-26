@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { CalendarClock, Users, MapPin, ArrowUpRight } from 'lucide-react'
 import type { VisitorBooking } from '../api/booking'
 import { formatTime } from '../api/availability'
-import { STATUS_STYLES, STATUS_LABELS, formatVisitDate } from '../lib/bookingDisplay'
+import { formatVisitDate, displayStatus } from '../lib/bookingDisplay'
 
 type BookingCardProps = {
   booking: VisitorBooking
@@ -30,6 +30,8 @@ function BookingCard({
   onConfirmCancel,
   onKeepCancel,
 }: BookingCardProps) {
+  const status = displayStatus(b)
+
   return (
     <div className="bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col gap-4 hover:border-brand-gold/60 transition">
       {/* Top: label + status */}
@@ -37,8 +39,8 @@ function BookingCard({
         <span className="text-[10px] uppercase tracking-wider text-brand-muted font-bold">
           Your visit
         </span>
-        <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_STYLES[b.status]}`}>
-          {STATUS_LABELS[b.status]}
+        <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${status.style}`}>
+          {status.label}
         </span>
       </div>
 

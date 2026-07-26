@@ -7,7 +7,7 @@ import {
   type BookingStatus,
 } from '../api/booking'
 import { formatTime } from '../api/availability'
-import { STATUS_STYLES, STATUS_LABELS, formatVisitDate } from '../lib/bookingDisplay'
+import { formatVisitDate, displayStatus } from '../lib/bookingDisplay'
 
 type Filter = 'all' | BookingStatus
 
@@ -193,9 +193,9 @@ function VisitorManagement() {
                   <td className="px-4 py-3 text-center text-brand-text">{b.party_size}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_STYLES[b.status]}`}
+                      className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${displayStatus(b).style}`}
                     >
-                      {STATUS_LABELS[b.status]}
+                      {displayStatus(b).label}
                     </span>
                   </td>
                   <td className="px-4 py-3">
