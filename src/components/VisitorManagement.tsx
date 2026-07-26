@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Mail, Users, Check, X, RefreshCw } from 'lucide-react'
+import { AlertTriangle, Mail, Users, Check, X, RefreshCw, Ban } from 'lucide-react'
 import {
   getFarmBookings,
   updateBookingStatus,
@@ -27,8 +27,11 @@ function VisitorManagement() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
-  // The booking whose Confirm/Decline is in flight, and any action error.
+  // The booking whose Confirm/Decline/Cancel is in flight, the confirmed
+  // booking currently showing the "are you sure?" cancel prompt, and any
+  // action error.
   const [busyId, setBusyId] = useState<number | null>(null)
+  const [confirmId, setConfirmId] = useState<number | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
   function fetchBookings(token: string) {
@@ -38,7 +41,7 @@ function VisitorManagement() {
       .finally(() => setLoading(false))
   }
 
-  async function act(id: number, status: 'confirmed' | 'declined') {
+  async function act(id: number, status: 'confirmed' | 'declined' | 'cancelled') {
     const token = localStorage.getItem('access_token')
     if (!token) return
     setBusyId(id)
@@ -47,11 +50,22 @@ function VisitorManagement() {
       const updated = await updateBookingStatus(token, id, status)
       // Swap the updated booking into the list; the derived views/counts follow.
       setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)))
+      if (status === 'cancelled') setConfirmId(null)
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to update the booking.')
     } finally {
       setBusyId(null)
     }
+  }
+
+  // Open/close the confirm prompt on a confirmed booking's Cancel visit button.
+  function requestCancel(id: number) {
+    setConfirmId(id)
+    setActionError(null)
+  }
+
+  function keepCancel() {
+    setConfirmId(null)
   }
 
   useEffect(() => {
@@ -147,7 +161,7 @@ function VisitorManagement() {
           <p className="text-brand-muted text-sm">
             {bookings.length === 0
               ? 'No visits have been booked yet.'
-              : 'No visits with this status.'}
+              : `No ${FILTERS.find(f => f.key === filter)?.label.toLowerCase()} visits.`}
           </p>
         </div>
       ) : (
@@ -216,6 +230,32 @@ function VisitorManagement() {
                           <X size={14} /> Decline
                         </button>
                       </div>
+                    ) : b.status === 'confirmed' ? (
+                      confirmId === b.id ? (
+                        <div className="flex items-center justify-start gap-2">
+                          <button
+                            onClick={() => act(b.id, 'cancelled')}
+                            disabled={busyId === b.id}
+                            className="bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-red-700 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {busyId === b.id ? 'Cancelling…' : 'Yes, cancel'}
+                          </button>
+                          <button
+                            onClick={keepCancel}
+                            disabled={busyId === b.id}
+                            className="text-brand-muted hover:text-brand-text font-bold px-3 py-1.5 rounded-lg border border-brand-border transition text-xs disabled:opacity-50"
+                          >
+                            Keep
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => requestCancel(b.id)}
+                          className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs"
+                        >
+                          <Ban size={14} /> Cancel visit
+                        </button>
+                      )
                     ) : (
                       <div className="text-left text-brand-muted text-xs">—</div>
                     )}

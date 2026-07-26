@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, CalendarClock, RefreshCw } from 'lucide-react'
+import { AlertTriangle, CalendarClock, RefreshCw, Users } from 'lucide-react'
 import type { BookingStatus } from '../api/booking'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 import { useVisitorBookings } from '../hooks/useVisitorBookings'
@@ -84,7 +84,10 @@ function BookingsSection() {
       )}
 
       {visible.length === 0 ? (
-        <p className="text-brand-muted text-sm">No {STATUS_LABELS[active].toLowerCase()} bookings.</p>
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-8 text-center flex flex-col items-center gap-3">
+          <Users size={28} className="text-brand-muted" />
+          <p className="text-brand-muted text-sm">No {STATUS_LABELS[active].toLowerCase()} bookings.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start">
           {visible.map(b => (

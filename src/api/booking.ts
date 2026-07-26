@@ -74,12 +74,13 @@ function defaultMessage(status: number): string {
   }
 }
 
-// The farmer confirms or declines a booking at their farm. Owner-only on the
-// server; returns the updated booking.
+// The farmer confirms, declines, or cancels a booking at their farm (the
+// latter only valid on an already-confirmed visit). Owner-only on the server;
+// returns the updated booking.
 export async function updateBookingStatus(
   token: string,
   id: number,
-  status: Extract<BookingStatus, 'confirmed' | 'declined'>
+  status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>
 ): Promise<Booking> {
   const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
     method: 'PATCH',
