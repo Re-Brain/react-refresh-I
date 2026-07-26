@@ -79,6 +79,7 @@ function BookVisitPage() {
                   value={form.selectedDate}
                   onSelect={form.selectDate}
                   availableWeekdays={farmAvailability.weekdays}
+                  minLeadDays={farmAvailability.min_lead_days}
                 />
 
                 {form.selectedDate && <BookingForm form={form} visitSlots={visitSlots} />}

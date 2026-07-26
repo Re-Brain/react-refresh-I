@@ -48,10 +48,11 @@ export type FarmAvailability = {
   enabled: boolean // whether the farm accepts visit bookings at all
   weekdays: number[] // 0=Sun … 6=Sat — days visits are accepted
   periods: Record<Period, PeriodSchedule>
+  min_lead_days: number // fewest days ahead a visit may be booked (0 = same day allowed)
 }
 
 // Sensible default for an unconfigured farm: open every day, mornings and
-// afternoons on (each spanning its full window), evenings off.
+// afternoons on (each spanning its full window), evenings off, a week's notice.
 export const DEFAULT_FARM_AVAILABILITY: FarmAvailability = {
   enabled: true,
   weekdays: [0, 1, 2, 3, 4, 5, 6],
@@ -60,6 +61,7 @@ export const DEFAULT_FARM_AVAILABILITY: FarmAvailability = {
     afternoon: { open: true, start: '12:00', end: '16:00' },
     evening: { open: false, start: '16:00', end: '18:00' },
   },
+  min_lead_days: 7,
 }
 
 // ─── Time helpers ───────────────────────────────────────────────────────────

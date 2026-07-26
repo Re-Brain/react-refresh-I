@@ -32,6 +32,11 @@ function FarmAvailabilityEditor({
   const [committed, setCommitted] = useState<FarmAvailability | null>(null)
   const [draft, setDraft] = useState<FarmAvailability | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  // Raw text of the minimum-notice field while it's being typed — lets the box
+  // go empty mid-edit instead of snapping back to a clamped number on every
+  // keystroke. Reconciled into `draft.min_lead_days` on blur; null means "not
+  // actively being typed in", so it falls back to showing the draft's value.
+  const [leadDaysText, setLeadDaysText] = useState<string | null>(null)
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
   const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -89,7 +94,18 @@ function FarmAvailabilityEditor({
     })
   }
 
-  const hasErrors =
+  // The minimum-notice field's raw text (leadDaysText while being typed,
+  // otherwise the draft's committed number) and whether it's currently valid.
+  const leadDaysRaw = leadDaysText ?? String(draft?.min_lead_days ?? '')
+  const leadDaysNum = Number(leadDaysRaw)
+  const leadDaysError =
+    leadDaysRaw.trim() === '' || Number.isNaN(leadDaysNum) || leadDaysNum < 1
+      ? 'Minimum notice must be at least 1 day.'
+      : leadDaysNum > 90
+      ? 'Minimum notice must be 90 days or fewer.'
+      : null
+
+  const periodsHaveErrors =
     !!draft &&
     draft.enabled &&
     PERIODS.some(p => {
@@ -97,15 +113,19 @@ function FarmAvailabilityEditor({
       return sched.open && validatePeriodSchedule(sched, p) !== null
     })
 
+  const hasErrors = periodsHaveErrors || (isEditing && leadDaysError !== null)
+
   function handleEdit() {
     setDraft(committed)
     setSaveError(null)
+    setLeadDaysText(null)
     setIsEditing(true)
   }
 
   function handleCancel() {
     setDraft(committed)
     setSaveError(null)
+    setLeadDaysText(null)
     setIsEditing(false)
   }
 
@@ -119,6 +139,7 @@ function FarmAvailabilityEditor({
       const saved = await saveFarmAvailability(token, draft)
       setCommitted(saved)
       setDraft(saved)
+      setLeadDaysText(null)
       setIsEditing(false)
       onChange?.(saved)
     } catch (err) {
@@ -179,6 +200,46 @@ function FarmAvailabilityEditor({
           Open for visit bookings:{' '}
           <span className={committed.enabled ? 'text-green-600' : 'text-brand-muted'}>
             {committed.enabled ? 'Yes' : 'No'}
+          </span>
+        </p>
+      )}
+
+      {/* Minimum notice — how many days ahead a visitor must book */}
+      {isEditing ? (
+        <div className="flex flex-col gap-1.5">
+          <label className="flex items-center gap-3">
+            <span className="text-sm font-bold text-brand-text">Minimum notice</span>
+            <input
+              type="number"
+              min={1}
+              max={90}
+              value={leadDaysRaw}
+              onChange={e => setLeadDaysText(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') e.preventDefault()
+              }}
+              onBlur={() => {
+                if (leadDaysError) return
+                setDraft(d => (d ? { ...d, min_lead_days: leadDaysNum } : d))
+                setLeadDaysText(null)
+              }}
+              className={`w-20 bg-brand-bg border rounded-lg px-3 py-1.5 text-brand-text text-sm focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                leadDaysError ? 'border-red-500/60 focus:border-red-500' : 'border-brand-border focus:border-brand-gold'
+              }`}
+            />
+            <span className="text-sm text-brand-muted">
+              day{leadDaysNum === 1 ? '' : 's'} ahead
+            </span>
+          </label>
+          {leadDaysError && <p className="text-red-600 text-xs">{leadDaysError}</p>}
+        </div>
+      ) : (
+        <p className="text-sm font-bold text-brand-text">
+          Minimum notice:{' '}
+          <span className="text-brand-muted font-normal">
+            {committed.min_lead_days === 0
+              ? 'None — same-day booking allowed'
+              : `${committed.min_lead_days} day${committed.min_lead_days === 1 ? '' : 's'} ahead`}
           </span>
         </p>
       )}
@@ -316,7 +377,9 @@ function FarmAvailabilityEditor({
               <X size={14} /> Cancel
             </button>
             {hasErrors && (
-              <span className="text-red-600 text-sm font-bold">Fix the highlighted times first.</span>
+              <span className="text-red-600 text-sm font-bold">
+                {periodsHaveErrors ? 'Fix the highlighted times first.' : 'Fix the minimum notice first.'}
+              </span>
             )}
           </div>
           {saveError && <p className="text-red-600 text-sm">{saveError}</p>}

@@ -17,15 +17,22 @@ function Calendar({
   value,
   onSelect,
   availableWeekdays,
+  minLeadDays = 0,
 }: {
   value: string | null
   onSelect: (date: string) => void
   // Weekdays (0=Sun … 6=Sat) the farm is open. Days on other weekdays are
   // disabled. Omit to allow every day.
   availableWeekdays?: number[]
+  // Fewest days ahead a visit may be booked — the farm's minimum-notice policy.
+  // Days between today and this cutoff are disabled even if the weekday is open.
+  minLeadDays?: number
 }) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+
+  const minDate = new Date(today)
+  minDate.setDate(minDate.getDate() + minLeadDays)
 
   const [view, setView] = useState(() => ({
     year: today.getFullYear(),
@@ -98,16 +105,24 @@ function Calendar({
           const iso = isoDate(view.year, view.month, day)
           const cellDate = new Date(view.year, view.month, day)
           const isPast = cellDate < today
+          const isTooSoon = !isPast && cellDate < minDate
           const isClosed = availableWeekdays != null && !availableWeekdays.includes(cellDate.getDay())
-          const disabled = isPast || isClosed
+          const disabled = isPast || isTooSoon || isClosed
           const isSelected = value === iso
+          const title = isPast
+            ? undefined
+            : isTooSoon
+            ? `Requires at least ${minLeadDays} day${minLeadDays === 1 ? '' : 's'}' notice`
+            : isClosed
+            ? 'Closed for visits'
+            : undefined
           return (
             <button
               key={iso}
               type="button"
               disabled={disabled}
               onClick={() => onSelect(iso)}
-              title={isClosed && !isPast ? 'Closed for visits' : undefined}
+              title={title}
               className={`h-14 rounded-lg text-base font-bold transition ${
                 isSelected
                   ? 'bg-brand-gold text-white'
