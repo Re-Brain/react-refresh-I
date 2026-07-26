@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Mail, Users, Check, X } from 'lucide-react'
+import { AlertTriangle, Mail, Users, Check, X, RefreshCw } from 'lucide-react'
 import {
   getFarmBookings,
   updateBookingStatus,
@@ -24,6 +24,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 function VisitorManagement() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
   // The booking whose Confirm/Decline is in flight, and any action error.
@@ -67,6 +68,19 @@ function VisitorManagement() {
     fetchBookings(token)
   }
 
+  // Manual refresh once bookings are already showing — keeps the table on
+  // screen instead of flipping back to the full loading state.
+  function refresh() {
+    const token = localStorage.getItem('access_token')
+    if (!token || refreshing) return
+    setRefreshing(true)
+    setError(null)
+    getFarmBookings(token)
+      .then(setBookings)
+      .catch(err => setError(err instanceof Error ? err.message : 'Failed to load bookings.'))
+      .finally(() => setRefreshing(false))
+  }
+
   const visible = filter === 'all' ? bookings : bookings.filter(b => b.status === filter)
   const countFor = (key: Filter) =>
     key === 'all' ? bookings.length : bookings.filter(b => b.status === key).length
@@ -91,21 +105,33 @@ function VisitorManagement() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Status filter */}
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-3 py-1.5 rounded-full text-sm font-bold border transition ${
-              filter === f.key
-                ? 'bg-brand-gold text-brand-bg border-brand-gold'
-                : 'border-brand-border text-brand-muted hover:text-brand-gold hover:border-brand-gold'
-            }`}
-          >
-            {f.label} <span className="opacity-70">({countFor(f.key)})</span>
-          </button>
-        ))}
+      {/* Status filter + refresh */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          {FILTERS.map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1.5 rounded-full text-sm font-bold border transition ${
+                filter === f.key
+                  ? 'bg-brand-gold text-brand-bg border-brand-gold'
+                  : 'border-brand-border text-brand-muted hover:text-brand-gold hover:border-brand-gold'
+              }`}
+            >
+              {f.label} <span className="opacity-70">({countFor(f.key)})</span>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={refresh}
+          disabled={refreshing}
+          title="Refresh bookings"
+          aria-label="Refresh bookings"
+          className="flex items-center gap-1.5 text-brand-muted hover:text-brand-gold font-bold text-xs px-3 py-1.5 rounded-lg border border-brand-border hover:border-brand-gold transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+          Refresh
+        </button>
       </div>
 
       {actionError && (

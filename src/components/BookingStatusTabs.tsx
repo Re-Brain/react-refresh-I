@@ -2,7 +2,7 @@ import type { BookingStatus } from '../api/booking'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 
 // Left-to-right order of the filter buttons.
-const STATUS_ORDER: BookingStatus[] = ['pending', 'confirmed', 'declined', 'cancelled']
+const STATUS_ORDER: BookingStatus[] = ['confirmed', 'pending', 'declined', 'cancelled']
 
 type BookingStatusTabsProps = {
   active: BookingStatus

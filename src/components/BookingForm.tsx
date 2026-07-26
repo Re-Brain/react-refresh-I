@@ -10,7 +10,7 @@ type BookingFormProps = {
 // period), party size, note, and submit — or the confirmation once requested.
 // All state and the submit flow live in the useBookingForm hook.
 function BookingForm({ form, visitSlots }: BookingFormProps) {
-  const { formRef, selectedDate, selectedSlot, setSelectedSlot, partySize, setPartySize, note, setNote, booking, submitting, submitError, handleSubmit } = form
+  const { formRef, selectedDate, selectedSlot, setSelectedSlot, partySize, setPartySize, note, setNote, submitting, submitError, handleSubmit } = form
 
   // Render the chosen day as e.g. "Saturday, 11 July 2026". Parse at local
   // midnight so the weekday doesn't shift across time zones.
@@ -101,24 +101,16 @@ function BookingForm({ form, visitSlots }: BookingFormProps) {
         />
       </div>
 
-      {booking ? (
-        <p className="text-brand-gold text-sm font-bold">
-          Visit requested for {prettyDate}
-          {`, ${formatTime(booking.start)}–${formatTime(booking.end)}`}
-          . The farm will confirm your booking.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
-          <button
-            type="submit"
-            disabled={!selectedSlot || submitting}
-            className="self-start bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
-          >
-            {submitting ? 'Requesting…' : 'Request visit'}
-          </button>
-        </div>
-      )}
+      <div className="flex flex-col gap-2">
+        {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
+        <button
+          type="submit"
+          disabled={!selectedSlot || submitting}
+          className="self-start bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
+        >
+          {submitting ? 'Requesting…' : 'Request visit'}
+        </button>
+      </div>
     </form>
   )
 }

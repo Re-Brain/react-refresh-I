@@ -17,6 +17,7 @@ import HorsesListPage from './pages/HorsesListPage.tsx'
 import FarmsListPage from './pages/FarmsListPage.tsx'
 import FarmDetailPage from './pages/FarmDetailPage.tsx'
 import BookVisitPage from './pages/BookVisitPage.tsx'
+import BookingConfirmationPage from './pages/BookingConfirmationPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
 import { LenisContext } from './context/LenisContext'
@@ -185,6 +186,7 @@ function App() {
         <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><HorseEditPage /></ProtectedRoute>} />
         <Route path="/horses/:id" element={<HorseProfilePage />} />
         <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
+        <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
       </Routes>
     </LenisContext.Provider>

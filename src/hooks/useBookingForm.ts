@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useContext, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createBooking, BookingError, type Booking } from '../api/booking'
+import { createBooking, BookingError } from '../api/booking'
 import { LenisContext } from '../context/LenisContext'
 import type { Period } from '../api/availability'
 
@@ -19,7 +19,6 @@ export function useBookingForm(horseId: string | undefined) {
   const [selectedSlot, setSelectedSlot] = useState<VisitSlot | null>(null)
   const [partySize, setPartySize] = useState(1)
   const [note, setNote] = useState('')
-  const [booking, setBooking] = useState<Booking | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -42,10 +41,9 @@ export function useBookingForm(horseId: string | undefined) {
     }
   }, [selectedDate, lenisRef])
 
-  // Picking a new day clears any previous confirmation / error.
+  // Picking a new day clears any previous error.
   function selectDate(d: string | null) {
     setSelectedDate(d)
-    setBooking(null)
     setSubmitError(null)
   }
 
@@ -68,7 +66,7 @@ export function useBookingForm(horseId: string | undefined) {
         party_size: partySize,
         note: note || undefined,
       })
-      setBooking(created)
+      navigate('/book/confirmation', { state: { booking: created } })
     } catch (err) {
       // Expired/invalid token → back to login, returning here afterwards.
       if (err instanceof BookingError && err.status === 401) {
@@ -92,7 +90,6 @@ export function useBookingForm(horseId: string | undefined) {
     setPartySize,
     note,
     setNote,
-    booking,
     submitting,
     submitError,
     handleSubmit,

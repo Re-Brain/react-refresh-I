@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, MapPin, ImageOff } from 'lucide-react'
 import type { ActiveFarm } from '../api/farm'
 
@@ -11,6 +11,7 @@ type FarmHeroProps = {
 // on the left and a framed photo — on a blurred backdrop — on the right, or an
 // empty state when the farm has no photos. Owns its own selected-photo index.
 function FarmHero({ farm }: FarmHeroProps) {
+  const navigate = useNavigate()
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const farmImages = farm.images ?? []
@@ -20,12 +21,12 @@ function FarmHero({ farm }: FarmHeroProps) {
 
   return (
     <section className="relative grid lg:grid-cols-[1fr_1.4fr] min-h-[calc(100vh-3.25rem)]">
-      <Link
-        to="/"
+      <button
+        onClick={() => navigate(-1)}
         className="fixed top-20 left-2 z-40 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition"
       >
         <ArrowLeft size={16} /> Back
-      </Link>
+      </button>
 
       {/* Left: details panel */}
       <div className="relative order-2 lg:order-1 flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-10 lg:p-16 overflow-hidden">

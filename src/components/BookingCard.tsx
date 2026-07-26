@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CalendarClock, Users, MapPin } from 'lucide-react'
+import { CalendarClock, Users, MapPin, ArrowUpRight } from 'lucide-react'
 import type { VisitorBooking } from '../api/booking'
 import { formatTime } from '../api/availability'
 import { STATUS_STYLES, STATUS_LABELS, formatVisitDate } from '../lib/bookingDisplay'
@@ -48,12 +48,19 @@ function BookingCard({
           <span className="text-[10px] uppercase tracking-wider text-brand-muted font-bold">
             Horse
           </span>
-          <Link
-            to={`/horses/${b.horse_id}`}
-            className="font-extrabold text-brand-text text-2xl leading-tight hover:text-brand-gold transition line-clamp-2"
-          >
-            {b.horse_name ?? 'Unknown horse'}
-          </Link>
+          <span className="flex items-center gap-1.5">
+            <span className="font-extrabold text-brand-text text-2xl leading-tight line-clamp-2">
+              {b.horse_name ?? 'Unknown horse'}
+            </span>
+            <Link
+              to={`/horses/${b.horse_id}`}
+              title="View horse"
+              aria-label="View horse"
+              className="shrink-0 text-brand-muted hover:text-brand-gold transition"
+            >
+              <ArrowUpRight size={16} />
+            </Link>
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="text-[10px] uppercase tracking-wider text-brand-muted font-bold">
@@ -62,6 +69,14 @@ function BookingCard({
           <span className="flex items-center gap-1.5 text-brand-text">
             <MapPin size={15} className="text-brand-gold shrink-0" />
             <span className="font-bold line-clamp-1">{b.farm_name ?? 'Unknown farm'}</span>
+            <Link
+              to={`/farms/${b.farm_id}`}
+              title="View farm"
+              aria-label="View farm"
+              className="shrink-0 text-brand-muted hover:text-brand-gold transition"
+            >
+              <ArrowUpRight size={16} />
+            </Link>
           </span>
         </div>
       </div>

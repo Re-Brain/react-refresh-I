@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, CalendarClock } from 'lucide-react'
+import { AlertTriangle, CalendarClock, RefreshCw } from 'lucide-react'
 import type { BookingStatus } from '../api/booking'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 import { useVisitorBookings } from '../hooks/useVisitorBookings'
@@ -11,10 +11,10 @@ import BookingCard from './BookingCard'
 // with loading / error / empty states. Pending is shown by default. Owns its
 // own bookings data and cancel flow (useVisitorBookings).
 function BookingsSection() {
-  const { bookings, loading, error, actionError, handleRetry, confirmId, busyId, requestCancel, cancel, keepCancel } = useVisitorBookings()
+  const { bookings, loading, refreshing, refresh, error, actionError, handleRetry, confirmId, busyId, requestCancel, cancel, keepCancel } = useVisitorBookings()
 
-  // Which status is being viewed. Pending is shown by default.
-  const [active, setActive] = useState<BookingStatus>('pending')
+  // Which status is being viewed. Confirmed is shown by default.
+  const [active, setActive] = useState<BookingStatus>('confirmed')
 
   // Count per status for the tab badges.
   const counts: Record<BookingStatus, number> = { pending: 0, confirmed: 0, declined: 0, cancelled: 0 }
@@ -59,7 +59,19 @@ function BookingsSection() {
 
   return (
     <section className="flex flex-col gap-5">
-      <h2 className="text-xl font-bold text-brand-text">Bookings</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-brand-text">Bookings</h2>
+        <button
+          onClick={refresh}
+          disabled={refreshing}
+          title="Refresh bookings"
+          aria-label="Refresh bookings"
+          className="flex items-center gap-1.5 text-brand-muted hover:text-brand-gold font-bold text-xs px-3 py-1.5 rounded-lg border border-brand-border hover:border-brand-gold transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+          Refresh
+        </button>
+      </div>
 
       {/* Status filter — click a button to show that status's cards. */}
       <BookingStatusTabs active={active} onSelect={setActive} counts={counts} />

@@ -6,6 +6,7 @@ import { getMyBookings, cancelBooking, type VisitorBooking } from '../api/bookin
 export function useVisitorBookings() {
   const [bookings, setBookings] = useState<VisitorBooking[]>([])
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<number | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
@@ -30,6 +31,20 @@ export function useVisitorBookings() {
     setLoading(true)
     setError(null)
     fetchBookings(token)
+  }
+
+  // Manual refresh once bookings are already showing — keeps the existing
+  // cards on screen (unlike handleRetry, this doesn't flip back to the
+  // full-section loading state).
+  function refresh() {
+    const token = localStorage.getItem('access_token')
+    if (!token || refreshing) return
+    setRefreshing(true)
+    setError(null)
+    getMyBookings(token)
+      .then(setBookings)
+      .catch(err => setError(err instanceof Error ? err.message : 'Failed to load your bookings.'))
+      .finally(() => setRefreshing(false))
   }
 
   // Open the confirm prompt on a card.
@@ -59,5 +74,5 @@ export function useVisitorBookings() {
     }
   }
 
-  return { bookings, loading, error, actionError, handleRetry, confirmId, busyId, requestCancel, keepCancel, cancel }
+  return { bookings, loading, refreshing, refresh, error, actionError, handleRetry, confirmId, busyId, requestCancel, keepCancel, cancel }
 }
