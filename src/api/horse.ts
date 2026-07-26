@@ -1,3 +1,5 @@
+import type { Period, FarmAvailability } from './availability'
+
 const API_BASE_URL = 'http://127.0.0.1:8000'
 
 export type HorseImage = {
@@ -25,6 +27,7 @@ export type RaceRecordCreate = Omit<RaceRecord, 'id' | 'horse_id' | 'grade'> & {
 export type Horse = {
   id: number
   name: string
+  story: string | null
   date_of_birth: string | null
   color: string | null
   gender: 'colt' | 'stallion' | 'gelding' | 'filly' | 'mare' | null
@@ -37,9 +40,12 @@ export type Horse = {
   farm_id: number | null
   images: HorseImage[]
   race_records: RaceRecord[]
+  periods: Period[]
+  farm_availability: FarmAvailability
 }
 
-export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id'>
+// The read-only availability fields aren't part of the create/update payload.
+export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id' | 'periods' | 'farm_availability'>
 export type HorseUpdate = Partial<HorseCreate>
 
 export async function getHorse(token: string, id: number): Promise<Horse> {
@@ -50,6 +56,7 @@ export async function getHorse(token: string, id: number): Promise<Horse> {
   return res.json()
 }
 
+// Return all horses, or throw an error if the request fails. This is used on the home page to show a carousel of horses.
 export async function getAllHorses(): Promise<Horse[]> {
   const res = await fetch(`${API_BASE_URL}/horses`)
   if (!res.ok) throw new Error('Failed to fetch horses')

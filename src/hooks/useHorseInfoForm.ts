@@ -1,0 +1,85 @@
+import { useState, type Dispatch, type SetStateAction } from 'react'
+import { updateHorse, type Horse, type HorseUpdate } from '../api/horse'
+import { validateName, validateColor, validateDob } from '../horseValidation'
+
+// The pedigree fields (key + display label), used for both validation and the
+// edit form. Shared by the hook (validation) and HorseInfoEditor (rendering).
+export const PEDIGREE_FIELDS: { key: keyof HorseUpdate; label: string }[] = [
+  { key: 'sire', label: 'Sire' },
+  { key: 'dam', label: 'Dam' },
+  { key: 'sires_sire', label: "Sire's Sire" },
+  { key: 'dams_sire', label: "Dam's Sire" },
+  { key: 'sires_dam', label: "Sire's Dam" },
+  { key: 'dams_dam', label: "Dam's Dam" },
+]
+
+// Owns the edit-mode state, form draft, and save logic for a horse's basic
+// info / story / pedigree. `handleSave` validates, sends only the changed
+// fields, and updates the shared horse on success.
+export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStateAction<Horse | null>>) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState<HorseUpdate>({})
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  function handleEditClick() {
+    if (!horse) return
+    setFormData({
+      name: horse.name,
+      story: horse.story ?? '',
+      date_of_birth: horse.date_of_birth ?? '',
+      color: horse.color ?? '',
+      gender: horse.gender ?? undefined,
+      sire: horse.sire ?? '',
+      dam: horse.dam ?? '',
+      sires_sire: horse.sires_sire ?? '',
+      dams_sire: horse.dams_sire ?? '',
+      sires_dam: horse.sires_dam ?? '',
+      dams_dam: horse.dams_dam ?? '',
+    })
+    setError(null)
+    setIsEditing(true)
+  }
+
+  async function handleSave() {
+    const token = localStorage.getItem('access_token')
+    if (!token || !horse) return
+
+    const validationError =
+      validateName(formData.name ?? '', 'Name') ??
+      validateColor(formData.color ?? '') ??
+      (!formData.gender ? 'Gender is required.' : null) ??
+      PEDIGREE_FIELDS.reduce<string | null>(
+        (err, { key, label }) => err ?? validateName((formData[key] as string) ?? '', label),
+        null,
+      ) ??
+      validateDob(formData.date_of_birth ?? '')
+
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+    try {
+      const trimmed = Object.fromEntries(
+        Object.entries(formData).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v])
+      )
+      // Send only fields that actually changed from the current horse.
+      const payload = Object.fromEntries(
+        Object.entries(trimmed).filter(([k, v]) => v !== horse[k as keyof Horse])
+      ) as HorseUpdate
+
+      const updated = await updateHorse(token, horse.id, payload)
+      setHorse(updated)
+      setIsEditing(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return { isEditing, setIsEditing, formData, setFormData, saving, error, handleEditClick, handleSave }
+}

@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  --font-title: 'Bebas Neue', sans-serif;
+  --font-title: 'Fraunces', serif;
   --font-subtitle: 'Inter', sans-serif;
   --font-caption: 'Inter', sans-serif;
+  --font-story-title: 'Playfair Display', serif;
+  --font-story-body: 'Cormorant Garamond', serif;
 
-  /* Premium Elegant Theme */
-  --color-brand-bg: #0f1117;
-  --color-brand-surface: #1a1d27;
-  --color-brand-border: #2e3142;
-  --color-brand-gold: #c9a84c;
-  --color-brand-gold-light: #e2c97e;
-  --color-brand-text: #f0ece4;
-  --color-brand-muted: #8a8fa8;
+  /* "Paddock & Post" — pastoral racing theme.
+     Warm parchment daylight + British-racing-green accents.
+     NB: the --brand-gold tokens now hold the primary GREEN accent
+     (name kept so we don't churn every className across the app). */
+  --color-brand-bg: #f5f1e6;        /* warm parchment / hay */
+  --color-brand-surface: #ffffff;   /* clean card white */
+  --color-brand-border: #e0d8c3;    /* soft sand */
+  --color-brand-gold: #1f4d3a;      /* deep racing / pasture green — primary accent */
+  --color-brand-gold-light: #2f6b4c;/* lighter pasture green — hover */
+  --color-brand-text: #29281f;      /* warm near-black, earthy */
+  --color-brand-muted: #71766a;     /* sage gray */
 }
 
 body {
   font-family: var(--font-subtitle);
   background-color: var(--color-brand-bg);
   color: var(--color-brand-text);
-  /* Render native controls (date picker, <select> dropdowns, scrollbars) in dark mode */
-  color-scheme: dark;
+  /* Render native controls (date picker, <select> dropdowns, scrollbars) in light mode */
+  color-scheme: light;
 }
 
 /* Remove the up/down spinner arrows on number inputs */
@@ -34,15 +39,30 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Make the date input's calendar button visible and gold-tinted on the dark theme */
+/* Tint the date input's calendar button racing-green on the light theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.7;
-  filter: invert(64%) sepia(38%) saturate(540%) hue-rotate(2deg) brightness(92%);
+  filter: invert(22%) sepia(24%) saturate(1200%) hue-rotate(96deg) brightness(94%);
   transition: opacity 0.15s;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+}
+
+/* Lenis smooth-scroll: let the library own scroll behaviour and page height */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 h1 {
