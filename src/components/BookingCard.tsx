@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { CalendarClock, Users, MapPin, ArrowUpRight } from 'lucide-react'
 import type { VisitorBooking } from '../api/booking'
 import { formatTime } from '../api/availability'
-import { formatVisitDate, displayStatus } from '../lib/bookingDisplay'
+import { formatVisitDate, displayStatus, isPastVisit } from '../lib/bookingDisplay'
 
 type BookingCardProps = {
   booking: VisitorBooking
@@ -100,8 +100,17 @@ function BookingCard({
         </div>
       </div>
 
-      {/* Cancel — only while the visit is still pending or confirmed */}
+      {/* Why the farmer declined/cancelled it, if they gave a reason */}
+      {(b.status === 'declined' || b.status === 'cancelled') && b.reason && (
+        <p className="text-sm text-brand-muted border-t border-brand-border pt-3">
+          <span className="font-bold text-brand-text">Reason: </span>
+          {b.reason}
+        </p>
+      )}
+
+      {/* Cancel — only while the visit is still pending/confirmed and hasn't happened yet */}
       {(b.status === 'pending' || b.status === 'confirmed') &&
+        !isPastVisit(b.date) &&
         (confirming ? (
           <div className="flex items-center gap-2">
             <button

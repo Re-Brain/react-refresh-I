@@ -7,7 +7,7 @@ import {
   type BookingStatus,
 } from '../api/booking'
 import { formatTime } from '../api/availability'
-import { formatVisitDate, displayStatus } from '../lib/bookingDisplay'
+import { formatVisitDate, displayStatus, isPastVisit } from '../lib/bookingDisplay'
 
 type Filter = 'all' | BookingStatus
 
@@ -19,6 +19,11 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'cancelled', label: 'Cancelled' },
 ]
 
+// Group order for the "All" tab — pending (needs action) first, cancelled
+// last. Single-status tabs ignore this (every row shares one status, so this
+// comparison is always a tie there) and fall straight through to the date sort.
+const STATUS_ORDER: BookingStatus[] = ['pending', 'confirmed', 'declined', 'cancelled']
+
 // All visits booked at the farmer's farm, with the visitor's contact details.
 // Fetched once (soonest-first from the server) and filtered by status client-side.
 function VisitorManagement() {
@@ -27,11 +32,12 @@ function VisitorManagement() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
-  // The booking whose Confirm/Decline/Cancel is in flight, the confirmed
-  // booking currently showing the "are you sure?" cancel prompt, and any
-  // action error.
+  // The booking whose Confirm/Decline/Cancel is in flight, and any action error.
   const [busyId, setBusyId] = useState<number | null>(null)
-  const [confirmId, setConfirmId] = useState<number | null>(null)
+  // The booking currently showing the Decline/Cancel reason prompt, and the
+  // reason text being typed for it (optional — shown to the visitor).
+  const [prompt, setPrompt] = useState<{ id: number; type: 'declined' | 'cancelled' } | null>(null)
+  const [reason, setReason] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
 
   function fetchBookings(token: string) {
@@ -41,16 +47,17 @@ function VisitorManagement() {
       .finally(() => setLoading(false))
   }
 
-  async function act(id: number, status: 'confirmed' | 'declined' | 'cancelled') {
+  async function act(id: number, status: 'confirmed' | 'declined' | 'cancelled', withReason?: string) {
     const token = localStorage.getItem('access_token')
     if (!token) return
     setBusyId(id)
     setActionError(null)
     try {
-      const updated = await updateBookingStatus(token, id, status)
+      const updated = await updateBookingStatus(token, id, status, withReason)
       // Swap the updated booking into the list; the derived views/counts follow.
       setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)))
-      if (status === 'cancelled') setConfirmId(null)
+      setPrompt(null)
+      setReason('')
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to update the booking.')
     } finally {
@@ -58,14 +65,16 @@ function VisitorManagement() {
     }
   }
 
-  // Open/close the confirm prompt on a confirmed booking's Cancel visit button.
-  function requestCancel(id: number) {
-    setConfirmId(id)
+  // Open/close the Decline/Cancel reason prompt on a given booking.
+  function openPrompt(id: number, type: 'declined' | 'cancelled') {
+    setPrompt({ id, type })
+    setReason('')
     setActionError(null)
   }
 
-  function keepCancel() {
-    setConfirmId(null)
+  function closePrompt() {
+    setPrompt(null)
+    setReason('')
   }
 
   useEffect(() => {
@@ -95,9 +104,19 @@ function VisitorManagement() {
       .finally(() => setRefreshing(false))
   }
 
-  const visible = filter === 'all' ? bookings : bookings.filter(b => b.status === filter)
+  // Grouped by status (All tab only — a real no-op on single-status tabs),
+  // then soonest-first by date and start time within each group.
+  const visible = (filter === 'all' ? bookings : bookings.filter(b => b.status === filter))
+    .slice()
+    .sort(
+      (a, b) =>
+        STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
+        a.date.localeCompare(b.date) ||
+        a.start.localeCompare(b.start)
+    )
   const countFor = (key: Filter) =>
     key === 'all' ? bookings.length : bookings.filter(b => b.status === key).length
+  const promptBooking = prompt ? bookings.find(b => b.id === prompt.id) : undefined
 
   if (loading) return <p className="text-brand-muted text-sm">Loading…</p>
 
@@ -223,39 +242,20 @@ function VisitorManagement() {
                           <Check size={14} /> Confirm
                         </button>
                         <button
-                          onClick={() => act(b.id, 'declined')}
+                          onClick={() => openPrompt(b.id, 'declined')}
                           disabled={busyId === b.id}
                           className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <X size={14} /> Decline
                         </button>
                       </div>
-                    ) : b.status === 'confirmed' ? (
-                      confirmId === b.id ? (
-                        <div className="flex items-center justify-start gap-2">
-                          <button
-                            onClick={() => act(b.id, 'cancelled')}
-                            disabled={busyId === b.id}
-                            className="bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-red-700 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {busyId === b.id ? 'Cancelling…' : 'Yes, cancel'}
-                          </button>
-                          <button
-                            onClick={keepCancel}
-                            disabled={busyId === b.id}
-                            className="text-brand-muted hover:text-brand-text font-bold px-3 py-1.5 rounded-lg border border-brand-border transition text-xs disabled:opacity-50"
-                          >
-                            Keep
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => requestCancel(b.id)}
-                          className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs"
-                        >
-                          <Ban size={14} /> Cancel visit
-                        </button>
-                      )
+                    ) : b.status === 'confirmed' && !isPastVisit(b.date) ? (
+                      <button
+                        onClick={() => openPrompt(b.id, 'cancelled')}
+                        className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs"
+                      >
+                        <Ban size={14} /> Cancel visit
+                      </button>
                     ) : (
                       <div className="text-left text-brand-muted text-xs">—</div>
                     )}
@@ -264,6 +264,66 @@ function VisitorManagement() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {prompt && promptBooking && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={closePrompt}
+        >
+          <div
+            className="bg-brand-surface border border-brand-border rounded-xl p-6 w-full max-w-md flex flex-col gap-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div>
+              <h3 className="text-lg font-bold text-brand-text">
+                {prompt.type === 'declined' ? 'Decline this request?' : 'Cancel this visit?'}
+              </h3>
+              <p className="text-brand-muted text-sm mt-1">
+                {promptBooking.visitor_name ?? 'This visitor'}&rsquo;s visit to see{' '}
+                <span className="font-bold text-brand-text">
+                  {promptBooking.horse_name ?? 'this horse'}
+                </span>{' '}
+                on {formatVisitDate(promptBooking.date)}.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-brand-muted uppercase">Reason for the visitor</label>
+              <textarea
+                value={reason}
+                onChange={e => setReason(e.target.value)}
+                placeholder="Let them know why…"
+                rows={3}
+                autoFocus
+                className="w-full bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold resize-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => act(promptBooking.id, prompt.type, reason.trim())}
+                disabled={busyId === promptBooking.id || !reason.trim()}
+                className="flex-1 bg-red-600 text-white font-bold px-4 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {busyId === promptBooking.id
+                  ? prompt.type === 'declined'
+                    ? 'Declining…'
+                    : 'Cancelling…'
+                  : prompt.type === 'declined'
+                  ? 'Confirm decline'
+                  : 'Yes, cancel'}
+              </button>
+              <button
+                onClick={closePrompt}
+                disabled={busyId === promptBooking.id}
+                className="flex-1 text-brand-muted hover:text-brand-text font-bold px-4 py-2.5 rounded-lg border border-brand-border transition text-sm disabled:opacity-50"
+              >
+                {prompt.type === 'declined' ? 'Keep pending' : 'Keep'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

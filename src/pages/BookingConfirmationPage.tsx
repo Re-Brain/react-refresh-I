@@ -1,5 +1,5 @@
 import { useLocation, Navigate, Link } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, AlertTriangle } from 'lucide-react'
 import type { Booking } from '../api/booking'
 import { formatTime } from '../api/availability'
 import { formatVisitDate } from '../lib/bookingDisplay'
@@ -34,6 +34,14 @@ function BookingConfirmationPage() {
           {formatTime(booking.start)}–{formatTime(booking.end)} was successfully sent to the farm.
           Please wait for their response.
         </p>
+
+        <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/40 text-yellow-600 rounded-lg px-4 py-3 text-sm text-left">
+          <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+          <p>
+            This is still just a request — the farm hasn&rsquo;t approved it yet. Hold off on any
+            travel plans until you get their confirmation.
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
           <Link

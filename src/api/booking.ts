@@ -25,6 +25,9 @@ export type Booking = {
   party_size: number
   note: string
   status: BookingStatus
+  // Why the farmer declined/cancelled it, if they gave one. Null otherwise
+  // (including for every non-declined/cancelled booking).
+  reason: string | null
   created_at: string
 }
 
@@ -76,16 +79,18 @@ function defaultMessage(status: number): string {
 
 // The farmer confirms, declines, or cancels a booking at their farm (the
 // latter only valid on an already-confirmed visit). Owner-only on the server;
-// returns the updated booking.
+// returns the updated booking. `reason` is an optional note shown to the
+// visitor — only meaningful alongside 'declined'/'cancelled'.
 export async function updateBookingStatus(
   token: string,
   id: number,
-  status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>
+  status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>,
+  reason?: string
 ): Promise<Booking> {
   const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
