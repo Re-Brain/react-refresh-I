@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, MapPin, ImageOff } from 'lucide-react'
+import { ArrowLeft, Heart, MapPin, ImageOff } from 'lucide-react'
 import type { ActiveFarm } from '../api/farm'
+import { LenisContext } from '../context/LenisContext'
 
 type FarmHeroProps = {
   farm: ActiveFarm
@@ -12,12 +13,26 @@ type FarmHeroProps = {
 // empty state when the farm has no photos. Owns its own selected-photo index.
 function FarmHero({ farm }: FarmHeroProps) {
   const navigate = useNavigate()
+  const lenisRef = useContext(LenisContext)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const farmImages = farm.images ?? []
   const hasImages = farmImages.length > 0
   // Selected photo, or '' when the farm has none (an empty state is shown instead).
   const farmImage = farmImages[activeImageIndex]?.image_url ?? ''
+
+  // Glide down to the "Support This Farm" section further down the page,
+  // rather than navigating anywhere — the donate form already lives here.
+  function scrollToDonate() {
+    const el = document.getElementById('support-farm')
+    if (!el) return
+    const lenis = lenisRef?.current
+    if (lenis) {
+      lenis.scrollTo(el, { offset: -80, duration: 1.4 })
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   return (
     <section className="relative grid lg:grid-cols-[1fr_1.4fr] min-h-[calc(100vh-3.25rem)]">
@@ -54,6 +69,14 @@ function FarmHero({ farm }: FarmHeroProps) {
               {farm.location ?? 'Location not specified'}
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={scrollToDonate}
+            className="flex items-center gap-2 bg-white text-brand-gold font-bold uppercase tracking-[0.2em] text-sm px-12 py-3.5 rounded-full shadow-md hover:bg-brand-bg hover:scale-[1.03] transition"
+          >
+            <Heart size={16} fill="currentColor" /> Donate
+          </button>
 
           {/* Photo gallery — click a thumbnail to change the main photo. */}
           {farmImages.length > 1 && (

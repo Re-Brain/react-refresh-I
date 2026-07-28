@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
 import type { Horse } from '../api/horse'
 import BookVisitButton from './BookVisitButton'
+import SupportFarmButton from './SupportFarmButton'
 
 type HorseHeroProps = {
   horse: Horse
@@ -9,13 +10,15 @@ type HorseHeroProps = {
   bookable: boolean
   /** Called when the visitor clicks "Book a Visit". */
   onBook: () => void
+  /** Called when the visitor clicks "Support This Horse's Farm". */
+  onSupport: () => void
 }
 
 // Full-height hero for the public horse page: framed photo (with a blurred
 // bleed behind it) on the left, and a details panel — name, meta line, sire ×
 // dam, book CTA, and thumbnail carousel — on the right. Owns its own
 // `activeImageIndex` since the selected photo is only relevant within here.
-function HorseHero({ horse, bookable, onBook }: HorseHeroProps) {
+function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   // Color · date of birth · gender, skipping whichever fields are unset.
@@ -104,8 +107,11 @@ function HorseHero({ horse, bookable, onBook }: HorseHeroProps) {
             )}
           </div>
 
-          <div className="mt-2">
+          <div className="mt-2 flex flex-col items-center gap-3">
             <BookVisitButton bookable={bookable} onBook={onBook} variant="onGold" />
+            {horse.farm_id !== null && (
+              <SupportFarmButton onSupport={onSupport} variant="onGold" />
+            )}
           </div>
 
           {/* Image carousel — click a thumbnail to change the main photo. */}

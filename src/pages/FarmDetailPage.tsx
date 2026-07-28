@@ -4,6 +4,7 @@ import FarmHero from '../components/FarmHero'
 import FarmStory from '../components/FarmStory'
 import FarmLocationMap from '../components/FarmLocationMap'
 import FarmResidents from '../components/FarmResidents'
+import FarmSupportSection from '../components/FarmSupportSection'
 
 function FarmDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -49,6 +50,7 @@ function FarmDetailPage() {
             <FarmStory description={state.farm.description} />
             <FarmLocationMap farm={state.farm} />
             <FarmResidents horses={horses} horsesError={horsesError} />
+            <FarmSupportSection farmId={state.farm.id} farmName={state.farm.name} />
           </div>
         </>
       )}

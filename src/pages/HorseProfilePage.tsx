@@ -8,6 +8,7 @@ import HorseStory from '../components/HorseStory'
 import HorsePedigree from '../components/HorsePedigree'
 import HorseRaceRecords from '../components/HorseRaceRecords'
 import BookVisitButton from '../components/BookVisitButton'
+import SupportFarmButton from '../components/SupportFarmButton'
 
 function HorseProfilePage() {
 
@@ -65,6 +66,7 @@ function HorseProfilePage() {
         horse={horse}
         bookable={bookable}
         onBook={() => navigate(`/book/${horse.id}`)}
+        onSupport={() => navigate(`/farms/${horse.farm_id}`)}
       />
 
       {/* Everything below the hero */}
@@ -76,12 +78,18 @@ function HorseProfilePage() {
 
           <HorseRaceRecords records={horse.race_records} />
 
-          <div className="flex justify-center py-4">
+          <div className="flex flex-row flex-wrap justify-center items-center gap-4 py-4">
             <BookVisitButton
               bookable={bookable}
               onBook={() => navigate(`/book/${horse.id}`)}
               variant="onLight"
             />
+            {horse.farm_id !== null && (
+              <SupportFarmButton
+                onSupport={() => navigate(`/farms/${horse.farm_id}`)}
+                variant="onLight"
+              />
+            )}
           </div>
         </div>
       </div>
