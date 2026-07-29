@@ -22,6 +22,8 @@ function DonateCancelPage() {
 
         <Link
           to={donation ? `/farms/${donation.farmId}` : '/farms'}
+          replace
+          state={{ fromDonation: true }}
           className="mt-4 bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm"
         >
           Back to farm

@@ -1,16 +1,23 @@
-import { Menu, Home, List, CalendarClock, Users, Settings, Lock } from 'lucide-react'
+import { Menu, Home, List, CalendarClock, Users, Heart, Settings, Lock } from 'lucide-react'
 
-export type Section = 'farm-info' | 'horse-management' | 'availability' | 'visitor-management' | 'settings'
+export type Section =
+  | 'farm-info'
+  | 'horse-management'
+  | 'availability'
+  | 'visitor-management'
+  | 'donations'
+  | 'settings'
 
 // Sections that stay locked until the farm profile is complete (they need
 // horses / a live farm to be useful).
-export const gatedSections: Section[] = ['horse-management', 'availability', 'visitor-management']
+export const gatedSections: Section[] = ['horse-management', 'availability', 'visitor-management', 'donations']
 
 const navItems: { key: Section; label: string; icon: React.ReactNode }[] = [
   { key: 'farm-info', label: 'Farm Info', icon: <Home size={18} /> },
   { key: 'horse-management', label: 'Horse Management', icon: <List size={18} /> },
   { key: 'availability', label: 'Visit Availability', icon: <CalendarClock size={18} /> },
   { key: 'visitor-management', label: 'Visitor Management', icon: <Users size={18} /> },
+  { key: 'donations', label: 'Donations', icon: <Heart size={18} /> },
   { key: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ]
 

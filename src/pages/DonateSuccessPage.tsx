@@ -37,6 +37,7 @@ function DonateSuccessPage() {
 
         <Link
           to="/farms"
+          replace
           className="mt-4 bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm"
         >
           Browse more farms

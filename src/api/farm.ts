@@ -28,6 +28,10 @@ export type ActiveFarm = {
   status: string
   owner_id: number
   images: FarmImage[]
+  // Whether this farm has finished Stripe Connect onboarding and can accept
+  // donations. Undefined/false both mean "not ready" — the donate UI treats
+  // them the same way.
+  payouts_enabled?: boolean
 }
 
 // Return all active farms, or throw an error if the request fails. This is used on the home page to show a carousel of farms.

@@ -1,0 +1,117 @@
+import { AlertTriangle, Heart, Users } from 'lucide-react'
+import { useFarmDonations } from '../hooks/useFarmDonations'
+
+function formatDonationDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+// The farmer dashboard's "Donations" tab: a Stripe connection banner (until
+// payouts are enabled) and, once they are, a total-raised summary plus a
+// table of supporters. Mirrors VisitorManagement's loading/error/retry shape.
+function DonationManagement() {
+  const { status, donations, loading, error, retry, connecting, connectError, connectStripe } =
+    useFarmDonations()
+
+  if (loading) return <p className="text-brand-muted text-sm">Loading…</p>
+
+  if (error)
+    return (
+      <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+        <div className="flex items-center gap-3">
+          <AlertTriangle size={18} className="shrink-0" />
+          <p>{error}</p>
+        </div>
+        <button
+          onClick={retry}
+          className="bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-4 py-2 rounded-lg hover:bg-red-500/20 transition text-sm shrink-0"
+        >
+          Retry
+        </button>
+      </div>
+    )
+
+  const totalYen = donations.reduce((sum, d) => sum + d.amount_yen, 0)
+
+  return (
+    <div className="flex flex-col gap-6">
+      {!status?.payouts_enabled && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-surface border border-brand-border rounded-lg p-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={20} className="text-yellow-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-brand-text">
+                {status?.connected ? 'Stripe verification in progress' : 'Connect your Stripe account'}
+              </p>
+              <p className="text-brand-muted text-sm mt-1 max-w-md">
+                {status?.connected
+                  ? "You've started connecting Stripe, but verification isn't finished yet — donations can't reach you until it is."
+                  : 'Visitors can only donate to your farm once you connect a Stripe account to receive the money.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={connectStripe}
+            disabled={connecting}
+            className="flex items-center gap-2 bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 shrink-0"
+          >
+            {connecting ? 'Redirecting…' : status?.connected ? 'Finish setup' : 'Connect Stripe'}
+          </button>
+        </div>
+      )}
+
+      {connectError && (
+        <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+          <AlertTriangle size={18} className="shrink-0" />
+          <p>{connectError}</p>
+        </div>
+      )}
+
+      {status?.payouts_enabled && (
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex items-center gap-4">
+          <span className="flex items-center justify-center w-12 h-12 rounded-full bg-brand-gold/10 text-brand-gold shrink-0">
+            <Heart size={22} fill="currentColor" />
+          </span>
+          <div>
+            <p className="text-xs font-bold text-brand-muted uppercase tracking-[0.15em]">Total raised</p>
+            <p className="text-2xl font-bold text-brand-text">¥{totalYen.toLocaleString()}</p>
+          </div>
+        </div>
+      )}
+
+      {donations.length === 0 ? (
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-8 text-center flex flex-col items-center gap-3">
+          <Users size={28} className="text-brand-muted" />
+          <p className="text-brand-muted text-sm">No donations yet.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-brand-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
+                <th className="text-left px-4 py-3 font-bold">Supporter</th>
+                <th className="text-left px-4 py-3 font-bold">Amount</th>
+                <th className="text-left px-4 py-3 font-bold">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {donations.map(d => (
+                <tr key={d.id} className="border-b border-brand-border last:border-0">
+                  <td className="px-4 py-3 font-bold text-brand-text">{d.donor_name ?? 'Anonymous'}</td>
+                  <td className="px-4 py-3 text-brand-text">¥{d.amount_yen.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-brand-muted">{formatDonationDate(d.created_at)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default DonationManagement

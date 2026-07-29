@@ -50,7 +50,11 @@ function FarmDetailPage() {
             <FarmStory description={state.farm.description} />
             <FarmLocationMap farm={state.farm} />
             <FarmResidents horses={horses} horsesError={horsesError} />
-            <FarmSupportSection farmId={state.farm.id} farmName={state.farm.name} />
+            <FarmSupportSection
+              farmId={state.farm.id}
+              farmName={state.farm.name}
+              payoutsEnabled={Boolean(state.farm.payouts_enabled)}
+            />
           </div>
         </>
       )}

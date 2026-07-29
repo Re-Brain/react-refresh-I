@@ -83,8 +83,8 @@ function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
         )}
 
         {/* Horse name and meta line */}
-        <div className="relative z-1 flex flex-col items-center gap-7">
-          <div className="flex flex-col items-center gap-4">
+        <div className="relative z-1 flex flex-col items-center gap-5">
+          <div className="flex flex-col items-center gap-3">
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
               <span className="text-amber-300">{horse.name.charAt(0)}</span>
               {horse.name.slice(1)}
@@ -107,7 +107,7 @@ function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
             )}
           </div>
 
-          <div className="mt-2 flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2">
             <BookVisitButton bookable={bookable} onBook={onBook} variant="onGold" />
             {horse.farm_id !== null && (
               <SupportFarmButton onSupport={onSupport} variant="onGold" />
@@ -116,7 +116,7 @@ function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
 
           {/* Image carousel — click a thumbnail to change the main photo. */}
           {horse.images.length > 1 && (
-            <div className="flex flex-wrap justify-center gap-3 max-w-xl mt-2">
+            <div className="flex flex-wrap justify-center gap-3 max-w-xl">
               {horse.images.map((img, i) => (
                 <button
                   key={img.id}

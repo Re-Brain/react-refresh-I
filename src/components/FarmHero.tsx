@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Heart, MapPin, ImageOff } from 'lucide-react'
 import type { ActiveFarm } from '../api/farm'
 import { LenisContext } from '../context/LenisContext'
@@ -13,8 +13,17 @@ type FarmHeroProps = {
 // empty state when the farm has no photos. Owns its own selected-photo index.
 function FarmHero({ farm }: FarmHeroProps) {
   const navigate = useNavigate()
+  const location = useLocation()
   const lenisRef = useContext(LenisContext)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+
+  // Normally "Back" just pops one step of browser history. But arriving here
+  // from the donate cancel/success flow means the previous entry is Stripe's
+  // own checkout page (outside our control, likely dead/expired by now) — so
+  // that flow tags its navigation with state telling us to go Home instead.
+  const cameFromDonationFlow = Boolean(
+    (location.state as { fromDonation?: boolean } | null)?.fromDonation
+  )
 
   const farmImages = farm.images ?? []
   const hasImages = farmImages.length > 0
@@ -37,7 +46,7 @@ function FarmHero({ farm }: FarmHeroProps) {
   return (
     <section className="relative grid lg:grid-cols-[1fr_1.4fr] min-h-[calc(100vh-3.25rem)]">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => (cameFromDonationFlow ? navigate('/') : navigate(-1))}
         className="fixed top-20 left-2 z-40 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition"
       >
         <ArrowLeft size={16} /> Back
