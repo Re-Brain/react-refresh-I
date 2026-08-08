@@ -9,6 +9,7 @@ function DashboardPage() {
   useEffect(() => {
     if (user?.role === 'farmer') navigate('/dashboard/farmer', { replace: true })
     else if (user?.role === 'visitor') navigate('/dashboard/visitor', { replace: true })
+    else if (user?.role === 'admin') navigate('/admin', { replace: true })
   }, [user, navigate])
 
   return null
