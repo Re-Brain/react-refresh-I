@@ -42,10 +42,14 @@ export type Horse = {
   race_records: RaceRecord[]
   periods: Period[]
   farm_availability: FarmAvailability
+  // Admin-review status. Optional because the backend doesn't send it yet —
+  // until it does, treat a missing status as 'approved' (today every horse is
+  // public immediately).
+  status?: 'pending' | 'approved' | 'rejected'
 }
 
-// The read-only availability fields aren't part of the create/update payload.
-export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id' | 'periods' | 'farm_availability'>
+// The read-only availability/status fields aren't part of the create/update payload.
+export type HorseCreate = Omit<Horse, 'id' | 'images' | 'farm_id' | 'periods' | 'farm_availability' | 'status'>
 export type HorseUpdate = Partial<HorseCreate>
 
 export async function getHorse(token: string, id: number): Promise<Horse> {

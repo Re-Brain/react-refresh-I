@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Trash2, SquarePen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { deleteHorse, type Horse } from '../api/horse'
+import { HORSE_STATUS_STYLES, HORSE_STATUS_LABELS } from '../lib/approvalStatusDisplay'
 
 type Props = {
   horses: Horse[]
@@ -45,6 +46,7 @@ function HorseTable({ horses, onChange }: Props) {
               <th className="text-left px-4 py-3 font-bold">Color</th>
               <th className="text-left px-4 py-3 font-bold">Date of Birth</th>
               <th className="text-left px-4 py-3 font-bold">Gender</th>
+              <th className="text-left px-4 py-3 font-bold">Status</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -59,6 +61,13 @@ function HorseTable({ horses, onChange }: Props) {
                 <td className="px-4 py-3 text-brand-muted">{horse.color ?? '—'}</td>
                 <td className="px-4 py-3 text-brand-muted">{horse.date_of_birth ?? '—'}</td>
                 <td className="px-4 py-3 text-brand-muted capitalize">{horse.gender ?? '—'}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${HORSE_STATUS_STYLES[horse.status ?? 'approved']}`}
+                  >
+                    {HORSE_STATUS_LABELS[horse.status ?? 'approved']}
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
                     {deleteConfirmId === horse.id ? (

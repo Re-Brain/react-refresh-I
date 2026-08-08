@@ -14,7 +14,7 @@ export type Farm = {
   location: string | null
   description: string | null
   capacity: number | null
-  status: 'pending' | 'active'
+  status: 'pending' | 'active' | 'rejected'
   images: FarmImage[]
 }
 

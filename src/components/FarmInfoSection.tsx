@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import type { Farm } from '../api/farm'
 import type { useFarmInfoForm } from '../hooks/useFarmInfoForm'
 import FarmImageManager from './FarmImageManager'
+import { FARM_STATUS_STYLES, FARM_STATUS_LABELS } from '../lib/approvalStatusDisplay'
 
 type FarmInfoSectionProps = {
   farm: Farm | null
@@ -18,7 +19,16 @@ function FarmInfoSection({ farm, setFarm, info }: FarmInfoSectionProps) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-brand-gold mb-6">Farm Info</h2>
+      <div className="flex items-center gap-3 mb-6">
+        <h2 className="text-2xl font-bold text-brand-gold">Farm Info</h2>
+        {farm && (
+          <span
+            className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${FARM_STATUS_STYLES[farm.status]}`}
+          >
+            {FARM_STATUS_LABELS[farm.status]}
+          </span>
+        )}
+      </div>
       <div className="flex flex-col gap-6">
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-6">
           {isEditing ? (
