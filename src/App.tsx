@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
 import RegisterFarmerPage from './pages/RegisterFarmerPage.tsx'
+import CheckEmailPage from './pages/CheckEmailPage.tsx'
+import VerifyEmailPage from './pages/VerifyEmailPage.tsx'
 import DashboardPage from './pages/DashboardPage.tsx'
 import FarmerDashboardPage from './pages/FarmerDashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
@@ -186,6 +188,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/visitor" element={<RegisterVisitorPage />} />
         <Route path="/register/farmer" element={<RegisterFarmerPage />} />
+        <Route path="/check-email" element={<CheckEmailPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer" element={<ProtectedRoute><FarmerDashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><AddHorsePage /></ProtectedRoute>} />

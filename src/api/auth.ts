@@ -5,6 +5,11 @@ export type Token = {
   token_type: string
 }
 
+export type RegisterResult = {
+  detail: string
+  email: string
+}
+
 export type UserMe = {
   id: number
   name: string
@@ -12,7 +17,17 @@ export type UserMe = {
   role: string
 }
 
-export async function registerVisitor(name: string, email: string, password: string): Promise<Token> {
+// Thrown for HTTP error responses so callers can branch on status (e.g. 403
+// "email not verified" during login needs different handling than other errors).
+export class ApiError extends Error {
+  status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
+  }
+}
+
+export async function registerVisitor(name: string, email: string, password: string): Promise<RegisterResult> {
   const res = await fetch(`${API_BASE_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,12 +35,12 @@ export async function registerVisitor(name: string, email: string, password: str
   })
   if (!res.ok) {
     const error = await res.json()
-    throw new Error(error.detail ?? 'Registration failed')
+    throw new ApiError(error.detail ?? 'Registration failed', res.status)
   }
   return res.json()
 }
 
-export async function registerFarmer(name: string, email: string, password: string, farmName: string): Promise<Token> {
+export async function registerFarmer(name: string, email: string, password: string, farmName: string): Promise<RegisterResult> {
   const res = await fetch(`${API_BASE_URL}/register/farmer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -33,9 +48,21 @@ export async function registerFarmer(name: string, email: string, password: stri
   })
   if (!res.ok) {
     const error = await res.json()
-    throw new Error(error.detail ?? 'Registration failed')
+    throw new ApiError(error.detail ?? 'Registration failed', res.status)
   }
   return res.json()
+}
+
+export async function verifyEmail(token: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  })
+  if (!res.ok) {
+    const error = await res.json().catch(() => null)
+    throw new ApiError(error?.detail ?? 'This verification link is invalid or has expired', res.status)
+  }
 }
 
 export async function login(email: string, password: string): Promise<Token> {
@@ -47,7 +74,7 @@ export async function login(email: string, password: string): Promise<Token> {
   })
   if (!res.ok) {
     const error = await res.json()
-    throw new Error(error.detail ?? 'Login failed')
+    throw new ApiError(error.detail ?? 'Login failed', res.status)
   }
   return res.json()
 }

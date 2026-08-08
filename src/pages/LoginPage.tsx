@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { login, getMe } from '../api/auth'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { login, getMe, ApiError } from '../api/auth'
 import { useAuth } from '../context/useAuth'
 
 function LoginPage() {
@@ -28,10 +28,15 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
+  // Set when the backend rejects login with 403 (email not verified yet), so
+  // we can render a link back to "check your email" instead of plain text.
+  const [unverified, setUnverified] = useState(false)
+
   // Handle form submission for login
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     setError('')
+    setUnverified(false)
     try {
 
       const token = await login(email, password)
@@ -42,7 +47,7 @@ function LoginPage() {
 
       // Fetch the user data after successful login and update the user state in the context
       const user = await getMe(token.access_token)
-      
+
       // Update the user state in the context with the fetched user data
       setUser(user)
 
@@ -51,6 +56,9 @@ function LoginPage() {
 
     } catch (err: unknown) {
 
+      if (err instanceof ApiError && err.status === 403) {
+        setUnverified(true)
+      }
       if (err instanceof Error) setError(err.message)
     }
   }
@@ -89,7 +97,19 @@ function LoginPage() {
             />
           </div>
           {/* Display error message if login fails */}
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && (
+            <p className="text-red-600 text-sm">
+              {error}
+              {unverified && (
+                <>
+                  {' '}
+                  <Link to="/check-email" state={{ email }} className="text-brand-gold hover:underline">
+                    Check your email
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
 
           {/* Submit button for login */}
           <button
