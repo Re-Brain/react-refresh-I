@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Trash2, SquarePen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { deleteHorse, DOCUMENT_TYPES, type Horse } from '../api/horse'
+import { deleteHorse, type Horse } from '../api/horse'
 import { HORSE_STATUS_STYLES, HORSE_STATUS_LABELS } from '../lib/approvalStatusDisplay'
 
 type Props = {
@@ -62,17 +62,12 @@ function HorseTable({ horses, onChange }: Props) {
                 <td className="px-4 py-3 text-brand-muted">{horse.date_of_birth ?? '—'}</td>
                 <td className="px-4 py-3 text-brand-muted capitalize">{horse.gender ?? '—'}</td>
                 <td className="px-4 py-3">
-                  <div className="flex flex-col items-start gap-1">
-                    <span
-                      title={horse.status === 'rejected' ? (horse.rejection_reason ?? undefined) : undefined}
-                      className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${HORSE_STATUS_STYLES[horse.status]}`}
-                    >
-                      {HORSE_STATUS_LABELS[horse.status]}
-                    </span>
-                    <span className="text-brand-muted text-xs">
-                      docs: {DOCUMENT_TYPES.filter(t => horse.documents?.some(d => d.document_type === t.key)).length}/3
-                    </span>
-                  </div>
+                  <span
+                    title={horse.status === 'rejected' ? (horse.rejection_reason ?? undefined) : undefined}
+                    className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${HORSE_STATUS_STYLES[horse.status]}`}
+                  >
+                    {HORSE_STATUS_LABELS[horse.status]}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">

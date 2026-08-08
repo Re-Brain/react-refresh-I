@@ -320,9 +320,9 @@ function AdminHorseDetailPage() {
             onClick={e => e.stopPropagation()}
           >
             <div>
-              <h3 className="text-lg font-bold text-brand-text">Reject this horse?</h3>
+              <h3 className="text-lg font-bold text-brand-text">Reject {horse.name}&rsquo;s registration?</h3>
               <p className="text-brand-muted text-sm mt-1">
-                <span className="font-bold text-brand-text">{horse.name}</span> will be notified with your reason.
+                The farmer will be notified with your reason, so let them know what needs fixing.
               </p>
             </div>
 

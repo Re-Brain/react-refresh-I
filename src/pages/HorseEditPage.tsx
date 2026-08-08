@@ -125,18 +125,22 @@ function HorseEditPage() {
           <div>
             <p className="font-bold">This horse was rejected.</p>
             {horse.rejection_reason && <p className="mt-0.5">{horse.rejection_reason}</p>}
+            <p className="mt-0.5 font-normal">Fix the issue above, then resubmit from step 3.</p>
           </div>
         </div>
       )}
 
-      {/* Step nav — jump directly to any section. */}
+      {/* Step nav — jump directly to any section. Locked while a section is
+          mid-edit so an unsaved edit can't be left stranded on a hidden step. */}
       <div className="flex flex-wrap gap-2 mb-8 pb-6 border-b border-brand-border">
         {STEPS.map(s => (
           <button
             key={s.step}
             type="button"
             onClick={() => setStep(s.step)}
-            className={`px-4 py-2 rounded-full text-sm font-bold border transition ${
+            disabled={imageActionsLocked}
+            title={imageActionsLocked ? 'Finish editing (Save or Cancel) before switching sections' : undefined}
+            className={`px-4 py-2 rounded-full text-sm font-bold border transition disabled:opacity-40 disabled:cursor-not-allowed ${
               step === s.step
                 ? 'bg-brand-gold text-brand-bg border-brand-gold'
                 : 'border-brand-border text-brand-muted hover:text-brand-gold hover:border-brand-gold'
@@ -240,7 +244,7 @@ function HorseEditPage() {
             </div>
           </div>
 
-          {horse.status === 'draft' && (
+          {(horse.status === 'draft' || horse.status === 'rejected') && (
             <div className="flex flex-col gap-3 bg-brand-surface border border-brand-border rounded-lg p-6">
               {submit.submitError && <p className="text-red-600 text-sm font-medium">{submit.submitError}</p>}
               <button
@@ -253,7 +257,11 @@ function HorseEditPage() {
                 }
                 className="self-start bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submit.submitting ? 'Submitting...' : 'Submit for Review'}
+                {submit.submitting
+                  ? 'Submitting...'
+                  : horse.status === 'rejected'
+                  ? 'Resubmit for Review'
+                  : 'Submit for Review'}
               </button>
             </div>
           )}
@@ -265,7 +273,9 @@ function HorseEditPage() {
           <button
             type="button"
             onClick={() => setStep(prev => (prev - 1) as Step)}
-            className="text-brand-muted hover:text-brand-text font-bold px-6 py-2 rounded-lg border border-brand-border transition text-sm"
+            disabled={imageActionsLocked}
+            title={imageActionsLocked ? 'Finish editing (Save or Cancel) before switching sections' : undefined}
+            className="text-brand-muted hover:text-brand-text font-bold px-6 py-2 rounded-lg border border-brand-border transition text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Back
           </button>
@@ -274,7 +284,9 @@ function HorseEditPage() {
           <button
             type="button"
             onClick={() => setStep(prev => (prev + 1) as Step)}
-            className="flex items-center gap-2 bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm"
+            disabled={imageActionsLocked}
+            title={imageActionsLocked ? 'Finish editing (Save or Cancel) before switching sections' : undefined}
+            className="flex items-center gap-2 bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Next <ArrowRight size={14} />
           </button>

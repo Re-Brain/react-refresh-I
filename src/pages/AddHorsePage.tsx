@@ -83,9 +83,11 @@ function AddHorsePage() {
         {step === 3 && (
           <section className="flex flex-col gap-6">
             <HorseReviewSummary form={form} imageDraft={imageDraft} documentDraft={documentDraft} recordDraft={recordDraft} />
-            {error && <p className="text-red-600 text-sm">{error}</p>}
           </section>
         )}
+
+        {/* Shown regardless of step — Save as Draft is reachable from any of them. */}
+        {error && <p className="text-red-600 text-sm">{error}</p>}
 
         <div className="flex items-center justify-between gap-3 pt-6 mt-2 border-t border-brand-border">
           <button
@@ -109,6 +111,14 @@ function AddHorsePage() {
               </button>
             )}
 
+            <button
+              type="submit"
+              disabled={busy}
+              className="text-brand-muted hover:text-brand-text font-bold px-6 py-2 rounded-lg border border-brand-border transition text-sm disabled:opacity-50"
+            >
+              {pendingAction === 'draft' ? 'Saving...' : 'Save as Draft'}
+            </button>
+
             {step < 3 ? (
               <button
                 type="button"
@@ -118,24 +128,15 @@ function AddHorsePage() {
                 Next <ArrowRight size={14} />
               </button>
             ) : (
-              <>
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
-                >
-                  {pendingAction === 'draft' ? 'Saving...' : 'Save as Draft'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmitForReview}
-                  disabled={busy || missingDocs.length > 0}
-                  title={missingDocs.length > 0 ? `Missing: ${missingDocs.map(t => t.label).join(', ')}` : undefined}
-                  className="bg-brand-surface text-brand-gold border border-brand-gold font-bold px-6 py-2 rounded-lg hover:bg-brand-gold hover:text-brand-bg transition text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-surface disabled:hover:text-brand-gold"
-                >
-                  {pendingAction === 'submit' ? 'Submitting...' : 'Submit for Review'}
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={handleSubmitForReview}
+                disabled={busy || missingDocs.length > 0}
+                title={missingDocs.length > 0 ? `Missing: ${missingDocs.map(t => t.label).join(', ')}` : undefined}
+                className="bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {pendingAction === 'submit' ? 'Submitting...' : 'Submit for Review'}
+              </button>
             )}
           </div>
         </div>
