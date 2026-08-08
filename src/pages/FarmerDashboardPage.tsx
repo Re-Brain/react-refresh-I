@@ -10,6 +10,7 @@ import HorseManagementSection from '../components/HorseManagementSection'
 import AvailabilitySection from '../components/AvailabilitySection'
 import SettingsSection from '../components/SettingsSection'
 import VisitorManagement from '../components/VisitorManagement'
+import DonationManagement from '../components/DonationManagement'
 
 function FarmerDashboardPage() {
   const navigate = useNavigate()
@@ -100,6 +101,17 @@ function FarmerDashboardPage() {
                   out, and check each visit&rsquo;s status.
                 </p>
                 <VisitorManagement />
+              </div>
+            )}
+
+            {activeSection === 'donations' && (
+              <div>
+                <h2 className="text-2xl font-bold text-brand-gold mb-2">Donations</h2>
+                <p className="text-brand-muted text-sm mb-6">
+                  Connect Stripe to receive donations, and keep track of the support your farm has
+                  received.
+                </p>
+                <DonationManagement />
               </div>
             )}
 

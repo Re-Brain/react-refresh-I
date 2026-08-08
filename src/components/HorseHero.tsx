@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
 import type { Horse } from '../api/horse'
 import BookVisitButton from './BookVisitButton'
+import SupportFarmButton from './SupportFarmButton'
 
 type HorseHeroProps = {
   horse: Horse
@@ -9,13 +10,15 @@ type HorseHeroProps = {
   bookable: boolean
   /** Called when the visitor clicks "Book a Visit". */
   onBook: () => void
+  /** Called when the visitor clicks "Support This Horse's Farm". */
+  onSupport: () => void
 }
 
 // Full-height hero for the public horse page: framed photo (with a blurred
 // bleed behind it) on the left, and a details panel — name, meta line, sire ×
 // dam, book CTA, and thumbnail carousel — on the right. Owns its own
 // `activeImageIndex` since the selected photo is only relevant within here.
-function HorseHero({ horse, bookable, onBook }: HorseHeroProps) {
+function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   // Color · date of birth · gender, skipping whichever fields are unset.
@@ -80,8 +83,8 @@ function HorseHero({ horse, bookable, onBook }: HorseHeroProps) {
         )}
 
         {/* Horse name and meta line */}
-        <div className="relative z-1 flex flex-col items-center gap-7">
-          <div className="flex flex-col items-center gap-4">
+        <div className="relative z-1 flex flex-col items-center gap-5">
+          <div className="flex flex-col items-center gap-3">
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
               <span className="text-amber-300">{horse.name.charAt(0)}</span>
               {horse.name.slice(1)}
@@ -104,13 +107,16 @@ function HorseHero({ horse, bookable, onBook }: HorseHeroProps) {
             )}
           </div>
 
-          <div className="mt-2">
+          <div className="flex flex-col items-center gap-2">
             <BookVisitButton bookable={bookable} onBook={onBook} variant="onGold" />
+            {horse.farm_id !== null && (
+              <SupportFarmButton onSupport={onSupport} variant="onGold" />
+            )}
           </div>
 
           {/* Image carousel — click a thumbnail to change the main photo. */}
           {horse.images.length > 1 && (
-            <div className="flex flex-wrap justify-center gap-3 max-w-xl mt-2">
+            <div className="flex flex-wrap justify-center gap-3 max-w-xl">
               {horse.images.map((img, i) => (
                 <button
                   key={img.id}

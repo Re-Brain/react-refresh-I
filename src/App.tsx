@@ -18,6 +18,10 @@ import FarmsListPage from './pages/FarmsListPage.tsx'
 import FarmDetailPage from './pages/FarmDetailPage.tsx'
 import BookVisitPage from './pages/BookVisitPage.tsx'
 import BookingConfirmationPage from './pages/BookingConfirmationPage.tsx'
+import DonateSuccessPage from './pages/DonateSuccessPage.tsx'
+import DonateCancelPage from './pages/DonateCancelPage.tsx'
+import StripeReturnPage from './pages/StripeReturnPage.tsx'
+import StripeRefreshPage from './pages/StripeRefreshPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { useAuth } from './context/useAuth'
 import { LenisContext } from './context/LenisContext'
@@ -188,6 +192,10 @@ function App() {
         <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
         <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
+        <Route path="/donate/success" element={<DonateSuccessPage />} />
+        <Route path="/donate/cancel" element={<DonateCancelPage />} />
+        <Route path="/farm/stripe/return" element={<ProtectedRoute><StripeReturnPage /></ProtectedRoute>} />
+        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><StripeRefreshPage /></ProtectedRoute>} />
       </Routes>
     </LenisContext.Provider>
   )
