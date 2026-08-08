@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { AlertTriangle } from 'lucide-react'
 import { useFarmData } from '../hooks/useFarmData'
 import { useFarmInfoForm } from '../hooks/useFarmInfoForm'
+import { useFarmDocuments } from '../hooks/useFarmDocuments'
+import { useFarmSubmit } from '../hooks/useFarmSubmit'
 import { useAccountSettings } from '../hooks/useAccountSettings'
 import DashboardSidebar, { gatedSections, type Section } from '../components/DashboardSidebar'
 import FarmInfoSection from '../components/FarmInfoSection'
@@ -24,6 +26,8 @@ function FarmerDashboardPage() {
   // Farm + horses data, the farm-info form, and the settings-tab logic.
   const { farm, setFarm, horses, setHorses, loading, loadError, horsesError, retryFarm, retryHorses, profileComplete } = useFarmData()
   const info = useFarmInfoForm(farm, setFarm)
+  const documents = useFarmDocuments(farm, setFarm)
+  const submit = useFarmSubmit(farm, setFarm)
   const settings = useAccountSettings()
 
   // Gated tabs stay unreachable until the farm profile is complete.
@@ -71,7 +75,7 @@ function FarmerDashboardPage() {
             )}
 
             {activeSection === 'farm-info' && (
-              <FarmInfoSection farm={farm} setFarm={setFarm} info={info} />
+              <FarmInfoSection farm={farm} setFarm={setFarm} info={info} documents={documents} submit={submit} />
             )}
 
             {activeSection === 'horse-management' && (

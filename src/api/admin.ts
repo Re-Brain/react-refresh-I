@@ -1,11 +1,12 @@
-import type { Farm } from './farm'
+import type { Farm, FarmDocument } from './farm'
 import type { Horse, HorseDocument } from './horse'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
 
-// Farm doesn't carry a 'rejected' status yet on the backend — this widens the
-// shared type for the admin queue until that lands.
-export type AdminFarm = Omit<Farm, 'status'> & { status: 'pending' | 'active' | 'rejected' }
+export type AdminFarm = Omit<Farm, 'documents'> & {
+  // Always present on the admin view, unlike the owner-only optional field on Farm.
+  documents: FarmDocument[]
+}
 export type AdminHorse = Omit<Horse, 'documents'> & {
   // Denormalized for display, same idea as Booking's horse_name/farm_name.
   farm_name?: string | null

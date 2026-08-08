@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, X, Home } from 'lucide-react'
+import { AlertTriangle, Check, X, Home, ExternalLink } from 'lucide-react'
 import { useAdminFarmApprovals } from '../../hooks/useAdminFarmApprovals'
+import { FARM_DOCUMENT_TYPES } from '../../api/farm'
+import { missingFarmDocumentTypes } from '../../lib/farmDocuments'
 
 // Queue of farm registrations awaiting review. Approve is immediate; Reject
 // requires a reason, shown to the farmer (same pattern as declining a visit).
@@ -67,22 +69,46 @@ function FarmApprovalsSection() {
                 <th className="text-left px-4 py-3 font-bold">Farm</th>
                 <th className="text-left px-4 py-3 font-bold">Location</th>
                 <th className="text-left px-4 py-3 font-bold">Description</th>
-                <th className="text-center px-4 py-3 font-bold">Capacity</th>
+                <th className="text-center px-4 py-3 font-bold">Documents</th>
                 <th className="text-left px-4 py-3 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {farms.map(f => (
+              {farms.map(f => {
+                const missing = missingFarmDocumentTypes(f.documents)
+                return (
                 <tr key={f.id} className="border-b border-brand-border last:border-0 align-top">
                   <td className="px-4 py-3 font-bold text-brand-text">{f.name}</td>
                   <td className="px-4 py-3 text-brand-text">{f.location ?? '—'}</td>
                   <td className="px-4 py-3 text-brand-muted text-xs max-w-xs">{f.description ?? '—'}</td>
-                  <td className="px-4 py-3 text-center text-brand-text">{f.capacity ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col items-start gap-1">
+                      {FARM_DOCUMENT_TYPES.map(t => {
+                        const doc = f.documents.find(d => d.document_type === t.key)
+                        return doc ? (
+                          <a
+                            key={t.key}
+                            href={doc.file_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-xs text-green-600 hover:text-green-500 transition"
+                          >
+                            <ExternalLink size={12} /> {t.label}
+                          </a>
+                        ) : (
+                          <span key={t.key} className="text-xs text-brand-muted">
+                            — {t.label}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-start gap-2">
                       <button
                         onClick={() => act(f.id, 'active')}
-                        disabled={busyId === f.id}
+                        disabled={busyId === f.id || missing.length > 0}
+                        title={missing.length > 0 ? `Missing: ${missing.map(m => FARM_DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
                         className="flex items-center gap-1 bg-green-500/10 text-green-600 border border-green-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Check size={14} /> Approve
@@ -97,7 +123,8 @@ function FarmApprovalsSection() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>

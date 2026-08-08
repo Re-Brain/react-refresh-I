@@ -15,7 +15,6 @@ export function useFarmInfoForm(farm: Farm | null, setFarm: Dispatch<SetStateAct
       name: farm.name,
       location: farm.location ?? '',
       description: farm.description ?? '',
-      capacity: farm.capacity ?? undefined,
     })
     setSaveError(null)
     setIsEditing(true)
@@ -37,8 +36,6 @@ export function useFarmInfoForm(farm: Farm | null, setFarm: Dispatch<SetStateAct
         payload.location = formData.location || null
       if ((formData.description ?? '') !== (farm.description ?? ''))
         payload.description = formData.description || null
-      if ((formData.capacity ?? null) !== (farm.capacity ?? null))
-        payload.capacity = formData.capacity || null
 
       const updated = await updateMyFarm(token, payload)
       setFarm(updated)
