@@ -15,9 +15,12 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
     <>
       <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
         <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
+        <p className="text-[12px] text-brand-muted normal-case">
+          Only Name is required for now — fill in the rest before submitting for review.
+        </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-brand-muted">Name <span className="text-red-600">*</span></label>
+            <label className="text-xs text-brand-muted">Name</label>
             <input
               maxLength={NAME_MAX}
               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -26,7 +29,7 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-brand-muted">Color <span className="text-red-600">*</span></label>
+            <label className="text-xs text-brand-muted">Color</label>
             <input
               maxLength={COLOR_MAX}
               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -35,7 +38,7 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-brand-muted">Date of Birth <span className="text-red-600">*</span></label>
+            <label className="text-xs text-brand-muted">Date of Birth</label>
             <input
               type="date"
               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
@@ -44,7 +47,7 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-brand-muted">Gender <span className="text-red-600">*</span></label>
+            <label className="text-xs text-brand-muted">Gender</label>
             <select
               className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
               value={form.gender ?? ''}
@@ -75,10 +78,11 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
 
       <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
         <p className="text-xs font-bold text-brand-muted uppercase">Pedigree</p>
+        <p className="text-[12px] text-brand-muted normal-case">Required before submitting for review, not to save a draft.</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {PEDIGREE_FIELDS.map(({ key, label }) => (
             <div key={key} className="flex flex-col gap-1">
-              <label className="text-xs text-brand-muted">{label} <span className="text-red-600">*</span></label>
+              <label className="text-xs text-brand-muted">{label}</label>
               <input
                 maxLength={NAME_MAX}
                 className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"

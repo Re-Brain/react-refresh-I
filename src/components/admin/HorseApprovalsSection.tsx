@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, X, ListChecks } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { AlertTriangle, Check, X, ListChecks, ExternalLink, Eye } from 'lucide-react'
 import { useAdminHorseApprovals } from '../../hooks/useAdminHorseApprovals'
+import { DOCUMENT_TYPES } from '../../api/horse'
+import { missingDocumentTypes } from '../../lib/horseDocuments'
 
 // Queue of horses farmers want to add to their farm, awaiting review. Approve
 // is immediate; Reject requires a reason, shown to the farmer.
@@ -64,25 +67,57 @@ function HorseApprovalsSection() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
-                <th className="text-left px-4 py-3 font-bold">Horse</th>
-                <th className="text-left px-4 py-3 font-bold">Farm</th>
-                <th className="text-left px-4 py-3 font-bold">Gender</th>
-                <th className="text-left px-4 py-3 font-bold">Date of birth</th>
-                <th className="text-left px-4 py-3 font-bold">Actions</th>
+                <th className="text-center px-4 py-3 font-bold">Horse</th>
+                <th className="text-center px-4 py-3 font-bold">Farm</th>
+                <th className="text-center px-4 py-3 font-bold">Gender</th>
+                <th className="text-center px-4 py-3 font-bold">Date of birth</th>
+                <th className="text-center px-4 py-3 font-bold">Documents</th>
+                <th className="text-center px-4 py-3 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {horses.map(h => (
+              {horses.map(h => {
+                const missing = missingDocumentTypes(h.documents)
+                return (
                 <tr key={h.id} className="border-b border-brand-border last:border-0 align-top">
-                  <td className="px-4 py-3 font-bold text-brand-text">{h.name}</td>
-                  <td className="px-4 py-3 text-brand-text">{h.farm_name ?? `Farm #${h.farm_id}`}</td>
-                  <td className="px-4 py-3 text-brand-text capitalize">{h.gender ?? '—'}</td>
-                  <td className="px-4 py-3 text-brand-text">{h.date_of_birth ?? '—'}</td>
+                  <td className="px-4 py-3 text-center font-bold text-brand-text">{h.name}</td>
+                  <td className="px-4 py-3 text-center text-brand-text">{h.farm_name ?? `Farm #${h.farm_id}`}</td>
+                  <td className="px-4 py-3 text-center text-brand-text capitalize">{h.gender ?? '—'}</td>
+                  <td className="px-4 py-3 text-center text-brand-text">{h.date_of_birth ?? '—'}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-start gap-2">
+                    <div className="flex flex-col items-start gap-1">
+                      {DOCUMENT_TYPES.map(t => {
+                        const doc = h.documents.find(d => d.document_type === t.key)
+                        return doc ? (
+                          <a
+                            key={t.key}
+                            href={doc.file_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-xs text-green-600 hover:text-green-500 transition"
+                          >
+                            <ExternalLink size={12} /> {t.label}
+                          </a>
+                        ) : (
+                          <span key={t.key} className="text-xs text-brand-muted">
+                            — {t.label}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <Link
+                        to={`/admin/horses/${h.id}`}
+                        className="flex items-center gap-1 text-brand-muted border border-brand-border font-bold px-3 py-1.5 rounded-lg hover:text-brand-gold hover:border-brand-gold transition text-xs"
+                      >
+                        <Eye size={14} /> View
+                      </Link>
                       <button
                         onClick={() => act(h.id, 'approved')}
-                        disabled={busyId === h.id}
+                        disabled={busyId === h.id || missing.length > 0}
+                        title={missing.length > 0 ? `Missing: ${missing.map(m => DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
                         className="flex items-center gap-1 bg-green-500/10 text-green-600 border border-green-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Check size={14} /> Approve
@@ -97,7 +132,8 @@ function HorseApprovalsSection() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>

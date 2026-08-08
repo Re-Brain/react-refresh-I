@@ -155,7 +155,12 @@ function HorsePeriodsGrid({
               const periods = view[horse.id] ?? []
               return (
                 <tr key={horse.id} className="border-b border-brand-border last:border-0">
-                  <td className="px-4 py-3 font-bold text-brand-text">{horse.name}</td>
+                  <td className="px-4 py-3 font-bold text-brand-text">
+                    {horse.name}
+                    {horse.status === 'pending' && (
+                      <span className="ml-2 text-xs font-normal text-yellow-500">(Pending review)</span>
+                    )}
+                  </td>
                   {PERIODS.map(p => {
                     const farmOpen = openPeriods.includes(p.key)
                     return (
@@ -163,9 +168,10 @@ function HorsePeriodsGrid({
                         <input
                           type="checkbox"
                           // A period the farm has closed is off for every horse;
-                          // checkboxes are only editable in edit mode.
+                          // checkboxes are only editable in edit mode. A pending
+                          // horse can't be edited at all until it's reviewed.
                           checked={farmOpen && periods.includes(p.key)}
-                          disabled={!isEditing || !farmOpen || saving}
+                          disabled={!isEditing || !farmOpen || saving || horse.status === 'pending'}
                           onChange={() => toggle(horse.id, p.key)}
                           aria-label={`${horse.name} — ${p.label}`}
                           className="h-4 w-4 accent-brand-gold disabled:opacity-40 disabled:cursor-not-allowed enabled:cursor-pointer"

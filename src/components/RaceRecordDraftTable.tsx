@@ -7,15 +7,18 @@ type RaceRecordDraftTableProps = {
 }
 
 // Race-record table for the add-horse form: added rows plus a persistent draft
-// row whose Add button appends it. At least one record is required. State lives
-// in useHorseRecordDraft.
+// row whose Add button appends it. At least one record is required before
+// submitting for review, not to save a draft. State lives in useHorseRecordDraft.
 function RaceRecordDraftTable({ draft }: RaceRecordDraftTableProps) {
   const { records, recordForm, setRecordForm, recordError, handleAddRecord, removeRecord } = draft
 
   return (
     <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-      <p className="text-xs font-bold text-brand-muted uppercase">Race Records <span className="text-red-600">*</span></p>
-      <p className="text-[12px] text-brand-muted normal-case">At least one race record is required. Fill in a row and click Add. Grade and FP are optional.</p>
+      <p className="text-xs font-bold text-brand-muted uppercase">Race Records</p>
+      <p className="text-[12px] text-brand-muted normal-case">
+        At least one race record is required before submitting for review, not to save a draft. Fill in a
+        row and click Add. Grade and FP are optional.
+      </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse uppercase">
           <thead>

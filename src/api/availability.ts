@@ -161,6 +161,9 @@ export async function saveHorsePeriods(
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ periods }),
   })
-  if (!res.ok) throw new Error('Failed to save horse periods')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.detail ?? 'Failed to save horse periods')
+  }
   return res.json()
 }

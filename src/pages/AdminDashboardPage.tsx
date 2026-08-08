@@ -8,7 +8,11 @@ import HorseApprovalsSection from '../components/admin/HorseApprovalsSection'
 function AdminDashboardPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [activeSection, setActiveSection] = useState<AdminSection>('farm-approvals')
+  // Persisted so navigating away (e.g. to a horse's detail page) and back
+  // returns to the same tab instead of resetting to Farm Approvals.
+  const [activeSection, setActiveSection] = useState<AdminSection>(
+    (sessionStorage.getItem('adminDashboardSection') as AdminSection) ?? 'farm-approvals'
+  )
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // Only admins belong here — bounce anyone else back to their own dashboard.
@@ -16,13 +20,18 @@ function AdminDashboardPage() {
     if (user && user.role !== 'admin') navigate('/dashboard', { replace: true })
   }, [user, navigate])
 
+  function handleNavClick(section: AdminSection) {
+    sessionStorage.setItem('adminDashboardSection', section)
+    setActiveSection(section)
+  }
+
   if (!user || user.role !== 'admin') return null
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text flex">
       <AdminDashboardSidebar
         activeSection={activeSection}
-        onNavClick={setActiveSection}
+        onNavClick={handleNavClick}
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />

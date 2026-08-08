@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage.tsx'
 import FarmerDashboardPage from './pages/FarmerDashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
 import AdminDashboardPage from './pages/AdminDashboardPage.tsx'
+import AdminHorseDetailPage from './pages/AdminHorseDetailPage.tsx'
 import AddHorsePage from './pages/AddHorsePage.tsx'
 import HorseEditPage from './pages/HorseEditPage.tsx'
 import HorseProfilePage from './pages/HorseProfilePage.tsx'
@@ -194,6 +195,7 @@ function App() {
         <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+        <Route path="/admin/horses/:id" element={<ProtectedRoute><AdminHorseDetailPage /></ProtectedRoute>} />
         <Route path="/donate/success" element={<DonateSuccessPage />} />
         <Route path="/donate/cancel" element={<DonateCancelPage />} />
         <Route path="/farm/stripe/return" element={<ProtectedRoute><StripeReturnPage /></ProtectedRoute>} />

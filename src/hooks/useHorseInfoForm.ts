@@ -45,15 +45,18 @@ export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStat
     const token = localStorage.getItem('access_token')
     if (!token || !horse) return
 
+    // A draft can be saved incrementally — only format is checked, not
+    // presence. Everything becomes required again once it's been submitted.
+    const required = horse.status !== 'draft'
     const validationError =
-      validateName(formData.name ?? '', 'Name') ??
-      validateColor(formData.color ?? '') ??
-      (!formData.gender ? 'Gender is required.' : null) ??
+      validateName(formData.name ?? '', 'Name', required) ??
+      validateColor(formData.color ?? '', required) ??
+      (required && !formData.gender ? 'Gender is required.' : null) ??
       PEDIGREE_FIELDS.reduce<string | null>(
-        (err, { key, label }) => err ?? validateName((formData[key] as string) ?? '', label),
+        (err, { key, label }) => err ?? validateName((formData[key] as string) ?? '', label, required),
         null,
       ) ??
-      validateDob(formData.date_of_birth ?? '')
+      validateDob(formData.date_of_birth ?? '', required)
 
     if (validationError) {
       setError(validationError)
@@ -64,7 +67,12 @@ export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStat
     setError(null)
     try {
       const trimmed = Object.fromEntries(
-        Object.entries(formData).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v])
+        Object.entries(formData).map(([k, v]) => {
+          if (typeof v !== 'string') return [k, v]
+          const t = v.trim()
+          // Empty string isn't a valid date for the backend — send null instead.
+          return k === 'date_of_birth' ? [k, t || null] : [k, t]
+        })
       )
       // Send only fields that actually changed from the current horse.
       const payload = Object.fromEntries(
