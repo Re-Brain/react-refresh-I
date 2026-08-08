@@ -40,7 +40,7 @@ function AdminDashboardPage() {
         <div className="max-w-6xl mx-auto flex flex-col gap-6">
           <div>
             <h1 className="text-3xl font-bold text-brand-gold">
-              {activeSection === 'farm-approvals' ? 'Farm Registrations' : 'Horse Registrations'}
+              {activeSection === 'farm-approvals' ? 'Farm Registrations Request' : 'Horse Registrations Request'}
             </h1>
             <p className="text-brand-muted text-sm mt-1">
               {activeSection === 'farm-approvals'

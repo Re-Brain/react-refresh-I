@@ -28,6 +28,17 @@ export async function getPendingFarms(token: string): Promise<AdminFarm[]> {
   return res.json()
 }
 
+export async function getAdminFarm(token: string, id: number): Promise<AdminFarm> {
+  const res = await fetch(`${API_BASE_URL}/admin/farms/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(body?.detail, 'Failed to load farm.'))
+  }
+  return res.json()
+}
+
 export async function updateFarmApproval(
   token: string,
   id: number,

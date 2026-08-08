@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, X, Home, ExternalLink } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { AlertTriangle, Check, X, Home, ExternalLink, Eye } from 'lucide-react'
 import { useAdminFarmApprovals } from '../../hooks/useAdminFarmApprovals'
 import { FARM_DOCUMENT_TYPES } from '../../api/farm'
 import { missingFarmDocumentTypes } from '../../lib/farmDocuments'
@@ -66,11 +67,10 @@ function FarmApprovalsSection() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
-                <th className="text-left px-4 py-3 font-bold">Farm</th>
-                <th className="text-left px-4 py-3 font-bold">Location</th>
-                <th className="text-left px-4 py-3 font-bold">Description</th>
+                <th className="text-center px-4 py-3 font-bold">Farm</th>
+                <th className="text-center px-4 py-3 font-bold">Location</th>
                 <th className="text-center px-4 py-3 font-bold">Documents</th>
-                <th className="text-left px-4 py-3 font-bold">Actions</th>
+                <th className="text-center px-4 py-3 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -78,9 +78,8 @@ function FarmApprovalsSection() {
                 const missing = missingFarmDocumentTypes(f.documents)
                 return (
                 <tr key={f.id} className="border-b border-brand-border last:border-0 align-top">
-                  <td className="px-4 py-3 font-bold text-brand-text">{f.name}</td>
-                  <td className="px-4 py-3 text-brand-text">{f.location ?? '—'}</td>
-                  <td className="px-4 py-3 text-brand-muted text-xs max-w-xs">{f.description ?? '—'}</td>
+                  <td className="px-4 py-3 text-center font-bold text-brand-text">{f.name}</td>
+                  <td className="px-4 py-3 text-center text-brand-text">{f.location ?? '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col items-start gap-1">
                       {FARM_DOCUMENT_TYPES.map(t => {
@@ -104,7 +103,13 @@ function FarmApprovalsSection() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-start gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Link
+                        to={`/admin/farms/${f.id}`}
+                        className="flex items-center gap-1 text-brand-muted border border-brand-border font-bold px-3 py-1.5 rounded-lg hover:text-brand-gold hover:border-brand-gold transition text-xs"
+                      >
+                        <Eye size={14} /> View
+                      </Link>
                       <button
                         onClick={() => act(f.id, 'active')}
                         disabled={busyId === f.id || missing.length > 0}
