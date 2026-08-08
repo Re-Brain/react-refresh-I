@@ -27,6 +27,7 @@ import DonateCancelPage from './pages/DonateCancelPage.tsx'
 import StripeReturnPage from './pages/StripeReturnPage.tsx'
 import StripeRefreshPage from './pages/StripeRefreshPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
+import RequireActiveFarm from './components/RequireActiveFarm.tsx'
 import { useAuth } from './context/useAuth'
 import { LenisContext } from './context/LenisContext'
 
@@ -192,8 +193,8 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer" element={<ProtectedRoute><FarmerDashboardPage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><AddHorsePage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><HorseEditPage /></ProtectedRoute>} />
+        <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><RequireActiveFarm><AddHorsePage /></RequireActiveFarm></ProtectedRoute>} />
+        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><RequireActiveFarm><HorseEditPage /></RequireActiveFarm></ProtectedRoute>} />
         <Route path="/horses/:id" element={<HorseProfilePage />} />
         <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
         <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
@@ -202,8 +203,8 @@ function App() {
         <Route path="/admin/horses/:id" element={<ProtectedRoute><AdminHorseDetailPage /></ProtectedRoute>} />
         <Route path="/donate/success" element={<DonateSuccessPage />} />
         <Route path="/donate/cancel" element={<DonateCancelPage />} />
-        <Route path="/farm/stripe/return" element={<ProtectedRoute><StripeReturnPage /></ProtectedRoute>} />
-        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><StripeRefreshPage /></ProtectedRoute>} />
+        <Route path="/farm/stripe/return" element={<ProtectedRoute><RequireActiveFarm><StripeReturnPage /></RequireActiveFarm></ProtectedRoute>} />
+        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><RequireActiveFarm><StripeRefreshPage /></RequireActiveFarm></ProtectedRoute>} />
       </Routes>
     </LenisContext.Provider>
   )

@@ -106,7 +106,10 @@ export async function getMyHorses(token: string): Promise<Horse[]> {
   const res = await fetch(`${API_BASE_URL}/horses/me`, {
     headers: { Authorization: `Bearer ${token}` },
   })
-  if (!res.ok) throw new Error('Failed to fetch horses')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to fetch horses'))
+  }
   return res.json()
 }
 
@@ -116,7 +119,10 @@ export async function createHorse(token: string, data: HorseCreate): Promise<Hor
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
-  if (!res.ok) throw new Error('Failed to create horse')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to create horse'))
+  }
   return res.json()
 }
 

@@ -55,6 +55,16 @@ export type ActiveFarm = {
   payouts_enabled?: boolean
 }
 
+// `detail` is a plain string for our own business-rule errors (e.g. "farm is
+// pending review"), but FastAPI's own validation 422s send an array of field
+// errors instead — pull a readable message out of either shape rather than
+// letting `new Error(arrayOrObject)` stringify to "[object Object]".
+function messageFromDetail(detail: unknown, fallback: string): string {
+  if (typeof detail === 'string') return detail
+  if (Array.isArray(detail) && typeof detail[0]?.msg === 'string') return detail[0].msg
+  return fallback
+}
+
 // Return all active farms, or throw an error if the request fails. This is used on the home page to show a carousel of farms.
 export async function getActiveFarms(): Promise<ActiveFarm[]> {
   const res = await fetch(`${API_BASE_URL}/farms`)
@@ -84,7 +94,10 @@ export async function getMyFarm(token: string): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me`, {
     headers: { Authorization: `Bearer ${token}` },
   })
-  if (!res.ok) throw new Error('Failed to fetch farm')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to fetch farm'))
+  }
   return res.json()
 }
 
@@ -97,7 +110,10 @@ export async function updateMyFarm(token: string, data: FarmUpdate): Promise<Far
     },
     body: JSON.stringify(data),
   })
-  if (!res.ok) throw new Error('Failed to update farm')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to update farm'))
+  }
   return res.json()
 }
 
@@ -123,7 +139,10 @@ export async function deleteFarmImage(token: string, imageId: number): Promise<F
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
-  if (!res.ok) throw new Error('Failed to delete image')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to delete image'))
+  }
   return res.json()
 }
 
@@ -133,18 +152,11 @@ export async function reorderFarmImages(token: string, imageIds: number[]): Prom
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ image_ids: imageIds }),
   })
-  if (!res.ok) throw new Error('Failed to reorder images')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(messageFromDetail(err.detail, 'Failed to reorder images'))
+  }
   return res.json()
-}
-
-// `detail` is a plain string for our own business-rule errors (e.g. "missing
-// documents"), but FastAPI's own validation 422s send an array of field
-// errors instead — pull a readable message out of either shape rather than
-// letting `new Error(arrayOrObject)` stringify to "[object Object]".
-function messageFromDetail(detail: unknown, fallback: string): string {
-  if (typeof detail === 'string') return detail
-  if (Array.isArray(detail) && typeof detail[0]?.msg === 'string') return detail[0].msg
-  return fallback
 }
 
 // Document endpoints mirror the horse document endpoints, scoped to the
