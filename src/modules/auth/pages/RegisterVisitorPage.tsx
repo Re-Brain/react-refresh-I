@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerVisitor } from '../api'
+import { registerVisitor, ApiError } from '../api'
+import { useRetryCountdown, formatCountdown } from '../../../hooks/useRetryCountdown'
 
 function RegisterVisitorPage() {
 
@@ -13,6 +14,10 @@ function RegisterVisitorPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
+  // Ticks down after a 429, disabling the submit button so the user isn't
+  // tempted to keep clicking and re-triggering the still-active limit.
+  const retry = useRetryCountdown()
+
    // Handle form submission for visitor registration
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
@@ -24,6 +29,9 @@ function RegisterVisitorPage() {
       await registerVisitor(name, email, password)
       navigate('/check-email', { state: { email } })
     } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 429 && err.retryAfterSeconds) {
+        retry.start(err.retryAfterSeconds)
+      }
       if (err instanceof Error) setError(err.message)
     }
   }
@@ -83,9 +91,10 @@ function RegisterVisitorPage() {
           {/* Submit button for registration */}
           <button
             type="submit"
-            className="bg-brand-gold text-brand-bg font-bold py-2 rounded-lg hover:bg-brand-gold-light transition mt-2"
+            disabled={retry.secondsLeft > 0}
+            className="bg-brand-gold text-brand-bg font-bold py-2 rounded-lg hover:bg-brand-gold-light transition mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {retry.secondsLeft > 0 ? `Try again in ${formatCountdown(retry.secondsLeft)}` : 'Create Account'}
           </button>
         </form>
 

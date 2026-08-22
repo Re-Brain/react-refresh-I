@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { login, getMe, ApiError } from '../api'
 import { useAuth } from '../context/useAuth'
+import { useRetryCountdown, formatCountdown } from '../../../hooks/useRetryCountdown'
 
 function LoginPage() {
 
@@ -32,6 +33,10 @@ function LoginPage() {
   // we can render a link back to "check your email" instead of plain text.
   const [unverified, setUnverified] = useState(false)
 
+  // Ticks down after a 429, disabling the submit button so the user isn't
+  // tempted to keep clicking and re-triggering the still-active limit.
+  const retry = useRetryCountdown()
+
   // Handle form submission for login
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
@@ -57,6 +62,9 @@ function LoginPage() {
 
       if (err instanceof ApiError && err.status === 403) {
         setUnverified(true)
+      }
+      if (err instanceof ApiError && err.status === 429 && err.retryAfterSeconds) {
+        retry.start(err.retryAfterSeconds)
       }
       if (err instanceof Error) setError(err.message)
     }
@@ -113,9 +121,10 @@ function LoginPage() {
           {/* Submit button for login */}
           <button
             type="submit"
-            className="bg-brand-gold text-brand-bg font-bold py-2 rounded-lg hover:bg-brand-gold-light transition mt-2"
+            disabled={retry.secondsLeft > 0}
+            className="bg-brand-gold text-brand-bg font-bold py-2 rounded-lg hover:bg-brand-gold-light transition mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {retry.secondsLeft > 0 ? `Try again in ${formatCountdown(retry.secondsLeft)}` : 'Login'}
           </button>
           
         </form>
