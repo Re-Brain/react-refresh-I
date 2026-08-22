@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+import { csrfHeaders } from '../../../lib/csrf'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 export type FarmImage = {
   id: number
@@ -90,9 +92,9 @@ export function isFarmComplete(farm: Farm): boolean {
   return Boolean(farm.location && farm.description)
 }
 
-export async function getMyFarm(token: string): Promise<Farm> {
+export async function getMyFarm(): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -101,12 +103,13 @@ export async function getMyFarm(token: string): Promise<Farm> {
   return res.json()
 }
 
-export async function updateMyFarm(token: string, data: FarmUpdate): Promise<Farm> {
+export async function updateMyFarm(data: FarmUpdate): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me`, {
     method: 'PATCH',
+    credentials: 'include',
     headers: {
-      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      ...csrfHeaders('PATCH'),
     },
     body: JSON.stringify(data),
   })
@@ -119,12 +122,13 @@ export async function updateMyFarm(token: string, data: FarmUpdate): Promise<Far
 
 // Image endpoints are scoped to the caller's own farm ("me"), mirroring the
 // horse image endpoints. Each returns the updated farm with its images array.
-export async function uploadFarmImage(token: string, file: File): Promise<Farm> {
+export async function uploadFarmImage(file: File): Promise<Farm> {
   const formData = new FormData()
   formData.append('file', file)
   const res = await fetch(`${API_BASE_URL}/farms/me/image`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -134,10 +138,11 @@ export async function uploadFarmImage(token: string, file: File): Promise<Farm> 
   return res.json()
 }
 
-export async function deleteFarmImage(token: string, imageId: number): Promise<Farm> {
+export async function deleteFarmImage(imageId: number): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me/image/${imageId}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    headers: { ...csrfHeaders('DELETE') },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -146,10 +151,11 @@ export async function deleteFarmImage(token: string, imageId: number): Promise<F
   return res.json()
 }
 
-export async function reorderFarmImages(token: string, imageIds: number[]): Promise<Farm> {
+export async function reorderFarmImages(imageIds: number[]): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me/images/order`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
     body: JSON.stringify({ image_ids: imageIds }),
   })
   if (!res.ok) {
@@ -161,13 +167,14 @@ export async function reorderFarmImages(token: string, imageIds: number[]): Prom
 
 // Document endpoints mirror the horse document endpoints, scoped to the
 // caller's own farm ("me"). Each returns the updated farm with its documents array.
-export async function uploadFarmDocument(token: string, file: File, documentType: FarmDocumentType): Promise<Farm> {
+export async function uploadFarmDocument(file: File, documentType: FarmDocumentType): Promise<Farm> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('document_type', documentType)
   const res = await fetch(`${API_BASE_URL}/farms/me/documents`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -177,10 +184,11 @@ export async function uploadFarmDocument(token: string, file: File, documentType
   return res.json()
 }
 
-export async function deleteFarmDocument(token: string, documentId: number): Promise<Farm> {
+export async function deleteFarmDocument(documentId: number): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me/documents/${documentId}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    headers: { ...csrfHeaders('DELETE') },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -192,10 +200,11 @@ export async function deleteFarmDocument(token: string, documentId: number): Pro
 // Moves the farm from draft/rejected to pending once the profile is complete
 // and all 3 documents are present. Missing requirements should block the
 // button client-side; this is the fallback for whatever slips through.
-export async function submitFarmForReview(token: string): Promise<Farm> {
+export async function submitFarmForReview(): Promise<Farm> {
   const res = await fetch(`${API_BASE_URL}/farms/me/submit`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    headers: { ...csrfHeaders('POST') },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))

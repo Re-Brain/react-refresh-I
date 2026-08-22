@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+import { csrfHeaders } from '../../../lib/csrf'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 export type DonationCheckoutSession = {
   checkout_url: string
@@ -37,19 +39,16 @@ function defaultMessage(status: number): string {
 }
 
 // Creates a Stripe Checkout Session for a one-time yen donation to a farm.
-// `token` is optional — donations work anonymously, so it's omitted entirely
-// (rather than sent empty) when the visitor isn't logged in.
+// Works for logged-out visitors too — the session cookie (and CSRF header) is
+// only present/sent when the visitor is actually logged in.
 export async function createDonationCheckoutSession(
   farmId: number,
   amount: number,
-  token?: string | null
 ): Promise<DonationCheckoutSession> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (token) headers.Authorization = `Bearer ${token}`
-
   const res = await fetch(`${API_BASE_URL}/donations/checkout-session`, {
     method: 'POST',
-    headers,
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...csrfHeaders('POST') },
     body: JSON.stringify({ farm_id: farmId, amount }),
   })
   if (!res.ok) {
