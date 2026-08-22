@@ -39,14 +39,13 @@ function LoginPage() {
     setUnverified(false)
     try {
 
-      const token = await login(email, password)
-      localStorage.setItem('access_token', token.access_token)
+      await login(email, password)
 
       // Reset the dashboard section in sessionStorage to ensure the user starts fresh after login
       sessionStorage.removeItem('dashboardSection')
 
       // Fetch the user data after successful login and update the user state in the context
-      const user = await getMe(token.access_token)
+      const user = await getMe()
 
       // Update the user state in the context with the fetched user data
       setUser(user)

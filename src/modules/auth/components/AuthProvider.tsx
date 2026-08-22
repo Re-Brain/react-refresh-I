@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getMe } from '../api'
+import { getMe, logout as logoutRequest } from '../api'
 import type { UserMe } from '../api'
 import { AuthContext } from '../context/AuthContext'
 
@@ -8,19 +8,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      getMe(token)
-        .then(setUser)
-        .catch(() => localStorage.removeItem('access_token'))
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
+    getMe()
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false))
   }, [])
 
-  function logout() {
-    localStorage.removeItem('access_token')
+  async function logout() {
+    await logoutRequest()
     setUser(null)
   }
 
