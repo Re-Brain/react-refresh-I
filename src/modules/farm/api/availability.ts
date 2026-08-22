@@ -18,6 +18,7 @@
 
 import type { Horse } from './horse'
 import { csrfHeaders } from '../../../lib/csrf'
+import { API_BASE_URL } from '../../../lib/apiBase'
 
 export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -123,8 +124,6 @@ export function getHorseVisitSlots(
 }
 
 // ─── Backend ────────────────────────────────────────────────────────────────
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 // The logged-in farmer's schedule. The backend returns the default (never a
 // 404) when the farm has never configured it.
