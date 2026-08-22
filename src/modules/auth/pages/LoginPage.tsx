@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { login, getMe, ApiError } from '../api/auth'
+import { login, getMe, ApiError } from '../api'
 import { useAuth } from '../context/useAuth'
 
 function LoginPage() {

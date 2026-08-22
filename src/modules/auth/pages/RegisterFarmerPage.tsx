@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerFarmer } from '../api/auth'
+import { registerFarmer } from '../api'
 
 function RegisterFarmerPage() {
 

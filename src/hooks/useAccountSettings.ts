@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/useAuth'
-import { changePassword, deleteAccount } from '../api/auth'
+import { useAuth, changePassword, deleteAccount } from '../modules/auth'
 
 // Owns the Settings tab's logic: the change-password form and the
 // delete-account flow. Deleting logs the user out and returns them home.

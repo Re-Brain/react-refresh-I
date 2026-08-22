@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '../modules/auth'
 
 function DashboardPage() {
   const { user } = useAuth()

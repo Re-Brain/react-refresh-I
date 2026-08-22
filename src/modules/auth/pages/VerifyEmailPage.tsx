@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { verifyEmail } from '../api/auth'
+import { verifyEmail } from '../api'
 
 type Status = 'verifying' | 'success' | 'error'
 
