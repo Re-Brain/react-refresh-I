@@ -1,21 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, AlertTriangle, Check, X, FileText, ExternalLink, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useAuth } from '../context/useAuth'
-import { FARM_DOCUMENT_TYPES } from '../api/farm'
-import { getAdminFarm, updateFarmApproval, type AdminFarm } from '../api/admin'
-import { missingFarmDocumentTypes } from '../lib/farmDocuments'
-import { FARM_STATUS_STYLES, FARM_STATUS_LABELS } from '../lib/approvalStatusDisplay'
+import { useAuth } from '../../auth'
+import {
+  getHorse,
+  DOCUMENT_TYPES,
+  type Horse,
+  missingDocumentTypes,
+  PEDIGREE_FIELDS,
+  HORSE_STATUS_STYLES,
+  HORSE_STATUS_LABELS,
+  GradeBadge,
+  FinishPos,
+} from '../../farm'
+import { updateHorseApproval } from '../api'
 
-// Mirrors AdminHorseDetailPage: full read view of a single farm registration
-// (images, profile, documents) plus the same approve/reject actions as the
-// approvals table, for when the table's summary row isn't enough context.
-function AdminFarmDetailPage() {
+function AdminHorseDetailPage() {
   const { user } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const [farm, setFarm] = useState<AdminFarm | null>(null)
+  const [horse, setHorse] = useState<Horse | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -32,22 +37,22 @@ function AdminFarmDetailPage() {
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token || !id) return
-    getAdminFarm(token, Number(id))
-      .then(setFarm)
-      .catch(() => setLoadError('Farm not found'))
+    getHorse(token, Number(id))
+      .then(setHorse)
+      .catch(() => setLoadError('Horse not found'))
       .finally(() => setLoading(false))
   }, [id])
 
-  async function act(status: 'active' | 'rejected', withReason?: string) {
+  async function act(status: 'approved' | 'rejected', withReason?: string) {
     const token = localStorage.getItem('access_token')
-    if (!token || !farm) return
+    if (!token || !horse) return
     setBusy(true)
     setActionError(null)
     try {
-      await updateFarmApproval(token, farm.id, status, withReason)
+      await updateHorseApproval(token, horse.id, status, withReason)
       navigate('/admin')
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to update the farm.')
+      setActionError(err instanceof Error ? err.message : 'Failed to update the horse.')
     } finally {
       setBusy(false)
     }
@@ -55,12 +60,13 @@ function AdminFarmDetailPage() {
 
   if (!user || user.role !== 'admin') return null
   if (loading) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-muted">Loading...</div>
-  if (!farm) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">{loadError ?? 'Farm not found'}</div>
+  if (!horse) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">{loadError ?? 'Horse not found'}</div>
 
-  const missing = missingFarmDocumentTypes(farm.documents)
-  const imageCount = farm.images.length
+  const missing = missingDocumentTypes(horse.documents)
+  const filledPedigree = PEDIGREE_FIELDS.filter(({ key }) => horse[key]).length
+  const imageCount = horse.images.length
   const safeImageIndex = Math.min(activeImageIndex, Math.max(0, imageCount - 1))
-  const activeImage = farm.images[safeImageIndex]
+  const activeImage = horse.images[safeImageIndex]
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-4xl mx-auto">
@@ -68,27 +74,27 @@ function AdminFarmDetailPage() {
         to="/admin"
         className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition"
       >
-        <ArrowLeft size={16} /> Back to Farm Approvals
+        <ArrowLeft size={16} /> Back to Horse Approvals
       </Link>
 
       <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-brand-gold">{farm.name}</h1>
+            <h1 className="text-3xl font-bold text-brand-gold">{horse.name}</h1>
             <span
-              className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border shrink-0 ${FARM_STATUS_STYLES[farm.status]}`}
+              className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border shrink-0 ${HORSE_STATUS_STYLES[horse.status]}`}
             >
-              {FARM_STATUS_LABELS[farm.status]}
+              {HORSE_STATUS_LABELS[horse.status]}
             </span>
           </div>
-          <p className="text-brand-muted text-sm mt-1">{farm.location ?? 'No location set'}</p>
+          <p className="text-brand-muted text-sm mt-1">{horse.farm_name ?? `Farm #${horse.farm_id}`}</p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => act('active')}
+            onClick={() => act('approved')}
             disabled={busy || missing.length > 0}
-            title={missing.length > 0 ? `Missing: ${missing.map(m => FARM_DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
+            title={missing.length > 0 ? `Missing: ${missing.map(m => DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
             className="flex items-center gap-2 bg-green-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check size={16} /> Approve
@@ -117,9 +123,9 @@ function AdminFarmDetailPage() {
         {/* Images */}
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">
-            Photos <span className="normal-case font-normal">({farm.images.length}/3)</span>
+            Images <span className="normal-case font-normal">({horse.images.length}/3)</span>
           </p>
-          {farm.images.length === 0 ? (
+          {horse.images.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 h-72 rounded-xl border border-dashed border-brand-border text-brand-muted text-sm">
               <ImageOff size={24} />
               No images uploaded
@@ -129,7 +135,7 @@ function AdminFarmDetailPage() {
               <img
                 key={activeImage.id}
                 src={activeImage.image_url}
-                alt={farm.name}
+                alt={horse.name}
                 className="w-full h-full object-contain"
                 decoding="async"
               />
@@ -156,7 +162,7 @@ function AdminFarmDetailPage() {
                   </button>
 
                   <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-                    {farm.images.map((img, i) => (
+                    {horse.images.map((img, i) => (
                       <button
                         key={img.id}
                         onClick={() => setActiveImageIndex(i)}
@@ -171,30 +177,99 @@ function AdminFarmDetailPage() {
           )}
         </div>
 
-        {/* Basic Info */}
+        {/* Basic Info + Story */}
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-brand-muted">Location</span>
-              <span className="text-brand-text font-bold">{farm.location || '—'}</span>
-            </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {([['Color', horse.color], ['Gender', horse.gender], ['Date of Birth', horse.date_of_birth]] as const).map(([label, value]) => (
+              <div key={label} className="flex flex-col gap-1">
+                <span className="text-xs text-brand-muted">{label}</span>
+                <span className="text-brand-text font-bold capitalize">{value || '—'}</span>
+              </div>
+            ))}
           </div>
 
-          <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">Description</p>
-          {farm.description ? (
-            <p className="text-sm text-brand-text leading-relaxed whitespace-pre-wrap">{farm.description}</p>
+          <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">Story</p>
+          {horse.story ? (
+            <p className="text-sm text-brand-text leading-relaxed whitespace-pre-wrap">{horse.story}</p>
           ) : (
-            <p className="text-sm text-brand-muted italic">No description yet.</p>
+            <p className="text-sm text-brand-muted italic">No story yet.</p>
           )}
+        </div>
 
-          {farm.status === 'rejected' && farm.rejection_reason && (
-            <>
-              <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">
-                Rejection Reason
-              </p>
-              <p className="text-sm text-red-600 leading-relaxed whitespace-pre-wrap">{farm.rejection_reason}</p>
-            </>
+        {/* Pedigree */}
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+          <p className="text-xs font-bold text-brand-muted uppercase">
+            Pedigree <span className="normal-case font-normal">({filledPedigree}/{PEDIGREE_FIELDS.length} filled)</span>
+          </p>
+          <table className="w-full text-sm border-collapse">
+            <tbody>
+              <tr>
+                <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle">
+                  Sire
+                </td>
+                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                  {horse.sire || '—'}
+                </td>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_sire || '—'}</td>
+              </tr>
+              <tr>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_dam || '—'}</td>
+              </tr>
+              <tr>
+                <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle">
+                  Dam
+                </td>
+                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                  {horse.dam || '—'}
+                </td>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_sire || '—'}</td>
+              </tr>
+              <tr>
+                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_dam || '—'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Race Records */}
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+          <p className="text-xs font-bold text-brand-muted uppercase">
+            Race Records <span className="normal-case font-normal">({horse.race_records.length})</span>
+          </p>
+          {horse.race_records.length === 0 ? (
+            <p className="text-sm text-brand-muted">No race records added.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse uppercase">
+                <thead>
+                  <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
+                    <th className="text-left px-3 py-2 font-bold">Date</th>
+                    <th className="text-left px-3 py-2 font-bold">Course</th>
+                    <th className="text-left px-3 py-2 font-bold">Race</th>
+                    <th className="text-left px-3 py-2 font-bold">Grade</th>
+                    <th className="text-center px-3 py-2 font-bold">FP</th>
+                    <th className="text-left px-3 py-2 font-bold">Track</th>
+                    <th className="text-left px-3 py-2 font-bold">Cond.</th>
+                    <th className="text-left px-3 py-2 font-bold">Dist.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {horse.race_records.map(r => (
+                    <tr key={r.id} className="border-b border-brand-border last:border-0">
+                      <td className="px-2 py-1.5 whitespace-nowrap"><span className="text-brand-muted">{r.race_date}</span></td>
+                      <td className="px-2 py-1.5"><span className="text-brand-text">{r.course}</span></td>
+                      <td className="px-2 py-1.5 whitespace-nowrap"><span className="text-brand-text">{r.race_name}</span></td>
+                      <td className="px-2 py-1.5"><GradeBadge grade={r.grade || null} /></td>
+                      <td className="px-2 py-1.5 text-center"><FinishPos pos={r.finish_position ?? null} /></td>
+                      <td className="px-2 py-1.5"><span className="text-brand-muted">{r.track}</span></td>
+                      <td className="px-2 py-1.5"><span className="text-brand-muted">{r.condition}</span></td>
+                      <td className="px-2 py-1.5"><span className="text-brand-muted">{r.distance}M</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
@@ -202,8 +277,8 @@ function AdminFarmDetailPage() {
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Proof Documents</p>
           <div className="flex flex-col gap-3">
-            {FARM_DOCUMENT_TYPES.map(({ key, label }) => {
-              const doc = farm.documents?.find(d => d.document_type === key)
+            {DOCUMENT_TYPES.map(({ key, label }) => {
+              const doc = horse.documents?.find(d => d.document_type === key)
               return (
                 <div
                   key={key}
@@ -251,7 +326,7 @@ function AdminFarmDetailPage() {
             onClick={e => e.stopPropagation()}
           >
             <div>
-              <h3 className="text-lg font-bold text-brand-text">Reject {farm.name}&rsquo;s registration?</h3>
+              <h3 className="text-lg font-bold text-brand-text">Reject {horse.name}&rsquo;s registration?</h3>
               <p className="text-brand-muted text-sm mt-1">
                 The farmer will be notified with your reason, so let them know what needs fixing.
               </p>
@@ -292,4 +367,4 @@ function AdminFarmDetailPage() {
   )
 }
 
-export default AdminFarmDetailPage
+export default AdminHorseDetailPage

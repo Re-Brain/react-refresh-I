@@ -3,34 +3,37 @@ import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import Lenis from 'lenis'
 import HomePage from './pages/HomePage.tsx'
-import LoginPage from './pages/LoginPage.tsx'
-import RegisterPage from './pages/RegisterPage.tsx'
-import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
-import RegisterFarmerPage from './pages/RegisterFarmerPage.tsx'
-import CheckEmailPage from './pages/CheckEmailPage.tsx'
-import VerifyEmailPage from './pages/VerifyEmailPage.tsx'
 import DashboardPage from './pages/DashboardPage.tsx'
-import FarmerDashboardPage from './pages/FarmerDashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
-import AdminDashboardPage from './pages/AdminDashboardPage.tsx'
-import AdminFarmDetailPage from './pages/AdminFarmDetailPage.tsx'
-import AdminHorseDetailPage from './pages/AdminHorseDetailPage.tsx'
-import AddHorsePage from './pages/AddHorsePage.tsx'
-import HorseEditPage from './pages/HorseEditPage.tsx'
-import HorseProfilePage from './pages/HorseProfilePage.tsx'
-import HorsesListPage from './pages/HorsesListPage.tsx'
-import FarmsListPage from './pages/FarmsListPage.tsx'
-import FarmDetailPage from './pages/FarmDetailPage.tsx'
-import BookVisitPage from './pages/BookVisitPage.tsx'
-import BookingConfirmationPage from './pages/BookingConfirmationPage.tsx'
-import DonateSuccessPage from './pages/DonateSuccessPage.tsx'
-import DonateCancelPage from './pages/DonateCancelPage.tsx'
-import StripeReturnPage from './pages/StripeReturnPage.tsx'
-import StripeRefreshPage from './pages/StripeRefreshPage.tsx'
-import ProtectedRoute from './components/ProtectedRoute.tsx'
-import RequireActiveFarm from './components/RequireActiveFarm.tsx'
-import { useAuth } from './context/useAuth'
 import { LenisContext } from './context/LenisContext'
+import {
+  useAuth,
+  ProtectedRoute,
+  LoginPage,
+  RegisterPage,
+  RegisterVisitorPage,
+  RegisterFarmerPage,
+  CheckEmailPage,
+  VerifyEmailPage,
+} from './modules/auth'
+import { AdminDashboardPage, AdminFarmDetailPage, AdminHorseDetailPage } from './modules/admin'
+import { BookVisitPage, BookingConfirmationPage } from './modules/booking'
+import {
+  FarmerDashboardPage,
+  FarmDetailPage,
+  FarmsListPage,
+  AddHorsePage,
+  HorseEditPage,
+  HorseProfilePage,
+  HorsesListPage,
+  RequireActiveFarm,
+} from './modules/farm'
+import {
+  DonateSuccessPage,
+  DonateCancelPage,
+  StripeReturnPage,
+  StripeRefreshPage,
+} from './modules/donation'
 
 // Shared styling for the big, uppercase headings inside the full-screen menu.
 const menuItemClass =

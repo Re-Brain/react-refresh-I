@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '../../auth'
 import AdminDashboardSidebar, { type AdminSection } from '../components/AdminDashboardSidebar'
-import FarmApprovalsSection from '../components/admin/FarmApprovalsSection'
-import HorseApprovalsSection from '../components/admin/HorseApprovalsSection'
+import FarmApprovalsSection from '../components/FarmApprovalsSection'
+import HorseApprovalsSection from '../components/HorseApprovalsSection'
 
 function AdminDashboardPage() {
   const { user } = useAuth()
