@@ -1,5 +1,6 @@
 import type { Period } from '../farm'
 import { apiFetch } from '../../lib/apiFetch'
+import { formatRateLimitMessage } from '../../lib/rateLimit'
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled'
 
@@ -134,6 +135,9 @@ export async function createBooking(data: BookingCreate): Promise<Booking> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
+  if (res.status === 429) {
+    throw new BookingError(429, formatRateLimitMessage(res))
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new BookingError(res.status, messageFromDetail(body.detail, defaultMessage(res.status)))

@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '../../lib/apiBase'
 import { apiFetch } from '../../lib/apiFetch'
+import { formatRateLimitMessage, getRetryAfterSeconds } from '../../lib/rateLimit'
 
 export type RegisterResult = {
   detail: string
@@ -14,12 +15,16 @@ export type UserMe = {
 }
 
 // Thrown for HTTP error responses so callers can branch on status (e.g. 403
-// "email not verified" during login needs different handling than other errors).
+// "email not verified" during login needs different handling than other
+// errors). retryAfterSeconds is only set for 429s, letting a caller run a
+// countdown/disable-submit UI without re-parsing the response itself.
 export class ApiError extends Error {
   status: number
-  constructor(message: string, status: number) {
+  retryAfterSeconds?: number
+  constructor(message: string, status: number, retryAfterSeconds?: number) {
     super(message)
     this.status = status
+    this.retryAfterSeconds = retryAfterSeconds
   }
 }
 
@@ -29,6 +34,9 @@ export async function registerVisitor(name: string, email: string, password: str
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
   })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
   if (!res.ok) {
     const error = await res.json()
     throw new ApiError(error.detail ?? 'Registration failed', res.status)
@@ -42,6 +50,9 @@ export async function registerFarmer(name: string, email: string, password: stri
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password, farm_name: farmName }),
   })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
   if (!res.ok) {
     const error = await res.json()
     throw new ApiError(error.detail ?? 'Registration failed', res.status)
@@ -55,6 +66,9 @@ export async function verifyEmail(token: string): Promise<void> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token }),
   })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
   if (!res.ok) {
     const error = await res.json().catch(() => null)
     throw new ApiError(error?.detail ?? 'This verification link is invalid or has expired', res.status)
@@ -70,6 +84,9 @@ export async function login(email: string, password: string): Promise<void> {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
   })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
   if (!res.ok) {
     const error = await res.json()
     throw new ApiError(error.detail ?? 'Login failed', res.status)

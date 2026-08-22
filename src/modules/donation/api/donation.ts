@@ -1,4 +1,5 @@
 import { apiFetch } from '../../../lib/apiFetch'
+import { formatRateLimitMessage } from '../../../lib/rateLimit'
 
 export type DonationCheckoutSession = {
   checkout_url: string
@@ -48,6 +49,9 @@ export async function createDonationCheckoutSession(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ farm_id: farmId, amount }),
   })
+  if (res.status === 429) {
+    throw new DonationError(429, formatRateLimitMessage(res))
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new DonationError(res.status, messageFromDetail(body?.detail, defaultMessage(res.status)))
