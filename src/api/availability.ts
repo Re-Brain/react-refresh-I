@@ -106,16 +106,18 @@ export function validatePeriodSchedule(s: PeriodSchedule, def: PeriodDef): strin
 }
 
 // The slots a visitor can pick when booking a given horse: the farm's time for
-// each period that is both open and one the horse takes part in.
-export type PeriodSlots = { period: PeriodDef; slots: Session[] }
+// each period that is both open and one the horse takes part in, plus that
+// period's visitor capacity.
+export type PeriodSlots = { period: PeriodDef; slots: Session[]; capacity: number }
 export function getHorseVisitSlots(
   farm: FarmAvailability,
-  horsePeriods: Period[]
+  horsePeriods: Record<Period, number>
 ): PeriodSlots[] {
   if (!farm.enabled) return []
-  return PERIODS.filter(p => horsePeriods.includes(p.key) && farm.periods[p.key].open).map(p => ({
+  return PERIODS.filter(p => horsePeriods[p.key] > 0 && farm.periods[p.key].open).map(p => ({
     period: p,
     slots: [{ start: farm.periods[p.key].start, end: farm.periods[p.key].end }],
+    capacity: horsePeriods[p.key],
   }))
 }
 
@@ -148,13 +150,12 @@ export async function saveFarmAvailability(
   return res.json()
 }
 
-// The periods a horse takes part in ([] = not available for visits). The server
-// dedupes and re-sorts to canonical order, so no need to sort here. Returns the
-// full updated horse.
+// The visitor capacity per period a horse takes part in (0 = not available for
+// visits that period). Returns the full updated horse.
 export async function saveHorsePeriods(
   token: string,
   horseId: number,
-  periods: Period[]
+  periods: Record<Period, number>
 ): Promise<Horse> {
   const res = await fetch(`${API_BASE_URL}/horses/${horseId}/periods`, {
     method: 'PUT',

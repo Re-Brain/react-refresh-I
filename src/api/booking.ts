@@ -69,7 +69,7 @@ function defaultMessage(status: number): string {
     case 404:
       return 'Horse not found.'
     case 409:
-      return "This slot isn't available."
+      return 'This slot is full.'
     case 422:
       return 'Please check your booking details.'
     default:

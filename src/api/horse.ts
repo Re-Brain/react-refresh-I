@@ -58,7 +58,9 @@ export type Horse = {
   farm_name?: string | null
   images: HorseImage[]
   race_records: RaceRecord[]
-  periods: Period[]
+  // Capacity per period — how many visitors can book that period at once.
+  // 0 (or missing) means the horse isn't offered in that period.
+  periods: Record<Period, number>
   farm_availability: FarmAvailability
   status: 'draft' | 'pending' | 'approved' | 'rejected'
   rejection_reason: string | null
