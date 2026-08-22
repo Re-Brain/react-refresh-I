@@ -7,9 +7,14 @@ import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import RegisterVisitorPage from './pages/RegisterVisitorPage.tsx'
 import RegisterFarmerPage from './pages/RegisterFarmerPage.tsx'
+import CheckEmailPage from './pages/CheckEmailPage.tsx'
+import VerifyEmailPage from './pages/VerifyEmailPage.tsx'
 import DashboardPage from './pages/DashboardPage.tsx'
 import FarmerDashboardPage from './pages/FarmerDashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
+import AdminDashboardPage from './pages/AdminDashboardPage.tsx'
+import AdminFarmDetailPage from './pages/AdminFarmDetailPage.tsx'
+import AdminHorseDetailPage from './pages/AdminHorseDetailPage.tsx'
 import AddHorsePage from './pages/AddHorsePage.tsx'
 import HorseEditPage from './pages/HorseEditPage.tsx'
 import HorseProfilePage from './pages/HorseProfilePage.tsx'
@@ -23,6 +28,7 @@ import DonateCancelPage from './pages/DonateCancelPage.tsx'
 import StripeReturnPage from './pages/StripeReturnPage.tsx'
 import StripeRefreshPage from './pages/StripeRefreshPage.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
+import RequireActiveFarm from './components/RequireActiveFarm.tsx'
 import { useAuth } from './context/useAuth'
 import { LenisContext } from './context/LenisContext'
 
@@ -184,18 +190,23 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/visitor" element={<RegisterVisitorPage />} />
         <Route path="/register/farmer" element={<RegisterFarmerPage />} />
+        <Route path="/check-email" element={<CheckEmailPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/farmer" element={<ProtectedRoute><FarmerDashboardPage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><AddHorsePage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><HorseEditPage /></ProtectedRoute>} />
+        <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><RequireActiveFarm><AddHorsePage /></RequireActiveFarm></ProtectedRoute>} />
+        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><RequireActiveFarm><HorseEditPage /></RequireActiveFarm></ProtectedRoute>} />
         <Route path="/horses/:id" element={<HorseProfilePage />} />
         <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
         <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
         <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+        <Route path="/admin/farms/:id" element={<ProtectedRoute><AdminFarmDetailPage /></ProtectedRoute>} />
+        <Route path="/admin/horses/:id" element={<ProtectedRoute><AdminHorseDetailPage /></ProtectedRoute>} />
         <Route path="/donate/success" element={<DonateSuccessPage />} />
         <Route path="/donate/cancel" element={<DonateCancelPage />} />
-        <Route path="/farm/stripe/return" element={<ProtectedRoute><StripeReturnPage /></ProtectedRoute>} />
-        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><StripeRefreshPage /></ProtectedRoute>} />
+        <Route path="/farm/stripe/return" element={<ProtectedRoute><RequireActiveFarm><StripeReturnPage /></RequireActiveFarm></ProtectedRoute>} />
+        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><RequireActiveFarm><StripeRefreshPage /></RequireActiveFarm></ProtectedRoute>} />
       </Routes>
     </LenisContext.Provider>
   )

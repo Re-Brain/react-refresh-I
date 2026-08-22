@@ -1,15 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerVisitor, getMe } from '../api/auth'
-import { useAuth } from '../context/useAuth'
+import { registerVisitor } from '../api/auth'
 
 function RegisterVisitorPage() {
-  
+
   // Get the navigate function from react-router-dom to programmatically navigate after successful registration
   const navigate = useNavigate()
-
-  // Get the setUser function from the useAuth context to update the user state after successful registration
-  const { setUser } = useAuth()
 
   // State for name, email, password, and error message
   const [name, setName] = useState('')
@@ -23,18 +19,10 @@ function RegisterVisitorPage() {
     setError('')
     try {
 
-      // Call the registerVisitor API function to register the visitor and get the access token
-      const token = await registerVisitor(name, email, password)
-      localStorage.setItem('access_token', token.access_token)
-
-      // Fetch the user data after successful registration and update the user state in the context
-      const user = await getMe(token.access_token)
-
-      // Update the user state in the context with the fetched user data
-      setUser(user)
-
-      // Navigate to the dashboard after successful registration
-      navigate('/dashboard')
+      // Register the visitor, then send them to the "check your email" screen
+      // since the account isn't usable until the verification link is clicked.
+      await registerVisitor(name, email, password)
+      navigate('/check-email', { state: { email } })
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message)
     }

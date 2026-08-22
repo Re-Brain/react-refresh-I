@@ -108,7 +108,7 @@ function BookingForm({ form, visitSlots }: BookingFormProps) {
           disabled={!selectedSlot || submitting}
           className="self-start bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
         >
-          {submitting ? 'Requesting…' : 'Request visit'}
+          {submitting ? 'Booking…' : 'Book visit'}
         </button>
       </div>
     </form>

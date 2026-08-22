@@ -8,8 +8,8 @@ export type Section =
   | 'donations'
   | 'settings'
 
-// Sections that stay locked until the farm profile is complete (they need
-// horses / a live farm to be useful).
+// Sections that stay locked until the farm is approved (active) — they need
+// a live, public farm to be useful, and their backend endpoints 403 until then.
 export const gatedSections: Section[] = ['horse-management', 'availability', 'visitor-management', 'donations']
 
 const navItems: { key: Section; label: string; icon: React.ReactNode }[] = [
@@ -26,12 +26,12 @@ type DashboardSidebarProps = {
   onNavClick: (key: Section) => void
   open: boolean
   onToggle: () => void
-  profileComplete: boolean
+  farmActive: boolean
 }
 
 // Collapsible left nav. Gated sections show a lock icon and are disabled until
-// the farm profile is complete.
-function DashboardSidebar({ activeSection, onNavClick, open, onToggle, profileComplete }: DashboardSidebarProps) {
+// the farm is approved (active).
+function DashboardSidebar({ activeSection, onNavClick, open, onToggle, farmActive }: DashboardSidebarProps) {
   return (
     <aside className={`${open ? 'w-56' : 'w-14'} bg-brand-surface border-r border-brand-border flex flex-col transition-all duration-300`}>
       <div className={`flex items-center ${open ? 'justify-between px-4' : 'justify-center'} py-4 border-b border-brand-border`}>
@@ -46,7 +46,7 @@ function DashboardSidebar({ activeSection, onNavClick, open, onToggle, profileCo
 
       <nav className="flex flex-col gap-1 p-2 mt-2">
         {navItems.map(item => {
-          const locked = gatedSections.includes(item.key) && !profileComplete
+          const locked = gatedSections.includes(item.key) && !farmActive
           return (
             <button
               key={item.key}
@@ -59,7 +59,7 @@ function DashboardSidebar({ activeSection, onNavClick, open, onToggle, profileCo
                   ? 'bg-brand-gold text-brand-bg'
                   : 'text-brand-muted hover:text-brand-gold hover:bg-brand-bg'
               } ${!open ? 'justify-center' : ''}`}
-              title={locked ? 'Complete your farm profile to unlock' : (!open ? item.label : undefined)}
+              title={locked ? 'Your farm must be approved to unlock this' : (!open ? item.label : undefined)}
             >
               {locked ? <Lock size={18} /> : item.icon}
               {open && <span>{item.label}</span>}

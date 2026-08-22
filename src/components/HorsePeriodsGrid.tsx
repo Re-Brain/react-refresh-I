@@ -7,13 +7,16 @@ import {
   type Period,
 } from '../api/availability'
 
-type PeriodsByHorse = Record<number, Period[]>
+type Capacities = Record<Period, number>
+type PeriodsByHorse = Record<number, Capacities>
 
-const samePeriods = (a: Period[], b: Period[]) =>
-  a.length === b.length && a.every((p, i) => p === b[i])
+const EMPTY_CAPACITIES: Capacities = { morning: 0, afternoon: 0, evening: 0 }
+
+const sameCapacities = (a: Capacities, b: Capacities) =>
+  PERIODS.every(p => (a[p.key] || 0) === (b[p.key] || 0))
 
 const periodsFromHorses = (horses: Horse[]): PeriodsByHorse =>
-  Object.fromEntries(horses.map(h => [h.id, h.periods ?? []]))
+  Object.fromEntries(horses.map(h => [h.id, { ...EMPTY_CAPACITIES, ...h.periods }]))
 
 // Which periods each horse takes part in. Read-only until the farmer clicks
 // Edit. A period the farm has closed (not in `openPeriods`) is disabled here for
@@ -46,14 +49,12 @@ function HorsePeriodsGrid({
     setDraft(next)
   }
 
-  function toggle(horseId: number, period: Period) {
-    setDraft(prev => {
-      const current = prev[horseId] ?? []
-      const next = current.includes(period)
-        ? current.filter(p => p !== period)
-        : PERIODS.map(p => p.key).filter(p => p === period || current.includes(p)) // keep order
-      return { ...prev, [horseId]: next }
-    })
+  function setCapacity(horseId: number, period: Period, value: number) {
+    const capacity = Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0
+    setDraft(prev => ({
+      ...prev,
+      [horseId]: { ...(prev[horseId] ?? EMPTY_CAPACITIES), [period]: capacity },
+    }))
   }
 
   function handleEdit() {
@@ -77,8 +78,8 @@ function HorsePeriodsGrid({
       // Only PUT the horses whose periods actually changed.
       await Promise.all(
         horses
-          .filter(h => !samePeriods(committed[h.id] ?? [], draft[h.id] ?? []))
-          .map(h => saveHorsePeriods(token, h.id, draft[h.id] ?? []))
+          .filter(h => !sameCapacities(committed[h.id] ?? EMPTY_CAPACITIES, draft[h.id] ?? EMPTY_CAPACITIES))
+          .map(h => saveHorsePeriods(token, h.id, draft[h.id] ?? EMPTY_CAPACITIES))
       )
       setCommitted(draft)
       setIsEditing(false)
@@ -152,23 +153,34 @@ function HorsePeriodsGrid({
           </thead>
           <tbody>
             {horses.map(horse => {
-              const periods = view[horse.id] ?? []
+              const capacities = view[horse.id] ?? EMPTY_CAPACITIES
               return (
                 <tr key={horse.id} className="border-b border-brand-border last:border-0">
-                  <td className="px-4 py-3 font-bold text-brand-text">{horse.name}</td>
+                  <td className="px-4 py-3 font-bold text-brand-text">
+                    {horse.name}
+                    {horse.status === 'pending' && (
+                      <span className="ml-2 text-xs font-normal text-yellow-500">(Pending review)</span>
+                    )}
+                  </td>
                   {PERIODS.map(p => {
                     const farmOpen = openPeriods.includes(p.key)
+                    const disabled = !isEditing || !farmOpen || saving || horse.status === 'pending'
                     return (
                       <td key={p.key} className="px-4 py-3 text-center">
                         <input
-                          type="checkbox"
-                          // A period the farm has closed is off for every horse;
-                          // checkboxes are only editable in edit mode.
-                          checked={farmOpen && periods.includes(p.key)}
-                          disabled={!isEditing || !farmOpen || saving}
-                          onChange={() => toggle(horse.id, p.key)}
-                          aria-label={`${horse.name} — ${p.label}`}
-                          className="h-4 w-4 accent-brand-gold disabled:opacity-40 disabled:cursor-not-allowed enabled:cursor-pointer"
+                          type="number"
+                          min={0}
+                          max={99}
+                          step={1}
+                          // A period the farm has closed always shows 0 for every
+                          // horse; inputs are only editable in edit mode. A pending
+                          // horse can't be edited at all until it's reviewed.
+                          value={farmOpen ? capacities[p.key] || 0 : 0}
+                          disabled={disabled}
+                          onChange={e => setCapacity(horse.id, p.key, e.target.valueAsNumber)}
+                          aria-label={`${horse.name} — ${p.label} capacity`}
+                          title={farmOpen ? 'Max visitors for this period' : 'Closed in the farm schedule'}
+                          className="w-16 bg-brand-bg border border-brand-border rounded-lg px-2 py-1 text-center text-brand-text text-sm focus:outline-none focus:border-brand-gold disabled:opacity-40 disabled:cursor-not-allowed [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
                       </td>
                     )

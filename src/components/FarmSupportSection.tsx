@@ -1,5 +1,6 @@
 import { Heart } from 'lucide-react'
 import { useDonation, MIN_DONATION_AMOUNT } from '../hooks/useDonation'
+import { useAuth } from '../context/useAuth'
 
 type FarmSupportSectionProps = {
   farmId: number
@@ -16,7 +17,9 @@ const SUGGESTED_AMOUNTS = [100, 300, 500, 1000, 2000]
 // Donate button that hands off to Stripe Checkout. Works for guests too;
 // donations don't require login.
 function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSectionProps) {
+  const { user } = useAuth()
   const { amount, setAmount, submitting, error, donate } = useDonation(farmId, farmName)
+  const canDonate = user?.role !== 'admin' && user?.role !== 'farmer'
 
   return (
     <section id="support-farm" className="flex flex-col gap-6 scroll-mt-24">
@@ -38,7 +41,12 @@ function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSec
             <Heart size={26} strokeWidth={1.75} fill="currentColor" />
           </span>
           <p className="text-sm text-brand-muted max-w-md leading-relaxed">
-            {payoutsEnabled ? (
+            {!canDonate ? (
+              <>
+                Farm and admin accounts can&rsquo;t make donations. Log in with a visitor account
+                to support <span className="font-bold text-brand-text">{farmName}</span>.
+              </>
+            ) : payoutsEnabled ? (
               <>
                 Your donation goes directly to{' '}
                 <span className="font-bold text-brand-text">{farmName}</span> to help care for
@@ -53,7 +61,7 @@ function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSec
           </p>
         </div>
 
-        {payoutsEnabled && (
+        {canDonate && payoutsEnabled && (
           <>
             <div className="flex flex-col items-center gap-3 w-full max-w-sm">
               <label className="text-xs font-bold text-brand-muted uppercase tracking-[0.15em]">

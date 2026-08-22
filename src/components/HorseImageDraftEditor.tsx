@@ -13,7 +13,7 @@ function HorseImageDraftEditor({ draft }: HorseImageDraftEditorProps) {
   return (
     <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="text-red-600">*</span> <span className="normal-case font-normal">({images.length}/3)</span></p>
+        <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="normal-case font-normal">({images.length}/3)</span></p>
         {images.length < 3 && (
           <>
             <button
@@ -34,7 +34,10 @@ function HorseImageDraftEditor({ draft }: HorseImageDraftEditorProps) {
         )}
       </div>
 
-      <p className="text-[12px] text-brand-muted normal-case">At least one image is required. You can add up to 3 and use the arrows to set their order.</p>
+      <p className="text-[12px] text-brand-muted normal-case">
+        At least one image is required before submitting for review, not to save a draft. You can add up
+        to 3 and use the arrows to set their order.
+      </p>
 
       {images.length === 0 ? (
         <div className="flex items-center justify-center h-40 rounded-lg border border-dashed border-brand-border text-brand-muted text-sm">
