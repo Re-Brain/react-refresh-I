@@ -5,43 +5,38 @@ import { getMyBookings, cancelBooking, type VisitorBooking } from '../api'
 // prompt (`confirmId`), the in-flight card (`busyId`), and action errors.
 export function useVisitorBookings() {
   const [bookings, setBookings] = useState<VisitorBooking[]>([])
-  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<number | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  function fetchBookings(token: string) {
-    getMyBookings(token)
+  function fetchBookings() {
+    getMyBookings()
       .then(setBookings)
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load your bookings.'))
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    fetchBookings(token)
+    fetchBookings()
   }, [])
 
   function handleRetry() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setLoading(true)
     setError(null)
-    fetchBookings(token)
+    fetchBookings()
   }
 
   // Manual refresh once bookings are already showing — keeps the existing
   // cards on screen (unlike handleRetry, this doesn't flip back to the
   // full-section loading state).
   function refresh() {
-    const token = localStorage.getItem('access_token')
-    if (!token || refreshing) return
+    if (refreshing) return
     setRefreshing(true)
     setError(null)
-    getMyBookings(token)
+    getMyBookings()
       .then(setBookings)
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load your bookings.'))
       .finally(() => setRefreshing(false))
@@ -59,12 +54,10 @@ export function useVisitorBookings() {
   }
 
   async function cancel(id: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setBusyId(id)
     setActionError(null)
     try {
-      const updated = await cancelBooking(token, id)
+      const updated = await cancelBooking(id)
       setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)))
       setConfirmId(null)
     } catch (err) {

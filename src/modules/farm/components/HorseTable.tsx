@@ -16,12 +16,10 @@ function HorseTable({ horses, onChange }: Props) {
   const [error, setError] = useState<string | null>(null)
 
   async function handleDelete(id: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setDeleting(true)
     setError(null)
     try {
-      await deleteHorse(token, id)
+      await deleteHorse(id)
       onChange(horses.filter(h => h.id !== id))
       setDeleteConfirmId(null)
     } catch (err) {

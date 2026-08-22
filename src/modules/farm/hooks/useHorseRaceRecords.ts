@@ -38,8 +38,7 @@ export function useHorseRaceRecords(horse: Horse | null, setHorse: Dispatch<SetS
   }
 
   async function handleSaveRecord(recordId: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     if (!recordFormIsValid(recordForm)) {
       setRecordError('Please fill in all fields (grade and FP are optional).')
@@ -49,7 +48,7 @@ export function useHorseRaceRecords(horse: Horse | null, setHorse: Dispatch<SetS
     setSavingRecord(true)
     setRecordError(null)
     try {
-      const updated = await updateRaceRecord(token, horse.id, recordId, recordForm)
+      const updated = await updateRaceRecord(horse.id, recordId, recordForm)
       setHorse(h => h ? { ...h, race_records: h.race_records.map(r => r.id === recordId ? updated : r) } : h)
       setEditingRecordId(null)
     } catch (err) {
@@ -71,8 +70,7 @@ export function useHorseRaceRecords(horse: Horse | null, setHorse: Dispatch<SetS
   }
 
   async function handleCreateRecord() {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     if (!recordFormIsValid(recordForm)) {
       setRecordError('Please fill in all fields (grade and FP are optional).')
@@ -82,7 +80,7 @@ export function useHorseRaceRecords(horse: Horse | null, setHorse: Dispatch<SetS
     setSavingRecord(true)
     setRecordError(null)
     try {
-      const updated = await createRaceRecord(token, horse.id, { ...recordForm, grade: recordForm.grade || null, finish_position: recordForm.finish_position ?? null } as RaceRecordCreate)
+      const updated = await createRaceRecord(horse.id, { ...recordForm, grade: recordForm.grade || null, finish_position: recordForm.finish_position ?? null } as RaceRecordCreate)
       setHorse(updated)
       setEditingRecordId(null)
     } catch (err) {
@@ -93,13 +91,12 @@ export function useHorseRaceRecords(horse: Horse | null, setHorse: Dispatch<SetS
   }
 
   async function handleDeleteRecord(recordId: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     setSavingRecord(true)
     setRecordError(null)
     try {
-      const updated = await deleteRaceRecord(token, horse.id, recordId)
+      const updated = await deleteRaceRecord(horse.id, recordId)
       setHorse(updated)
       setDeleteRecordConfirmId(null)
     } catch (err) {

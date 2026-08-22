@@ -28,21 +28,19 @@ function AdminFarmDetailPage() {
   }, [user, navigate])
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token || !id) return
-    getAdminFarm(token, Number(id))
+    if (!id) return
+    getAdminFarm(Number(id))
       .then(setFarm)
       .catch(() => setLoadError('Farm not found'))
       .finally(() => setLoading(false))
   }, [id])
 
   async function act(status: 'active' | 'rejected', withReason?: string) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !farm) return
+    if (!farm) return
     setBusy(true)
     setActionError(null)
     try {
-      await updateFarmApproval(token, farm.id, status, withReason)
+      await updateFarmApproval(farm.id, status, withReason)
       navigate('/admin')
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to update the farm.')

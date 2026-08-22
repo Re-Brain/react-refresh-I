@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { CheckCircle2, Info, Loader2 } from 'lucide-react'
 import { getStripeStatus, createStripeOnboardingLink } from '../api/donationDashboard'
 
@@ -18,25 +18,19 @@ type Phase = 'checking' | 'success' | 'incomplete'
 // retries this settles into a neutral "not finished yet" state with a way to
 // resume, rather than spinning forever.
 function StripeReturnPage() {
-  const navigate = useNavigate()
   const [phase, setPhase] = useState<Phase>('checking')
   const [resuming, setResuming] = useState(false)
   const [resumeError, setResumeError] = useState<string | null>(null)
 
   useEffect(() => {
     sessionStorage.setItem('dashboardSection', 'donations')
-    const token = localStorage.getItem('access_token')
-    if (!token) {
-      navigate('/dashboard/farmer', { replace: true })
-      return
-    }
 
     let cancelled = false
     let timer: ReturnType<typeof setTimeout>
 
     async function poll(attempt: number) {
       try {
-        const status = await getStripeStatus(token!)
+        const status = await getStripeStatus()
         if (cancelled) return
         if (status.payouts_enabled) {
           setPhase('success')
@@ -59,15 +53,13 @@ function StripeReturnPage() {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [navigate])
+  }, [])
 
   async function resumeOnboarding() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setResuming(true)
     setResumeError(null)
     try {
-      const { onboarding_url } = await createStripeOnboardingLink(token)
+      const { onboarding_url } = await createStripeOnboardingLink()
       window.location.href = onboarding_url
     } catch (err) {
       setResumeError(err instanceof Error ? err.message : 'Failed to restart Stripe onboarding.')

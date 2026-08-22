@@ -51,9 +51,8 @@ function HorseEditPage() {
 
   // Load the owner-only horse whenever the id changes.
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token || !id) return
-    getHorse(token, Number(id))
+    if (!id) return
+    getHorse(Number(id))
       .then(setHorse)
       .catch(() => setLoadError('Horse not found'))
       .finally(() => setLoading(false))

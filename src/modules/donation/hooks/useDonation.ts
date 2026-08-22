@@ -21,8 +21,7 @@ export function useDonation(farmId: number, farmName: string) {
     setSubmitting(true)
     setError(null)
     try {
-      const token = localStorage.getItem('access_token')
-      const { checkout_url } = await createDonationCheckoutSession(farmId, parsed, token)
+      const { checkout_url } = await createDonationCheckoutSession(farmId, parsed)
       stashPendingDonation({ farmId, farmName, amount: parsed })
       // Full top-level navigation, not a client-side route — Stripe's
       // redirect-back needs this to be a real page load.

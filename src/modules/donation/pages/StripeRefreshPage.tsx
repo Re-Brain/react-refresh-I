@@ -11,19 +11,14 @@ function StripeRefreshPage() {
 
   useEffect(() => {
     sessionStorage.setItem('dashboardSection', 'donations')
-    const token = localStorage.getItem('access_token')
-    if (!token) {
-      navigate('/dashboard/farmer', { replace: true })
-      return
-    }
-    createStripeOnboardingLink(token)
+    createStripeOnboardingLink()
       .then(({ onboarding_url }) => {
         window.location.href = onboarding_url
       })
       .catch(err => {
         setError(err instanceof Error ? err.message : 'Failed to restart Stripe onboarding.')
       })
-  }, [navigate])
+  }, [])
 
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center gap-4 text-center px-6">

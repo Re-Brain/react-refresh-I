@@ -10,13 +10,11 @@ export function useHorseSubmit(horse: Horse | null, setHorse: Dispatch<SetStateA
 
   async function handleSubmit() {
     if (!horse) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const updated = await submitHorseForReview(token, horse.id)
+      const updated = await submitHorseForReview(horse.id)
       setHorse(updated)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Failed to submit horse for review')

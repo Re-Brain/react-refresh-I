@@ -5,39 +5,33 @@ import { getPendingFarms, updateFarmApproval, type AdminFarm } from '../api'
 // removes the farm from the queue once it's been decided.
 export function useAdminFarmApprovals() {
   const [farms, setFarms] = useState<AdminFarm[]>([])
-  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  function load(token: string) {
-    getPendingFarms(token)
+  function load() {
+    getPendingFarms()
       .then(setFarms)
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load pending farms.'))
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    load(token)
+    load()
   }, [])
 
   function retry() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setLoading(true)
     setError(null)
-    load(token)
+    load()
   }
 
   async function act(id: number, status: 'active' | 'rejected', reason?: string): Promise<boolean> {
-    const token = localStorage.getItem('access_token')
-    if (!token) return false
     setBusyId(id)
     setActionError(null)
     try {
-      await updateFarmApproval(token, id, status, reason)
+      await updateFarmApproval(id, status, reason)
       setFarms(prev => prev.filter(f => f.id !== id))
       return true
     } catch (err) {

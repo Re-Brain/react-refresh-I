@@ -11,13 +11,11 @@ export function useFarmSubmit(farm: Farm | null, setFarm: Dispatch<SetStateActio
 
   async function handleSubmit() {
     if (!farm) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const updated = await submitFarmForReview(token)
+      const updated = await submitFarmForReview()
       setFarm(updated)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Failed to submit farm for review')

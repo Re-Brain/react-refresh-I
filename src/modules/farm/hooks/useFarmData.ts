@@ -9,44 +9,38 @@ import { getMyHorses, type Horse } from '../api/horse'
 export function useFarmData(enabled = true) {
   const [farm, setFarm] = useState<Farm | null>(null)
   const [horses, setHorses] = useState<Horse[]>([])
-  const [loading, setLoading] = useState(() => enabled && Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(enabled)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [horsesError, setHorsesError] = useState<string | null>(null)
 
-  function loadFarm(token: string) {
-    getMyFarm(token)
+  function loadFarm() {
+    getMyFarm()
       .then(setFarm)
       .catch(err => setLoadError(err instanceof Error ? err.message : 'Failed to load your farm.'))
       .finally(() => setLoading(false))
   }
 
-  function loadHorses(token: string) {
-    getMyHorses(token)
+  function loadHorses() {
+    getMyHorses()
       .then(setHorses)
       .catch(err => setHorsesError(err instanceof Error ? err.message : 'Failed to load your horses.'))
   }
 
   useEffect(() => {
     if (!enabled) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    loadFarm(token)
-    loadHorses(token)
+    loadFarm()
+    loadHorses()
   }, [enabled])
 
   function retryFarm() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setLoading(true)
     setLoadError(null)
-    loadFarm(token)
+    loadFarm()
   }
 
   function retryHorses() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setHorsesError(null)
-    loadHorses(token)
+    loadHorses()
   }
 
   const profileComplete = farm ? isFarmComplete(farm) : false

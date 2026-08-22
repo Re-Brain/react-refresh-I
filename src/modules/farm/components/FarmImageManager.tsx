@@ -41,12 +41,10 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setUploadingImage(true)
     setImageError(null)
     try {
-      const updated = await uploadFarmImage(token, file)
+      const updated = await uploadFarmImage(file)
       onChange(updated)
     } catch (err) {
       setImageError(err instanceof Error ? err.message : 'Failed to upload image')
@@ -57,12 +55,10 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
   }
 
   async function handleImageDelete(imageId: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setImageError(null)
     setDeletingImage(true)
     try {
-      const updated = await deleteFarmImage(token, imageId)
+      const updated = await deleteFarmImage(imageId)
       onChange(updated)
       // Keep the active index in range now that the array is shorter.
       setActiveImageIndex(i => Math.min(i, Math.max(0, (updated.images ?? []).length - 1)))
@@ -75,8 +71,6 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
   }
 
   async function handleReorderImage(direction: -1 | 1) {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     const target = safeImageIndex + direction
     if (target < 0 || target >= imageCount) return
     const ids = images.map(img => img.id)
@@ -84,7 +78,7 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
     setReordering(true)
     setImageError(null)
     try {
-      const updated = await reorderFarmImages(token, ids)
+      const updated = await reorderFarmImages(ids)
       onChange(updated)
       setActiveImageIndex(target)
     } catch (err) {

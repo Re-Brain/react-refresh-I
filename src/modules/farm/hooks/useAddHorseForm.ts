@@ -103,8 +103,8 @@ export function useAddHorseForm() {
 
   // Creates the horse (as a draft) and uploads every image/document/race
   // record against it. Shared by both end actions below.
-  async function createAndPopulate(token: string, allRecords: RaceRecordUpdate[]): Promise<Horse> {
-    const horse = await createHorse(token, {
+  async function createAndPopulate(allRecords: RaceRecordUpdate[]): Promise<Horse> {
+    const horse = await createHorse({
       ...form,
       name: form.name.trim(),
       story: (form.story ?? '').trim(),
@@ -122,14 +122,14 @@ export function useAddHorseForm() {
     })
     // Upload images in the order they were added so their positions match the preview.
     for (const img of imageDraft.images) {
-      await uploadHorseImage(token, horse.id, img.file)
+      await uploadHorseImage(horse.id, img.file)
     }
     for (const { key } of DOCUMENT_TYPES) {
       const file = documentDraft.files[key]
-      if (file) await uploadHorseDocument(token, horse.id, file, key)
+      if (file) await uploadHorseDocument(horse.id, file, key)
     }
     for (const record of allRecords) {
-      await createRaceRecord(token, horse.id, toRecordCreate(record))
+      await createRaceRecord(horse.id, toRecordCreate(record))
     }
     return horse
   }
@@ -141,13 +141,11 @@ export function useAddHorseForm() {
       setError(nameError)
       return
     }
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setPendingAction('draft')
     setError(null)
     try {
-      await createAndPopulate(token, collectRecords())
+      await createAndPopulate(collectRecords())
       navigate(-1)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save horse')
@@ -159,14 +157,12 @@ export function useAddHorseForm() {
   async function handleSubmitForReview() {
     const allRecords = checkSubmitReady()
     if (!allRecords) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setPendingAction('submit')
     setError(null)
     try {
-      const horse = await createAndPopulate(token, allRecords)
-      await submitHorseForReview(token, horse.id)
+      const horse = await createAndPopulate(allRecords)
+      await submitHorseForReview(horse.id)
       navigate(-1)
     } catch (err) {
       // The horse was already created (as a draft) even if this last step

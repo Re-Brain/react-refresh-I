@@ -70,8 +70,6 @@ function HorsePeriodsGrid({
   }
 
   async function handleSave() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setSaving(true)
     setSaveError(null)
     try {
@@ -79,7 +77,7 @@ function HorsePeriodsGrid({
       await Promise.all(
         horses
           .filter(h => !sameCapacities(committed[h.id] ?? EMPTY_CAPACITIES, draft[h.id] ?? EMPTY_CAPACITIES))
-          .map(h => saveHorsePeriods(token, h.id, draft[h.id] ?? EMPTY_CAPACITIES))
+          .map(h => saveHorsePeriods(h.id, draft[h.id] ?? EMPTY_CAPACITIES))
       )
       setCommitted(draft)
       setIsEditing(false)

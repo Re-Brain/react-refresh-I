@@ -28,7 +28,7 @@ const STATUS_ORDER: BookingStatus[] = ['pending', 'confirmed', 'declined', 'canc
 // Fetched once (soonest-first from the server) and filtered by status client-side.
 function VisitorManagement() {
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
@@ -40,20 +40,18 @@ function VisitorManagement() {
   const [reason, setReason] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
 
-  function fetchBookings(token: string) {
-    getFarmBookings(token)
+  function fetchBookings() {
+    getFarmBookings()
       .then(setBookings)
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load bookings.'))
       .finally(() => setLoading(false))
   }
 
   async function act(id: number, status: 'confirmed' | 'declined' | 'cancelled', withReason?: string) {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setBusyId(id)
     setActionError(null)
     try {
-      const updated = await updateBookingStatus(token, id, status, withReason)
+      const updated = await updateBookingStatus(id, status, withReason)
       // Swap the updated booking into the list; the derived views/counts follow.
       setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)))
       setPrompt(null)
@@ -78,27 +76,22 @@ function VisitorManagement() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    fetchBookings(token)
+    fetchBookings()
   }, [])
 
   function handleRetry() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setLoading(true)
     setError(null)
-    fetchBookings(token)
+    fetchBookings()
   }
 
   // Manual refresh once bookings are already showing — keeps the table on
   // screen instead of flipping back to the full loading state.
   function refresh() {
-    const token = localStorage.getItem('access_token')
-    if (!token || refreshing) return
+    if (refreshing) return
     setRefreshing(true)
     setError(null)
-    getFarmBookings(token)
+    getFarmBookings()
       .then(setBookings)
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load bookings.'))
       .finally(() => setRefreshing(false))
