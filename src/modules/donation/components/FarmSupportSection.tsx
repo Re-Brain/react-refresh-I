@@ -1,6 +1,6 @@
 import { Heart } from 'lucide-react'
 import { useDonation, MIN_DONATION_AMOUNT } from '../hooks/useDonation'
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '../../auth'
 
 type FarmSupportSectionProps = {
   farmId: number
