@@ -1,5 +1,4 @@
-import { csrfHeaders } from '../../../lib/csrf'
-import { API_BASE_URL } from '../../../lib/apiBase'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export type DonationCheckoutSession = {
   checkout_url: string
@@ -44,10 +43,9 @@ export async function createDonationCheckoutSession(
   farmId: number,
   amount: number,
 ): Promise<DonationCheckoutSession> {
-  const res = await fetch(`${API_BASE_URL}/donations/checkout-session`, {
+  const res = await apiFetch('/donations/checkout-session', {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('POST') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ farm_id: farmId, amount }),
   })
   if (!res.ok) {

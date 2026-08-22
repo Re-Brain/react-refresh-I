@@ -1,6 +1,5 @@
 import type { Farm, FarmDocument, Horse, HorseDocument } from '../farm'
-import { csrfHeaders } from '../../lib/csrf'
-import { API_BASE_URL } from '../../lib/apiBase'
+import { apiFetch } from '../../lib/apiFetch'
 
 export type AdminFarm = Omit<Farm, 'documents'> & {
   // Always present on the admin view, unlike the owner-only optional field on Farm.
@@ -20,17 +19,13 @@ function messageFromDetail(detail: unknown, fallback: string): string {
 }
 
 export async function getPendingFarms(): Promise<AdminFarm[]> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms?status=pending`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/admin/farms?status=pending')
   if (!res.ok) throw new Error('Failed to load pending farms.')
   return res.json()
 }
 
 export async function getAdminFarm(id: number): Promise<AdminFarm> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms/${id}`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch(`/admin/farms/${id}`)
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(body?.detail, 'Failed to load farm.'))
@@ -43,10 +38,9 @@ export async function updateFarmApproval(
   status: Extract<AdminFarm['status'], 'active' | 'rejected'>,
   reason?: string
 ): Promise<AdminFarm> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms/${id}`, {
+  const res = await apiFetch(`/admin/farms/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {
@@ -57,9 +51,7 @@ export async function updateFarmApproval(
 }
 
 export async function getPendingHorses(): Promise<AdminHorse[]> {
-  const res = await fetch(`${API_BASE_URL}/admin/horses?status=pending`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/admin/horses?status=pending')
   if (!res.ok) throw new Error('Failed to load pending horses.')
   return res.json()
 }
@@ -69,10 +61,9 @@ export async function updateHorseApproval(
   status: Extract<AdminHorse['status'], 'approved' | 'rejected'>,
   reason?: string
 ): Promise<AdminHorse> {
-  const res = await fetch(`${API_BASE_URL}/admin/horses/${id}`, {
+  const res = await apiFetch(`/admin/horses/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {

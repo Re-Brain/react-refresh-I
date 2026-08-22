@@ -17,8 +17,7 @@
 // needs no extra request. Weekdays use 0 = Sunday … 6 = Saturday.
 
 import type { Horse } from './horse'
-import { csrfHeaders } from '../../../lib/csrf'
-import { API_BASE_URL } from '../../../lib/apiBase'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -128,9 +127,7 @@ export function getHorseVisitSlots(
 // The logged-in farmer's schedule. The backend returns the default (never a
 // 404) when the farm has never configured it.
 export async function getFarmAvailability(): Promise<FarmAvailability> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/availability`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/farms/me/availability')
   if (!res.ok) throw new Error('Failed to load farm availability')
   return res.json()
 }
@@ -138,10 +135,9 @@ export async function getFarmAvailability(): Promise<FarmAvailability> {
 // PUT replaces the whole object — always send all three periods and every
 // field. Returns the saved schedule.
 export async function saveFarmAvailability(value: FarmAvailability): Promise<FarmAvailability> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/availability`, {
+  const res = await apiFetch('/farms/me/availability', {
     method: 'PUT',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PUT') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(value),
   })
   if (!res.ok) throw new Error('Failed to save farm availability')
@@ -154,10 +150,9 @@ export async function saveHorsePeriods(
   horseId: number,
   periods: Record<Period, number>
 ): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/periods`, {
+  const res = await apiFetch(`/horses/${horseId}/periods`, {
     method: 'PUT',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PUT') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ periods }),
   })
   if (!res.ok) {

@@ -1,5 +1,5 @@
-import { csrfHeaders } from '../../lib/csrf'
 import { API_BASE_URL } from '../../lib/apiBase'
+import { apiFetch } from '../../lib/apiFetch'
 
 export type RegisterResult = {
   detail: string
@@ -65,9 +65,8 @@ export async function verifyEmail(token: string): Promise<void> {
 // no token in the response body anymore, just a confirmation.
 export async function login(email: string, password: string): Promise<void> {
   const body = new URLSearchParams({ username: email, password })
-  const res = await fetch(`${API_BASE_URL}/login`, {
+  const res = await apiFetch('/login', {
     method: 'POST',
-    credentials: 'include',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
   })
@@ -80,17 +79,11 @@ export async function login(email: string, password: string): Promise<void> {
 // Clears the access_token/csrf_token cookies server-side. JS can't delete an
 // HttpOnly cookie itself, so this is the only way to actually log out.
 export async function logout(): Promise<void> {
-  await fetch(`${API_BASE_URL}/logout`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
-  })
+  await apiFetch('/logout', { method: 'POST' })
 }
 
 export async function getMe(): Promise<UserMe> {
-  const res = await fetch(`${API_BASE_URL}/me`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/me')
   if (!res.ok) throw new Error('Failed to fetch user')
   return res.json()
 }
@@ -99,13 +92,9 @@ export async function changePassword(
   currentPassword: string,
   newPassword: string,
 ): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/me/password`, {
+  const res = await apiFetch('/me/password', {
     method: 'PATCH',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...csrfHeaders('PATCH'),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
   })
   if (!res.ok) {
@@ -115,11 +104,7 @@ export async function changePassword(
 }
 
 export async function deleteAccount(): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/me`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch('/me', { method: 'DELETE' })
   if (!res.ok) {
     const error = await res.json().catch(() => null)
     throw new Error(error?.detail ?? 'Failed to delete account')

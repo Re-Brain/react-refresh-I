@@ -1,5 +1,5 @@
-import { csrfHeaders } from '../../../lib/csrf'
 import { API_BASE_URL } from '../../../lib/apiBase'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export type FarmImage = {
   id: number
@@ -66,7 +66,10 @@ function messageFromDetail(detail: unknown, fallback: string): string {
   return fallback
 }
 
-// Return all active farms, or throw an error if the request fails. This is used on the home page to show a carousel of farms.
+// Return all active farms, or throw an error if the request fails. This is
+// used on the home page to show a carousel of farms. Public/no-auth, so this
+// goes straight through fetch rather than apiFetch — there's never a session
+// to refresh here.
 export async function getActiveFarms(): Promise<ActiveFarm[]> {
   const res = await fetch(`${API_BASE_URL}/farms`)
   if (!res.ok) throw new Error('Failed to fetch farms')
@@ -92,9 +95,7 @@ export function isFarmComplete(farm: Farm): boolean {
 }
 
 export async function getMyFarm(): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/farms/me')
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to fetch farm'))
@@ -103,13 +104,9 @@ export async function getMyFarm(): Promise<Farm> {
 }
 
 export async function updateMyFarm(data: FarmUpdate): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me`, {
+  const res = await apiFetch('/farms/me', {
     method: 'PATCH',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...csrfHeaders('PATCH'),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -124,10 +121,8 @@ export async function updateMyFarm(data: FarmUpdate): Promise<Farm> {
 export async function uploadFarmImage(file: File): Promise<Farm> {
   const formData = new FormData()
   formData.append('file', file)
-  const res = await fetch(`${API_BASE_URL}/farms/me/image`, {
+  const res = await apiFetch('/farms/me/image', {
     method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -138,11 +133,7 @@ export async function uploadFarmImage(file: File): Promise<Farm> {
 }
 
 export async function deleteFarmImage(imageId: number): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/image/${imageId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/farms/me/image/${imageId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete image'))
@@ -151,10 +142,9 @@ export async function deleteFarmImage(imageId: number): Promise<Farm> {
 }
 
 export async function reorderFarmImages(imageIds: number[]): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/images/order`, {
+  const res = await apiFetch('/farms/me/images/order', {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ image_ids: imageIds }),
   })
   if (!res.ok) {
@@ -170,10 +160,8 @@ export async function uploadFarmDocument(file: File, documentType: FarmDocumentT
   const formData = new FormData()
   formData.append('file', file)
   formData.append('document_type', documentType)
-  const res = await fetch(`${API_BASE_URL}/farms/me/documents`, {
+  const res = await apiFetch('/farms/me/documents', {
     method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -184,11 +172,7 @@ export async function uploadFarmDocument(file: File, documentType: FarmDocumentT
 }
 
 export async function deleteFarmDocument(documentId: number): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/documents/${documentId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/farms/me/documents/${documentId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete document'))
@@ -200,11 +184,7 @@ export async function deleteFarmDocument(documentId: number): Promise<Farm> {
 // and all 3 documents are present. Missing requirements should block the
 // button client-side; this is the fallback for whatever slips through.
 export async function submitFarmForReview(): Promise<Farm> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/submit`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
-  })
+  const res = await apiFetch('/farms/me/submit', { method: 'POST' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to submit farm for review'))

@@ -1,6 +1,6 @@
 import type { Period, FarmAvailability } from './availability'
-import { csrfHeaders } from '../../../lib/csrf'
 import { API_BASE_URL } from '../../../lib/apiBase'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export type HorseImage = {
   id: number
@@ -84,14 +84,13 @@ function messageFromDetail(detail: unknown, fallback: string): string {
 }
 
 export async function getHorse(id: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch(`/horses/${id}`)
   if (!res.ok) throw new Error('Failed to fetch horse')
   return res.json()
 }
 
-// Return all horses, or throw an error if the request fails. This is used on the home page to show a carousel of horses.
+// Return all horses, or throw an error if the request fails. This is used on
+// the home page to show a carousel of horses. Public/no-auth.
 export async function getAllHorses(): Promise<Horse[]> {
   const res = await fetch(`${API_BASE_URL}/horses`)
   if (!res.ok) throw new Error('Failed to fetch horses')
@@ -105,9 +104,7 @@ export async function getHorsePublic(id: number): Promise<Horse> {
 }
 
 export async function getMyHorses(): Promise<Horse[]> {
-  const res = await fetch(`${API_BASE_URL}/horses/me`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/horses/me')
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to fetch horses'))
@@ -116,10 +113,9 @@ export async function getMyHorses(): Promise<Horse[]> {
 }
 
 export async function createHorse(data: HorseCreate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses`, {
+  const res = await apiFetch('/horses', {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('POST') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -130,10 +126,9 @@ export async function createHorse(data: HorseCreate): Promise<Horse> {
 }
 
 export async function updateHorse(id: number, data: HorseUpdate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
+  const res = await apiFetch(`/horses/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -144,11 +139,7 @@ export async function updateHorse(id: number, data: HorseUpdate): Promise<Horse>
 }
 
 export async function submitHorseForReview(horseId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/submit`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
-  })
+  const res = await apiFetch(`/horses/${horseId}/submit`, { method: 'POST' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to submit horse for review'))
@@ -157,11 +148,7 @@ export async function submitHorseForReview(horseId: number): Promise<Horse> {
 }
 
 export async function deleteHorse(id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/horses/${id}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete horse'))
@@ -171,10 +158,8 @@ export async function deleteHorse(id: number): Promise<void> {
 export async function uploadHorseImage(horseId: number, file: File): Promise<Horse> {
   const formData = new FormData()
   formData.append('file', file)
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/image`, {
+  const res = await apiFetch(`/horses/${horseId}/image`, {
     method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -192,10 +177,8 @@ export async function uploadHorseDocument(
   const formData = new FormData()
   formData.append('file', file)
   formData.append('document_type', documentType)
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/documents`, {
+  const res = await apiFetch(`/horses/${horseId}/documents`, {
     method: 'POST',
-    credentials: 'include',
-    headers: { ...csrfHeaders('POST') },
     body: formData,
   })
   if (!res.ok) {
@@ -206,11 +189,7 @@ export async function uploadHorseDocument(
 }
 
 export async function deleteHorseDocument(horseId: number, documentId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/documents/${documentId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/horses/${horseId}/documents/${documentId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete document'))
@@ -219,10 +198,9 @@ export async function deleteHorseDocument(horseId: number, documentId: number): 
 }
 
 export async function createRaceRecord(horseId: number, data: RaceRecordCreate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records`, {
+  const res = await apiFetch(`/horses/${horseId}/race-records`, {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('POST') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -233,11 +211,7 @@ export async function createRaceRecord(horseId: number, data: RaceRecordCreate):
 }
 
 export async function deleteRaceRecord(horseId: number, recordId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/horses/${horseId}/race-records/${recordId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete race record'))
@@ -246,10 +220,9 @@ export async function deleteRaceRecord(horseId: number, recordId: number): Promi
 }
 
 export async function updateRaceRecord(horseId: number, recordId: number, data: RaceRecordUpdate): Promise<RaceRecord> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
+  const res = await apiFetch(`/horses/${horseId}/race-records/${recordId}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -260,10 +233,9 @@ export async function updateRaceRecord(horseId: number, recordId: number, data: 
 }
 
 export async function reorderHorseImages(horseId: number, imageIds: number[]): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/images/order`, {
+  const res = await apiFetch(`/horses/${horseId}/images/order`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ image_ids: imageIds }),
   })
   if (!res.ok) {
@@ -274,11 +246,7 @@ export async function reorderHorseImages(horseId: number, imageIds: number[]): P
 }
 
 export async function deleteHorseImage(horseId: number, imageId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/image/${imageId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { ...csrfHeaders('DELETE') },
-  })
+  const res = await apiFetch(`/horses/${horseId}/image/${imageId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete image'))

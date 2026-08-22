@@ -1,6 +1,5 @@
 import type { Period } from '../farm'
-import { csrfHeaders } from '../../lib/csrf'
-import { API_BASE_URL } from '../../lib/apiBase'
+import { apiFetch } from '../../lib/apiFetch'
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled'
 
@@ -86,10 +85,9 @@ export async function updateBookingStatus(
   status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>,
   reason?: string
 ): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+  const res = await apiFetch(`/bookings/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {
@@ -102,10 +100,9 @@ export async function updateBookingStatus(
 // The visitor cancels their own booking. The server allows this only for the
 // booking's own visitor; returns the updated booking.
 export async function cancelBooking(id: number): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+  const res = await apiFetch(`/bookings/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('PATCH') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'cancelled' }),
   })
   if (!res.ok) {
@@ -119,27 +116,22 @@ export async function cancelBooking(id: number): Promise<Booking> {
 // server. Optionally filtered to a single status.
 export async function getFarmBookings(status?: BookingStatus): Promise<Booking[]> {
   const query = status ? `?status=${status}` : ''
-  const res = await fetch(`${API_BASE_URL}/farms/me/bookings${query}`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch(`/farms/me/bookings${query}`)
   if (!res.ok) throw new Error('Failed to load bookings.')
   return res.json()
 }
 
 // The logged-in visitor's own bookings (identity resolved from the session cookie).
 export async function getMyBookings(): Promise<VisitorBooking[]> {
-  const res = await fetch(`${API_BASE_URL}/bookings/me`, {
-    credentials: 'include',
-  })
+  const res = await apiFetch('/bookings/me')
   if (!res.ok) throw new Error('Failed to load your bookings.')
   return res.json()
 }
 
 export async function createBooking(data: BookingCreate): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings`, {
+  const res = await apiFetch('/bookings', {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...csrfHeaders('POST') },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
