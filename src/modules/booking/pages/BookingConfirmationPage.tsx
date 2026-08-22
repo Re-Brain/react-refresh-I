@@ -1,7 +1,7 @@
 import { useLocation, Navigate, Link } from 'react-router-dom'
 import { CheckCircle2, AlertTriangle } from 'lucide-react'
 import type { Booking } from '../api'
-import { formatTime } from '../../../api/availability'
+import { formatTime } from '../../farm'
 import { formatVisitDate } from '../lib/bookingDisplay'
 
 // Shown right after a visitor submits a booking request. The just-created

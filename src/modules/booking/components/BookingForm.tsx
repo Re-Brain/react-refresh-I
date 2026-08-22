@@ -1,4 +1,4 @@
-import { formatTime, getHorseVisitSlots } from '../../../api/availability'
+import { formatTime, getHorseVisitSlots } from '../../farm'
 import type { useBookingForm } from '../hooks/useBookingForm'
 
 type BookingFormProps = {

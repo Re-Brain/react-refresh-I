@@ -1,5 +1,5 @@
 import { useFarmData } from '../hooks/useFarmData'
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '../../auth'
 import { FarmContext } from '../context/FarmContext'
 
 // Fetches the farmer's farm + horses once per session (mounted above <Routes>,

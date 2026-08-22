@@ -1,5 +1,5 @@
 import type { Horse } from '../api/horse'
-import OverlayCard from './OverlayCard'
+import OverlayCard from '../../../components/OverlayCard'
 
 type FarmResidentsProps = {
   horses: Horse[]

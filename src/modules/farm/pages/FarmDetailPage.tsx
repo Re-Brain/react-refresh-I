@@ -4,7 +4,7 @@ import FarmHero from '../components/FarmHero'
 import FarmStory from '../components/FarmStory'
 import FarmLocationMap from '../components/FarmLocationMap'
 import FarmResidents from '../components/FarmResidents'
-import FarmSupportSection from '../components/FarmSupportSection'
+import { FarmSupportSection } from '../../donation'
 
 function FarmDetailPage() {
   const { id } = useParams<{ id: string }>()

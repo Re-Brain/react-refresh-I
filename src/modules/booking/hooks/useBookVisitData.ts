@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getHorsePublic, type Horse } from '../../../api/horse'
-import { getFarm, type ActiveFarm } from '../../../api/farm'
+import { getHorsePublic, type Horse, getFarm, type ActiveFarm } from '../../farm'
 
 // Loads the public horse being booked and its owning farm (for the heading).
 export function useBookVisitData(horseId: string | undefined) {

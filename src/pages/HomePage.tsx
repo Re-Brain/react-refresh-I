@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getActiveFarms, type ActiveFarm } from '../api/farm'
-import { getAllHorses, type Horse } from '../api/horse'
+import { getActiveFarms, type ActiveFarm, getAllHorses, type Horse } from '../modules/farm'
 import { Link } from 'react-router-dom'
 import OverlayCard from '../components/OverlayCard'
 import Carousel from '../components/Carousel'

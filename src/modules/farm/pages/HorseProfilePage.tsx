@@ -7,8 +7,8 @@ import HorseHero from '../components/HorseHero'
 import HorseStory from '../components/HorseStory'
 import HorsePedigree from '../components/HorsePedigree'
 import HorseRaceRecords from '../components/HorseRaceRecords'
-import BookVisitButton from '../components/BookVisitButton'
-import SupportFarmButton from '../components/SupportFarmButton'
+import { BookVisitButton } from '../../booking'
+import { SupportFarmButton } from '../../donation'
 
 function HorseProfilePage() {
 

@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Heart, MapPin, ImageOff } from 'lucide-react'
 import type { ActiveFarm } from '../api/farm'
-import { LenisContext } from '../context/LenisContext'
+import { LenisContext } from '../../../context/LenisContext'
 
 type FarmHeroProps = {
   farm: ActiveFarm

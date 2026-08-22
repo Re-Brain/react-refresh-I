@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { getHorseVisitSlots } from '../../../api/availability'
+import { getHorseVisitSlots } from '../../farm'
 import Calendar from '../../../components/Calendar'
 import BookingForm from '../components/BookingForm'
 import { useBookVisitData } from '../hooks/useBookVisitData'

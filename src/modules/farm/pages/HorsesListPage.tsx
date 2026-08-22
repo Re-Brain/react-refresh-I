@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { getActiveFarms, type ActiveFarm } from '../api/farm'
-import OverlayCard from '../components/OverlayCard'
+import { getAllHorses, type Horse } from '../api/horse'
+import OverlayCard from '../../../components/OverlayCard'
 
-function FarmsListPage() {
+function HorsesListPage() {
 
-  // State for farms, error handling, and loading state
-  const [farms, setFarms] = useState<ActiveFarm[]>([])
+  // State for horses, error handling, and loading state
+  const [horses, setHorses] = useState<Horse[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch farms data when the component mounts
+  // Fetch horses data when the component mounts
   useEffect(() => {
-    getActiveFarms()
-      .then(setFarms)
-      .catch(() => setError('Failed to load farms. Please try again later.'))
+    getAllHorses()
+      .then(setHorses)
+      .catch(() => setError('Failed to load horses. Please try again later.'))
       .finally(() => setLoading(false))
   }, [])
 
   return (
     <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text">
       <div className="max-w-7xl mx-auto px-8 py-10">
-
+        
         {/* Back link to the home page */}
         <Link
           to="/"
@@ -33,28 +33,28 @@ function FarmsListPage() {
 
         {/* Page title */}
         <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">
-          Farms Open to Visitors
+          Champions in Retirement
         </h1>
 
-        {/* Show loading state when farms are being fetched */}
+        {/* Show loading state when horses are being fetched */}
         {loading && <p className="text-brand-muted text-sm">Loading...</p>}
-        
-        {/* Show error message if there was an error fetching farms */}
+
+        {/* Show error message if there was an error fetching horses */}
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        
-        {/* Show message if there are no active farms */}
-        {!loading && !error && farms.length === 0 && (
-          <p className="text-brand-muted text-sm">No active farms yet.</p>
+
+        {/* Show message if there are no horses */}
+        {!loading && !error && horses.length === 0 && (
+          <p className="text-brand-muted text-sm">No horses listed yet.</p>
         )}
 
-        {/* Show grid of farms if there are any */}
+        {/* Show grid of horses if there are any */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {farms.map(farm => (
+          {horses.map(horse => (
             <OverlayCard
-              key={farm.id}
-              to={`/farms/${farm.id}`}
-              imageUrl={farm.images?.[0]?.image_url}
-              title={farm.name}
+              key={horse.id}
+              to={`/horses/${horse.id}`}
+              imageUrl={horse.images[0]?.image_url}
+              title={horse.name}
             />
           ))}
         </div>
@@ -63,4 +63,4 @@ function FarmsListPage() {
   )
 }
 
-export default FarmsListPage
+export default HorsesListPage

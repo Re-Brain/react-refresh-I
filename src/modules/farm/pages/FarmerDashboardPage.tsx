@@ -5,14 +5,14 @@ import { useFarm } from '../context/useFarm'
 import { useFarmInfoForm } from '../hooks/useFarmInfoForm'
 import { useFarmDocuments } from '../hooks/useFarmDocuments'
 import { useFarmSubmit } from '../hooks/useFarmSubmit'
-import { useAccountSettings } from '../hooks/useAccountSettings'
+import { useAccountSettings } from '../../../hooks/useAccountSettings'
 import DashboardSidebar, { gatedSections, type Section } from '../components/DashboardSidebar'
 import FarmInfoSection from '../components/FarmInfoSection'
 import HorseManagementSection from '../components/HorseManagementSection'
 import AvailabilitySection from '../components/AvailabilitySection'
-import SettingsSection from '../components/SettingsSection'
-import VisitorManagement from '../components/VisitorManagement'
-import DonationManagement from '../components/DonationManagement'
+import SettingsSection from '../../../components/SettingsSection'
+import { VisitorManagement } from '../../booking'
+import { DonationManagement } from '../../donation'
 
 function FarmerDashboardPage() {
   const navigate = useNavigate()

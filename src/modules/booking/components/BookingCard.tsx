@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CalendarClock, Users, MapPin, ArrowUpRight } from 'lucide-react'
 import type { VisitorBooking } from '../api'
-import { formatTime } from '../../../api/availability'
+import { formatTime } from '../../farm'
 import { formatVisitDate, displayStatus, isPastVisit } from '../lib/bookingDisplay'
 
 type BookingCardProps = {

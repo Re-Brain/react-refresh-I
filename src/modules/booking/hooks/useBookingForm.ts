@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createBooking, BookingError } from '../api'
 import { LenisContext } from '../../../context/LenisContext'
-import type { Period } from '../../../api/availability'
+import type { Period } from '../../farm'
 
 // A time slot the visitor has picked, tagged with the period it belongs to.
 export type VisitSlot = { period: Period; start: string; end: string }

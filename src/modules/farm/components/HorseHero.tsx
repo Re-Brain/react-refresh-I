@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
 import type { Horse } from '../api/horse'
-import BookVisitButton from './BookVisitButton'
-import SupportFarmButton from './SupportFarmButton'
+import { BookVisitButton } from '../../booking'
+import { SupportFarmButton } from '../../donation'
 
 type HorseHeroProps = {
   horse: Horse

@@ -6,7 +6,7 @@ import {
   type Booking,
   type BookingStatus,
 } from '../api'
-import { formatTime } from '../../../api/availability'
+import { formatTime } from '../../farm'
 import { formatVisitDate, displayStatus, isPastVisit } from '../lib/bookingDisplay'
 
 type Filter = 'all' | BookingStatus
