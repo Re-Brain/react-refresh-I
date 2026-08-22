@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMyBookings, cancelBooking, type VisitorBooking } from '../api/booking'
+import { getMyBookings, cancelBooking, type VisitorBooking } from '../api'
 
 // Loads the visitor's bookings and owns the cancel flow: the per-card confirm
 // prompt (`confirmId`), the in-flight card (`busyId`), and action errors.

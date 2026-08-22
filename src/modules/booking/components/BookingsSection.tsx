@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, CalendarClock, RefreshCw, Users } from 'lucide-react'
-import type { BookingStatus } from '../api/booking'
+import type { BookingStatus } from '../api'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 import { useVisitorBookings } from '../hooks/useVisitorBookings'
 import BookingStatusTabs from './BookingStatusTabs'

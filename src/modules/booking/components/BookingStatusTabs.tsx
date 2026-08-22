@@ -1,4 +1,4 @@
-import type { BookingStatus } from '../api/booking'
+import type { BookingStatus } from '../api'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 
 // Left-to-right order of the filter buttons.

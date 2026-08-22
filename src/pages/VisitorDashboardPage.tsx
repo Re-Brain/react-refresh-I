@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '../modules/auth'
 import VisitorDashboardSidebar, { type VisitorSection } from '../components/VisitorDashboardSidebar'
-import BookingsSection from '../components/BookingsSection'
-import SubscriptionSection from '../components/SubscriptionSection'
+import { BookingsSection } from '../modules/booking'
+import { SubscriptionSection } from '../modules/donation'
 
 function VisitorDashboardPage() {
   const { user } = useAuth()

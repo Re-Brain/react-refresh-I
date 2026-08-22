@@ -1,4 +1,4 @@
-import type { BookingStatus } from '../api/booking'
+import type { BookingStatus } from '../api'
 
 // Badge styling and label per booking status — shared by the visitor dashboard
 // and the farmer's visitor-management section.
