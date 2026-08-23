@@ -20,7 +20,11 @@ function LoginPage() {
   // redirect the user somewhere unexpected after login; anything else falls
   // back to /dashboard at navigate time.
   const from = rawFrom?.startsWith('/book/') ? rawFrom : undefined
-  
+
+  // Informational banner for redirects that need to explain themselves, e.g.
+  // being logged out after requesting a password reset from Settings.
+  const notice = (location.state as { notice?: string } | null)?.notice
+
   // Get the setUser function from the useAuth context to update the user state after a successful login
   const { setUser } = useAuth()
 
@@ -76,7 +80,13 @@ function LoginPage() {
         
         {/* Page title */}
         <h1 className="text-3xl font-bold text-brand-gold mb-6 text-center">Login</h1>
-        
+
+        {notice && (
+          <p className="bg-brand-gold/10 border border-brand-gold/40 text-brand-text text-sm rounded-lg px-4 py-3 mb-4">
+            {notice}
+          </p>
+        )}
+
         {/* Login form */}
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           

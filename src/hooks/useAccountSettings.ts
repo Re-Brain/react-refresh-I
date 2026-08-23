@@ -8,24 +8,31 @@ export function useAccountSettings() {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [pwResetSending, setPwResetSending] = useState(false)
-  const [pwResetSent, setPwResetSent] = useState(false)
   const [pwResetError, setPwResetError] = useState<string | null>(null)
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  // Requesting a reset link also ends the current session immediately (the
+  // backend revokes it server-side; logging out here clears this tab's
+  // cookies right away instead of waiting for the next API call to 401) so
+  // the dashboard isn't still reachable while the email is in flight.
   async function handleSendPasswordReset() {
     setPwResetError(null)
     setPwResetSending(true)
     try {
       await requestPasswordReset()
-      setPwResetSent(true)
+      await logout()
+      navigate('/login', {
+        state: { notice: 'We sent a password reset link to your email. You have been logged out for security — use the link to set a new password, then log back in.' },
+      })
     } catch (err) {
       setPwResetError(err instanceof Error ? err.message : 'Failed to send password reset link')
-    } finally {
       setPwResetSending(false)
+      setShowResetConfirm(false)
     }
   }
 
@@ -43,7 +50,7 @@ export function useAccountSettings() {
   }
 
   return {
-    pwResetSending, pwResetSent, pwResetError, handleSendPasswordReset,
+    showResetConfirm, setShowResetConfirm, pwResetSending, pwResetError, handleSendPasswordReset,
     showDeleteConfirm, setShowDeleteConfirm, deleting, deleteError, setDeleteError, handleDeleteAccount,
   }
 }
