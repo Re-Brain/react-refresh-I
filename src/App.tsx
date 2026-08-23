@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  useNavigate,
+  useNavigationType,
+} from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import Lenis from 'lenis'
 import HomePage from './pages/HomePage.tsx'
 import DashboardPage from './pages/DashboardPage.tsx'
 import VisitorDashboardPage from './pages/VisitorDashboardPage.tsx'
+import Footer from './components/Footer.tsx'
+import HorseshoeIcon from './components/HorseshoeIcon.tsx'
 import { LenisContext } from './context/LenisContext'
 import {
   useAuth,
@@ -16,7 +25,11 @@ import {
   CheckEmailPage,
   VerifyEmailPage,
 } from './modules/auth'
-import { AdminDashboardPage, AdminFarmDetailPage, AdminHorseDetailPage } from './modules/admin'
+import {
+  AdminDashboardPage,
+  AdminFarmDetailPage,
+  AdminHorseDetailPage,
+} from './modules/admin'
 import { BookVisitPage, BookingConfirmationPage } from './modules/booking'
 import {
   FarmerDashboardPage,
@@ -64,9 +77,47 @@ function MenuButton({
 function App() {
   const { user, logout } = useAuth()
   const lenisRef = useRef<Lenis | null>(null)
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const { pathname } = location
+  const navigationType = useNavigationType()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  // True while we're actively re-asserting a restored scroll position (see
+  // below) — the routed page is hidden during this window so the user never
+  // sees the brief "lands in the wrong spot, then jumps" flash while async
+  // content is still loading in underneath it.
+  const [restoringScroll, setRestoringScroll] = useState(false)
+
+  // Remember each history entry's scroll position as the user scrolls, so a
+  // back/forward navigation can restore it below.
+  const scrollPositions = useRef<Map<string, number>>(new Map())
+  useEffect(() => {
+    const key = location.key
+    const onScroll = () => scrollPositions.current.set(key, window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [location.key])
+
+  // Detecting "was this a back/forward navigation" turned out to need two
+  // signals, neither reliable alone: React Router's useNavigationType() and
+  // a raw window 'popstate' listener each missed it in different testing
+  // environments. Neither ever fires for a <Link> click or navigate() call,
+  // so trusting either one (an OR, not an AND) can't produce a false
+  // positive — it just doubles our chances of catching a real one.
+  const wasPopRef = useRef(false)
+  useEffect(() => {
+    const onPopState = () => {
+      wasPopRef.current = true
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  // We restore scroll position ourselves (below), so stop the browser from
+  // fighting us with its own guess.
+  useEffect(() => {
+    window.history.scrollRestoration = 'manual'
+  }, [])
 
   // Smooth inertia scrolling: the page eases toward the target instead of
   // snapping, giving that gentle "glide" feel. Disabled for users who ask
@@ -92,17 +143,57 @@ function App() {
     }
   }, [])
 
-  // Reset scroll to the top on every route change (React Router keeps the old
-  // position by default). Go through Lenis so it doesn't fight the smooth scroll.
-  useEffect(() => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true })
-    } else {
-      window.scrollTo(0, 0)
-    }
-    // Collapse the hamburger menu whenever we navigate to a new page.
+  // On a normal (link click / navigate()) navigation, jump to the top of the
+  // new page. On a real back/forward navigation, restore the scroll position
+  // the user left this page at. Runs before paint (useLayoutEffect) so the
+  // very first application never flashes at the wrong spot first.
+  useLayoutEffect(() => {
     setMenuOpen(false)
-  }, [pathname])
+
+    const isPop = navigationType === 'POP' || wasPopRef.current
+    wasPopRef.current = false
+
+    const saved = scrollPositions.current.get(location.key)
+    const target = isPop ? (saved ?? 0) : 0
+
+    const applyScroll = () => {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(target, { immediate: true })
+      } else {
+        window.scrollTo(0, target)
+      }
+    }
+    applyScroll()
+
+    if (target === 0) return
+
+    // Farm/horse lists (and similar) load asynchronously, so the page can
+    // still be growing after we land on it — and Lenis has its own internal
+    // resize handling that re-syncs to the current native scroll position
+    // whenever the page's height changes, which can silently undo a single
+    // restore attempt. So instead of reacting once, we keep re-asserting the
+    // target every frame for up to a couple of seconds (stopping the moment
+    // we've actually reached it), which wins that race regardless of what
+    // knocked it off. The page stays hidden the whole time, so none of these
+    // intermediate jumps are ever visible — checking every frame (rather
+    // than e.g. every 100ms) means it reveals the instant it's ready instead
+    // of sitting hidden longer than it needs to.
+    setRestoringScroll(true)
+    const start = Date.now()
+    let rafId = requestAnimationFrame(function tick() {
+      applyScroll()
+      if (Math.abs(window.scrollY - target) < 4 || Date.now() - start > 2500) {
+        setRestoringScroll(false)
+      } else {
+        rafId = requestAnimationFrame(tick)
+      }
+    })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      setRestoringScroll(false)
+    }
+  }, [pathname, navigationType, location.key])
 
   return (
     <LenisContext.Provider value={lenisRef}>
@@ -119,28 +210,12 @@ function App() {
             onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 text-2xl font-extrabold tracking-tight hover:text-brand-gold transition"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-10 w-10 shrink-0"
-              aria-hidden="true"
-            >
-              {/* Horseshoe: open U-shaped arc with nail holes */}
-              <path d="M6 21c-2-1.5-3-4-3-7a9 9 0 0 1 18 0c0 3-1 5.5-3 7" />
-              <circle cx="7" cy="12" r="0.6" fill="currentColor" stroke="none" />
-              <circle cx="6" cy="16" r="0.6" fill="currentColor" stroke="none" />
-              <circle cx="17" cy="12" r="0.6" fill="currentColor" stroke="none" />
-              <circle cx="18" cy="16" r="0.6" fill="currentColor" stroke="none" />
-            </svg>
+            <HorseshoeIcon className="h-10 w-10 shrink-0" />
             <span className="leading-none">Furlong</span>
           </Link>
         </div>
         <button
-          onClick={() => setMenuOpen(open => !open)}
+          onClick={() => setMenuOpen((open) => !open)}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
           className={`flex items-center justify-center rounded p-1 transition ${
@@ -184,33 +259,128 @@ function App() {
           )}
         </div>
       </div>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/horses" element={<HorsesListPage />} />
-        <Route path="/farms" element={<FarmsListPage />} />
-        <Route path="/farms/:id" element={<FarmDetailPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/register/visitor" element={<RegisterVisitorPage />} />
-        <Route path="/register/farmer" element={<RegisterFarmerPage />} />
-        <Route path="/check-email" element={<CheckEmailPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer" element={<ProtectedRoute><FarmerDashboardPage /></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/new" element={<ProtectedRoute><RequireActiveFarm><AddHorsePage /></RequireActiveFarm></ProtectedRoute>} />
-        <Route path="/dashboard/farmer/horses/:id" element={<ProtectedRoute><RequireActiveFarm><HorseEditPage /></RequireActiveFarm></ProtectedRoute>} />
-        <Route path="/horses/:id" element={<HorseProfilePage />} />
-        <Route path="/book/:horseId" element={<ProtectedRoute><BookVisitPage /></ProtectedRoute>} />
-        <Route path="/book/confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
-        <Route path="/dashboard/visitor" element={<ProtectedRoute><VisitorDashboardPage /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
-        <Route path="/admin/farms/:id" element={<ProtectedRoute><AdminFarmDetailPage /></ProtectedRoute>} />
-        <Route path="/admin/horses/:id" element={<ProtectedRoute><AdminHorseDetailPage /></ProtectedRoute>} />
-        <Route path="/donate/success" element={<DonateSuccessPage />} />
-        <Route path="/donate/cancel" element={<DonateCancelPage />} />
-        <Route path="/farm/stripe/return" element={<ProtectedRoute><RequireActiveFarm><StripeReturnPage /></RequireActiveFarm></ProtectedRoute>} />
-        <Route path="/farm/stripe/refresh" element={<ProtectedRoute><RequireActiveFarm><StripeRefreshPage /></RequireActiveFarm></ProtectedRoute>} />
-      </Routes>
+      <div style={restoringScroll ? { visibility: 'hidden' } : undefined}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/horses" element={<HorsesListPage />} />
+          <Route path="/farms" element={<FarmsListPage />} />
+          <Route path="/farms/:id" element={<FarmDetailPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register/visitor" element={<RegisterVisitorPage />} />
+          <Route path="/register/farmer" element={<RegisterFarmerPage />} />
+          <Route path="/check-email" element={<CheckEmailPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/farmer"
+            element={
+              <ProtectedRoute>
+                <FarmerDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/farmer/horses/new"
+            element={
+              <ProtectedRoute>
+                <RequireActiveFarm>
+                  <AddHorsePage />
+                </RequireActiveFarm>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/farmer/horses/:id"
+            element={
+              <ProtectedRoute>
+                <RequireActiveFarm>
+                  <HorseEditPage />
+                </RequireActiveFarm>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/horses/:id" element={<HorseProfilePage />} />
+          <Route
+            path="/book/:horseId"
+            element={
+              <ProtectedRoute>
+                <BookVisitPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book/confirmation"
+            element={
+              <ProtectedRoute>
+                <BookingConfirmationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/visitor"
+            element={
+              <ProtectedRoute>
+                <VisitorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/farms/:id"
+            element={
+              <ProtectedRoute>
+                <AdminFarmDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/horses/:id"
+            element={
+              <ProtectedRoute>
+                <AdminHorseDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/donate/success" element={<DonateSuccessPage />} />
+          <Route path="/donate/cancel" element={<DonateCancelPage />} />
+          <Route
+            path="/farm/stripe/return"
+            element={
+              <ProtectedRoute>
+                <RequireActiveFarm>
+                  <StripeReturnPage />
+                </RequireActiveFarm>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/farm/stripe/refresh"
+            element={
+              <ProtectedRoute>
+                <RequireActiveFarm>
+                  <StripeRefreshPage />
+                </RequireActiveFarm>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <Footer />
+      </div>
     </LenisContext.Provider>
   )
 }
