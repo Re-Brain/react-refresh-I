@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { getActiveFarms, type ActiveFarm, getAllHorses, type Horse } from '../modules/farm'
 import { Link } from 'react-router-dom'
-import { Search, CalendarCheck, HeartHandshake } from 'lucide-react'
+import { Search, CalendarCheck, HeartHandshake, HandCoins } from 'lucide-react'
 import OverlayCard from '../components/OverlayCard'
 import Carousel from '../components/Carousel'
+import HorseshoeIcon from '../components/HorseshoeIcon'
 
 // The 3-step explainer shown in the "How It Works" section below the hero.
 const HOW_IT_WORKS_STEPS = [
@@ -55,7 +56,7 @@ function HomePage() {
         
         {/* Background image of hero */}
         <img
-          src="https://picsum.photos/seed/horse-hero/1920/1080"
+          src="https://images.unsplash.com/photo-1599635406076-0f40532a59fc?fm=jpg&q=80&w=1920&auto=format&fit=crop"
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -64,10 +65,10 @@ function HomePage() {
         <div className="absolute inset-0 bg-linear-to-t from-[#0f2a1f]/85 via-[#1f4d3a]/45 to-[#1f4d3a]/25" />
         <div className="relative z-10 px-6 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg max-w-4xl mx-auto">
-            Life After the Finish Line
+            Life Beyond the Track
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-white/90 drop-shadow">
-            Meet the racehorses who once ruled the track — and book a visit to their farm.
+            Discover the champions who once ruled the track — book a visit, or support their care from afar.
           </p>
         </div>
       </section>
@@ -182,32 +183,61 @@ function HomePage() {
           ))}
         </Carousel>
 
-        {/* Support/Donate CTA - surfaces the donation flow, which otherwise
-            only appears once you're already on a farm's page */}
-        <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 mt-16 flex flex-col items-center gap-4 text-center">
-          <div
-            aria-hidden
-            className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
-          />
-          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-brand-gold/10 text-brand-gold">
-            <HeartHandshake className="h-6 w-6" />
-          </span>
-          <h2
-            style={{ fontFamily: 'var(--font-story-title)' }}
-            className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
-          >
-            Support a Retired Champion
-          </h2>
-          <p className="text-brand-muted max-w-2xl">
-            Not everyone can visit in person. Your donation goes directly to the farm caring for
-            these horses — covering feed, vet care, and daily upkeep.
-          </p>
-          <Link
-            to="/farms"
-            className="mt-2 text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-6 py-2 hover:bg-brand-gold hover:text-brand-bg transition"
-          >
-            Find a Farm to Support
-          </Link>
+        {/* Meet/Support CTAs - surface the booking and donation flows, which
+            otherwise only appear once you're already on a horse's or farm's
+            page */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-16">
+          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
+            <div
+              aria-hidden
+              className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
+            />
+            <span className="flex items-center justify-center w-14 h-14 rounded-full bg-brand-gold/10 text-brand-gold">
+              <HorseshoeIcon className="h-6 w-6" />
+            </span>
+            <h2
+              style={{ fontFamily: 'var(--font-story-title)' }}
+              className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
+            >
+              Meet a Retired Champion
+            </h2>
+            <p className="text-brand-muted max-w-2xl">
+              Every horse has a story worth hearing in person. Browse our champions and book a
+              visit to meet one at their farm.
+            </p>
+            <Link
+              to="/horses"
+              className="mt-auto text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-6 py-2 hover:bg-brand-gold hover:text-brand-bg transition"
+            >
+              Find a Champion to Meet
+            </Link>
+          </div>
+
+          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
+            <div
+              aria-hidden
+              className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
+            />
+            <span className="flex items-center justify-center w-14 h-14 rounded-full bg-brand-gold/10 text-brand-gold">
+              <HandCoins className="h-6 w-6" />
+            </span>
+            <h2
+              style={{ fontFamily: 'var(--font-story-title)' }}
+              className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
+            >
+              Support a Retired Champion
+            </h2>
+            <p className="text-brand-muted max-w-2xl">
+              Not everyone can visit in person. Your donation goes directly to the farm caring for
+              these horses — covering feed, vet care, and daily upkeep.
+            </p>
+            <Link
+              to="/farms"
+              className="mt-auto text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-6 py-2 hover:bg-brand-gold hover:text-brand-bg transition"
+            >
+              Find a Farm to Support
+            </Link>
+          </div>
         </div>
       </div>
     </div>
