@@ -24,6 +24,7 @@ import {
   RegisterFarmerPage,
   CheckEmailPage,
   VerifyEmailPage,
+  ResetPasswordPage,
 } from './modules/auth'
 import {
   AdminDashboardPage,
@@ -271,6 +272,7 @@ function App() {
           <Route path="/register/farmer" element={<RegisterFarmerPage />} />
           <Route path="/check-email" element={<CheckEmailPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
             element={

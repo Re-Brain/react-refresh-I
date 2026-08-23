@@ -1,42 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth, changePassword, deleteAccount } from '../modules/auth'
+import { useAuth, requestPasswordReset, deleteAccount } from '../modules/auth'
 
-// Owns the Settings tab's logic: the change-password form and the
+// Owns the Settings tab's logic: sending the password-reset email and the
 // delete-account flow. Deleting logs the user out and returns them home.
 export function useAccountSettings() {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' })
-  const [pwSaving, setPwSaving] = useState(false)
-  const [pwError, setPwError] = useState<string | null>(null)
-  const [pwSuccess, setPwSuccess] = useState(false)
+  const [pwResetSending, setPwResetSending] = useState(false)
+  const [pwResetSent, setPwResetSent] = useState(false)
+  const [pwResetError, setPwResetError] = useState<string | null>(null)
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  async function handleChangePassword() {
-    setPwError(null)
-    setPwSuccess(false)
-    if (pwForm.next.length < 8) {
-      setPwError('New password must be at least 8 characters.')
-      return
-    }
-    if (pwForm.next !== pwForm.confirm) {
-      setPwError('New password and confirmation do not match.')
-      return
-    }
-    setPwSaving(true)
+  async function handleSendPasswordReset() {
+    setPwResetError(null)
+    setPwResetSending(true)
     try {
-      await changePassword(pwForm.current, pwForm.next)
-      setPwForm({ current: '', next: '', confirm: '' })
-      setPwSuccess(true)
+      await requestPasswordReset()
+      setPwResetSent(true)
     } catch (err) {
-      setPwError(err instanceof Error ? err.message : 'Failed to change password')
+      setPwResetError(err instanceof Error ? err.message : 'Failed to send password reset link')
     } finally {
-      setPwSaving(false)
+      setPwResetSending(false)
     }
   }
 
@@ -54,7 +43,7 @@ export function useAccountSettings() {
   }
 
   return {
-    pwForm, setPwForm, pwSaving, pwError, pwSuccess, handleChangePassword,
+    pwResetSending, pwResetSent, pwResetError, handleSendPasswordReset,
     showDeleteConfirm, setShowDeleteConfirm, deleting, deleteError, setDeleteError, handleDeleteAccount,
   }
 }

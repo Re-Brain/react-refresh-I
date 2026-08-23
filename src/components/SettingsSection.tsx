@@ -9,7 +9,7 @@ type SettingsSectionProps = {
 // (with an inline confirm step). All logic lives in the useAccountSettings hook.
 function SettingsSection({ settings }: SettingsSectionProps) {
   const {
-    pwForm, setPwForm, pwSaving, pwError, pwSuccess, handleChangePassword,
+    pwResetSending, pwResetSent, pwResetError, handleSendPasswordReset,
     showDeleteConfirm, setShowDeleteConfirm, deleting, deleteError, setDeleteError, handleDeleteAccount,
   } = settings
 
@@ -21,47 +21,23 @@ function SettingsSection({ settings }: SettingsSectionProps) {
         <h3 className="text-lg font-bold text-brand-text flex items-center gap-2">
           <Lock size={18} /> Change Password
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1 sm:col-span-2">
-            <label className="text-xs font-bold text-brand-muted uppercase">Current Password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-              value={pwForm.current}
-              onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-brand-muted uppercase">New Password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-              value={pwForm.next}
-              onChange={e => setPwForm(p => ({ ...p, next: e.target.value }))}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-brand-muted uppercase">Confirm New Password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
-              value={pwForm.confirm}
-              onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))}
-            />
-          </div>
-        </div>
-        {pwError && <p className="text-red-600 text-sm">{pwError}</p>}
-        {pwSuccess && <p className="text-green-400 text-sm">Password changed successfully.</p>}
-        <button
-          onClick={handleChangePassword}
-          disabled={pwSaving || !pwForm.current || !pwForm.next || !pwForm.confirm}
-          className="self-start bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
-        >
-          {pwSaving ? 'Saving...' : 'Update Password'}
-        </button>
+        <p className="text-brand-muted text-sm">
+          We&rsquo;ll email a password reset link to your account email address.
+        </p>
+        {pwResetError && <p className="text-red-600 text-sm">{pwResetError}</p>}
+        {pwResetSent ? (
+          <p className="text-green-400 text-sm">
+            Check your email — we sent a password reset link to your account email address.
+          </p>
+        ) : (
+          <button
+            onClick={handleSendPasswordReset}
+            disabled={pwResetSending}
+            className="self-start bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50"
+          >
+            {pwResetSending ? 'Sending...' : 'Send Password Reset Link'}
+          </button>
+        )}
       </div>
 
       <div className="bg-brand-surface border border-red-500/40 rounded-lg p-6 flex flex-col gap-4">
