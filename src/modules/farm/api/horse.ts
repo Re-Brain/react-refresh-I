@@ -89,12 +89,20 @@ export async function getHorse(id: number): Promise<Horse> {
   return res.json()
 }
 
+// Cached for the browser session so re-visiting the home/horses list page
+// (e.g. via the back button) renders instantly with the same data instead of
+// re-fetching and showing a loading state every time.
+let allHorsesCache: Horse[] | null = null
+
 // Return all horses, or throw an error if the request fails. This is used on
 // the home page to show a carousel of horses. Public/no-auth.
 export async function getAllHorses(): Promise<Horse[]> {
+  if (allHorsesCache) return allHorsesCache
   const res = await fetch(`${API_BASE_URL}/horses`)
   if (!res.ok) throw new Error('Failed to fetch horses')
-  return res.json()
+  const horses = await res.json()
+  allHorsesCache = horses
+  return horses
 }
 
 export async function getHorsePublic(id: number): Promise<Horse> {
