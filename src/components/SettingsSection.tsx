@@ -1,5 +1,6 @@
 import { Lock, AlertTriangle } from 'lucide-react'
 import type { useAccountSettings } from '../hooks/useAccountSettings'
+import { useAuth } from '../modules/auth'
 import ConfirmDialog from './ConfirmDialog'
 
 type SettingsSectionProps = {
@@ -7,13 +8,18 @@ type SettingsSectionProps = {
 }
 
 // Settings tab: the password-reset trigger and the destructive delete-account
-// flow, each confirmed via a ConfirmDialog popup. All logic lives in the
-// useAccountSettings hook.
+// flow, each confirmed via a ConfirmDialog popup. Shared by the farmer and
+// visitor dashboards — all logic lives in the useAccountSettings hook.
 function SettingsSection({ settings }: SettingsSectionProps) {
+  const { user } = useAuth()
   const {
     showResetConfirm, setShowResetConfirm, pwResetSending, pwResetError, handleSendPasswordReset,
     showDeleteConfirm, setShowDeleteConfirm, deleting, deleteError, setDeleteError, handleDeleteAccount,
   } = settings
+
+  const deleteMessage = user?.role === 'farmer'
+    ? "This permanently deletes your account, your farm, and all associated horses. This action cannot be undone."
+    : "This permanently deletes your account and all associated data. This action cannot be undone."
 
   return (
     <div className="max-w-3xl">
@@ -36,7 +42,7 @@ function SettingsSection({ settings }: SettingsSectionProps) {
       {showResetConfirm && (
         <ConfirmDialog
           title="Reset your password?"
-          message="We'll send a password reset link to your registered email address. You'll be logged out immediately for security — check your email and click the link to set a new password, then log back in."
+          message="We'll send a password reset link to your registered email address. Every device you're logged in on will be logged out immediately for security — check your email and click the link to set a new password, then log back in."
           confirmLabel="Send Reset Link"
           confirmingLabel="Sending…"
           busy={pwResetSending}
@@ -61,7 +67,7 @@ function SettingsSection({ settings }: SettingsSectionProps) {
       {showDeleteConfirm && (
         <ConfirmDialog
           title="Delete your account?"
-          message="This permanently deletes your account, your farm, and all associated horses. This action cannot be undone."
+          message={deleteMessage}
           confirmLabel="Yes, delete my account"
           confirmingLabel="Deleting…"
           danger
