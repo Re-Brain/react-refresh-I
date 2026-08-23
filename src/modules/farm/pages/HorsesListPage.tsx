@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { getAllHorses, type Horse } from '../api/horse'
 import OverlayCard from '../../../components/OverlayCard'
 
 function HorsesListPage() {
+  const navigate = useNavigate()
 
   // State for horses, error handling, and loading state
   const [horses, setHorses] = useState<Horse[]>([])
@@ -23,13 +24,15 @@ function HorsesListPage() {
     <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text">
       <div className="max-w-7xl mx-auto px-8 py-10">
         
-        {/* Back link to the home page */}
-        <Link
-          to="/"
+        {/* Back button — uses real history-back navigation (not a Link to a
+            hardcoded path) so it restores the previous page's scroll
+            position instead of always landing at its top. */}
+        <button
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition w-fit"
         >
           <ArrowLeft size={16} /> Back
-        </Link>
+        </button>
 
         {/* Page title */}
         <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">
