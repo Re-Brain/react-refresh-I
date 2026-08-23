@@ -1,8 +1,28 @@
 import { useState, useEffect } from 'react'
 import { getActiveFarms, type ActiveFarm, getAllHorses, type Horse } from '../modules/farm'
 import { Link } from 'react-router-dom'
+import { Search, CalendarCheck, HeartHandshake } from 'lucide-react'
 import OverlayCard from '../components/OverlayCard'
 import Carousel from '../components/Carousel'
+
+// The 3-step explainer shown in the "How It Works" section below the hero.
+const HOW_IT_WORKS_STEPS = [
+  {
+    icon: Search,
+    title: 'Browse Farms & Horses',
+    description: 'Explore vetted farms across the country and meet the champions who call them home.',
+  },
+  {
+    icon: CalendarCheck,
+    title: 'Book a Visit',
+    description: 'Pick a farm, pick a horse, and schedule a visit to meet a retired racehorse in person.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Support From Afar',
+    description: "Can't make it in person? Donate directly to a farm and help fund a horse's care.",
+  },
+]
 
 function HomePage() {
 
@@ -52,7 +72,47 @@ function HomePage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-8 py-10">
+      {/* Mission Blurb - short "why this exists" statement before anything else */}
+      <section className="max-w-4xl mx-auto px-8 py-20 sm:py-24 text-center">
+        <h2
+          style={{ fontFamily: 'var(--font-story-title)' }}
+          className="text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold mb-6"
+        >
+          Why Furlong
+        </h2>
+        <p className="text-brand-muted text-lg sm:text-xl leading-relaxed">
+          Every year, thousands of racehorses retire from the track into the care of farms
+          across the country — whether they're out to pasture or still earning their keep at
+          stud. Furlong is where you find them — browse the farms already caring for these
+          horses, book a visit to meet one in person, or donate to support their day-to-day
+          care.
+        </p>
+      </section>
+
+      {/* How It Works - 3-step explainer for first-time visitors */}
+      <section className="bg-brand-surface border-y border-brand-border">
+        <div className="max-w-6xl mx-auto px-8 py-20 sm:py-24">
+          <h2
+            style={{ fontFamily: 'var(--font-story-title)' }}
+            className="text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold text-center mb-16"
+          >
+            How It Works
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-14">
+            {HOW_IT_WORKS_STEPS.map(({ icon: Icon, title, description }) => (
+              <div key={title} className="flex flex-col items-center text-center gap-4">
+                <span className="flex items-center justify-center w-20 h-20 rounded-full bg-brand-gold/10 text-brand-gold">
+                  <Icon className="h-9 w-9" />
+                </span>
+                <h3 className="text-lg font-bold text-brand-text">{title}</h3>
+                <p className="text-base text-brand-muted">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-8 py-16 sm:py-20">
 
         {/* Farms Section Zone */}
 
@@ -79,7 +139,7 @@ function HomePage() {
         {/* Maximum at 12 farms */}
         <Carousel>
           {farms.slice(0, 12).map(farm => (
-            <div key={farm.id} className="flex-none w-40 sm:w-48">
+            <div key={farm.id} className="flex-none w-48 sm:w-56">
               <OverlayCard
                 to={`/farms/${farm.id}`}
                 imageUrl={farm.images?.[0]?.image_url}
@@ -92,7 +152,7 @@ function HomePage() {
         {/* Horses Section Content */}
 
         {/* Horses Section Header - Header text & Button link to the list of all horses  */}
-        <div className="flex items-baseline justify-between mb-8 mt-12">
+        <div className="flex items-baseline justify-between mb-8 mt-16">
           <Link to="/horses" className="text-xs sm:text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-4 py-1.5 hover:bg-brand-gold hover:text-brand-bg transition shrink-0">Meet every champion</Link>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold">Champions in Retirement</h1>
         </div>
@@ -112,7 +172,7 @@ function HomePage() {
         {/* Maximum at 12 horses */}
         <Carousel direction="right">
           {horses.slice(0, 12).map(horse => (
-            <div key={horse.id} className="flex-none w-40 sm:w-48">
+            <div key={horse.id} className="flex-none w-48 sm:w-56">
               <OverlayCard
                 to={`/horses/${horse.id}`}
                 imageUrl={horse.images[0]?.image_url}
@@ -121,6 +181,34 @@ function HomePage() {
             </div>
           ))}
         </Carousel>
+
+        {/* Support/Donate CTA - surfaces the donation flow, which otherwise
+            only appears once you're already on a farm's page */}
+        <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 mt-16 flex flex-col items-center gap-4 text-center">
+          <div
+            aria-hidden
+            className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
+          />
+          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-brand-gold/10 text-brand-gold">
+            <HeartHandshake className="h-6 w-6" />
+          </span>
+          <h2
+            style={{ fontFamily: 'var(--font-story-title)' }}
+            className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
+          >
+            Support a Retired Champion
+          </h2>
+          <p className="text-brand-muted max-w-2xl">
+            Not everyone can visit in person. Your donation goes directly to the farm caring for
+            these horses — covering feed, vet care, and daily upkeep.
+          </p>
+          <Link
+            to="/farms"
+            className="mt-2 text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-6 py-2 hover:bg-brand-gold hover:text-brand-bg transition"
+          >
+            Find a Farm to Support
+          </Link>
+        </div>
       </div>
     </div>
   )
