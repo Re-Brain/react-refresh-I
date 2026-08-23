@@ -16,13 +16,11 @@ export function useHorseImages(horse: Horse | null, setHorse: Dispatch<SetStateA
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file || !horse) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setUploadingImage(true)
     setImageError(null)
     try {
-      const updated = await uploadHorseImage(token, horse.id, file)
+      const updated = await uploadHorseImage(horse.id, file)
       setHorse(updated)
     } catch (err) {
       setImageError(err instanceof Error ? err.message : 'Failed to upload image')
@@ -33,13 +31,12 @@ export function useHorseImages(horse: Horse | null, setHorse: Dispatch<SetStateA
   }
 
   async function handleImageDelete(imageId: number) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     setImageError(null)
     setDeletingImage(true)
     try {
-      const updated = await deleteHorseImage(token, horse.id, imageId)
+      const updated = await deleteHorseImage(horse.id, imageId)
       setHorse(updated)
       setActiveImageIndex(i => Math.min(i, Math.max(0, updated.images.length - 1)))
       setDeleteImageConfirmId(null)
@@ -51,8 +48,7 @@ export function useHorseImages(horse: Horse | null, setHorse: Dispatch<SetStateA
   }
 
   async function handleReorderImage(direction: -1 | 1) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     const target = activeImageIndex + direction
     if (target < 0 || target >= horse.images.length) return
@@ -63,7 +59,7 @@ export function useHorseImages(horse: Horse | null, setHorse: Dispatch<SetStateA
     setReordering(true)
     setImageError(null)
     try {
-      const updated = await reorderHorseImages(token, horse.id, ids)
+      const updated = await reorderHorseImages(horse.id, ids)
       setHorse(updated)
       setActiveImageIndex(target)
     } catch (err) {

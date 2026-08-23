@@ -35,21 +35,19 @@ function AdminHorseDetailPage() {
   }, [user, navigate])
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token || !id) return
-    getHorse(token, Number(id))
+    if (!id) return
+    getHorse(Number(id))
       .then(setHorse)
       .catch(() => setLoadError('Horse not found'))
       .finally(() => setLoading(false))
   }, [id])
 
   async function act(status: 'approved' | 'rejected', withReason?: string) {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
     setBusy(true)
     setActionError(null)
     try {
-      await updateHorseApproval(token, horse.id, status, withReason)
+      await updateHorseApproval(horse.id, status, withReason)
       navigate('/admin')
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to update the horse.')

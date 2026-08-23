@@ -17,6 +17,7 @@
 // needs no extra request. Weekdays use 0 = Sunday … 6 = Saturday.
 
 import type { Horse } from './horse'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -123,27 +124,20 @@ export function getHorseVisitSlots(
 
 // ─── Backend ────────────────────────────────────────────────────────────────
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
-
 // The logged-in farmer's schedule. The backend returns the default (never a
 // 404) when the farm has never configured it.
-export async function getFarmAvailability(token: string): Promise<FarmAvailability> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/availability`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getFarmAvailability(): Promise<FarmAvailability> {
+  const res = await apiFetch('/farms/me/availability')
   if (!res.ok) throw new Error('Failed to load farm availability')
   return res.json()
 }
 
 // PUT replaces the whole object — always send all three periods and every
 // field. Returns the saved schedule.
-export async function saveFarmAvailability(
-  token: string,
-  value: FarmAvailability
-): Promise<FarmAvailability> {
-  const res = await fetch(`${API_BASE_URL}/farms/me/availability`, {
+export async function saveFarmAvailability(value: FarmAvailability): Promise<FarmAvailability> {
+  const res = await apiFetch('/farms/me/availability', {
     method: 'PUT',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(value),
   })
   if (!res.ok) throw new Error('Failed to save farm availability')
@@ -153,13 +147,12 @@ export async function saveFarmAvailability(
 // The visitor capacity per period a horse takes part in (0 = not available for
 // visits that period). Returns the full updated horse.
 export async function saveHorsePeriods(
-  token: string,
   horseId: number,
   periods: Record<Period, number>
 ): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/periods`, {
+  const res = await apiFetch(`/horses/${horseId}/periods`, {
     method: 'PUT',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ periods }),
   })
   if (!res.ok) {

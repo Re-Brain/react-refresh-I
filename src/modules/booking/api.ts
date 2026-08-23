@@ -1,6 +1,6 @@
 import type { Period } from '../farm'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+import { apiFetch } from '../../lib/apiFetch'
+import { formatRateLimitMessage } from '../../lib/rateLimit'
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled'
 
@@ -34,7 +34,7 @@ export type Booking = {
 // The visitor's-dashboard list uses the same shape.
 export type VisitorBooking = Booking
 
-// The visitor's identity comes from the token, so it isn't part of the body.
+// The visitor's identity comes from the session cookie, so it isn't part of the body.
 export type BookingCreate = {
   horse_id: number
   date: string // ISO "YYYY-MM-DD", today or later
@@ -82,14 +82,13 @@ function defaultMessage(status: number): string {
 // returns the updated booking. `reason` is an optional note shown to the
 // visitor — only meaningful alongside 'declined'/'cancelled'.
 export async function updateBookingStatus(
-  token: string,
   id: number,
   status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>,
   reason?: string
 ): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+  const res = await apiFetch(`/bookings/${id}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {
@@ -101,10 +100,10 @@ export async function updateBookingStatus(
 
 // The visitor cancels their own booking. The server allows this only for the
 // booking's own visitor; returns the updated booking.
-export async function cancelBooking(token: string, id: number): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+export async function cancelBooking(id: number): Promise<Booking> {
+  const res = await apiFetch(`/bookings/${id}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'cancelled' }),
   })
   if (!res.ok) {
@@ -116,33 +115,29 @@ export async function cancelBooking(token: string, id: number): Promise<Booking>
 
 // All bookings made at the logged-in farmer's farm, sorted soonest-first by the
 // server. Optionally filtered to a single status.
-export async function getFarmBookings(
-  token: string,
-  status?: BookingStatus
-): Promise<Booking[]> {
+export async function getFarmBookings(status?: BookingStatus): Promise<Booking[]> {
   const query = status ? `?status=${status}` : ''
-  const res = await fetch(`${API_BASE_URL}/farms/me/bookings${query}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const res = await apiFetch(`/farms/me/bookings${query}`)
   if (!res.ok) throw new Error('Failed to load bookings.')
   return res.json()
 }
 
-// The logged-in visitor's own bookings (identity resolved from the token).
-export async function getMyBookings(token: string): Promise<VisitorBooking[]> {
-  const res = await fetch(`${API_BASE_URL}/bookings/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+// The logged-in visitor's own bookings (identity resolved from the session cookie).
+export async function getMyBookings(): Promise<VisitorBooking[]> {
+  const res = await apiFetch('/bookings/me')
   if (!res.ok) throw new Error('Failed to load your bookings.')
   return res.json()
 }
 
-export async function createBooking(token: string, data: BookingCreate): Promise<Booking> {
-  const res = await fetch(`${API_BASE_URL}/bookings`, {
+export async function createBooking(data: BookingCreate): Promise<Booking> {
+  const res = await apiFetch('/bookings', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
+  if (res.status === 429) {
+    throw new BookingError(429, formatRateLimitMessage(res))
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new BookingError(res.status, messageFromDetail(body.detail, defaultMessage(res.status)))

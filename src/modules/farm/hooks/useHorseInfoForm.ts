@@ -42,8 +42,7 @@ export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStat
   }
 
   async function handleSave() {
-    const token = localStorage.getItem('access_token')
-    if (!token || !horse) return
+    if (!horse) return
 
     // A draft can be saved incrementally — only format is checked, not
     // presence. Everything becomes required again once it's been submitted.
@@ -79,7 +78,7 @@ export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStat
         Object.entries(trimmed).filter(([k, v]) => v !== horse[k as keyof Horse])
       ) as HorseUpdate
 
-      const updated = await updateHorse(token, horse.id, payload)
+      const updated = await updateHorse(horse.id, payload)
       setHorse(updated)
       setIsEditing(false)
     } catch (err) {

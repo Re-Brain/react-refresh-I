@@ -50,16 +50,10 @@ export function useBookingForm(horseId: string | undefined) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!selectedDate || !selectedSlot) return
-    const token = localStorage.getItem('access_token')
-    // Auth-gated route, but the token can expire mid-session → send to login.
-    if (!token) {
-      navigate('/login', { state: { from: `/book/${horseId}` }, replace: true })
-      return
-    }
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const created = await createBooking(token, {
+      const created = await createBooking({
         horse_id: Number(horseId),
         date: selectedDate,
         period: selectedSlot.period,

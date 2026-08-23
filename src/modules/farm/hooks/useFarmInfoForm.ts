@@ -21,8 +21,7 @@ export function useFarmInfoForm(farm: Farm | null, setFarm: Dispatch<SetStateAct
   }
 
   async function handleSave() {
-    const token = localStorage.getItem('access_token')
-    if (!token || !farm) return
+    if (!farm) return
 
     setSaving(true)
     setSaveError(null)
@@ -37,7 +36,7 @@ export function useFarmInfoForm(farm: Farm | null, setFarm: Dispatch<SetStateAct
       if ((formData.description ?? '') !== (farm.description ?? ''))
         payload.description = formData.description || null
 
-      const updated = await updateMyFarm(token, payload)
+      const updated = await updateMyFarm(payload)
       setFarm(updated)
       setIsEditing(false)
     } catch (err) {

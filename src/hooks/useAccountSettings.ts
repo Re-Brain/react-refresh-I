@@ -28,11 +28,9 @@ export function useAccountSettings() {
       setPwError('New password and confirmation do not match.')
       return
     }
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setPwSaving(true)
     try {
-      await changePassword(token, pwForm.current, pwForm.next)
+      await changePassword(pwForm.current, pwForm.next)
       setPwForm({ current: '', next: '', confirm: '' })
       setPwSuccess(true)
     } catch (err) {
@@ -43,13 +41,11 @@ export function useAccountSettings() {
   }
 
   async function handleDeleteAccount() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setDeleting(true)
     setDeleteError(null)
     try {
-      await deleteAccount(token)
-      logout()
+      await deleteAccount()
+      await logout()
       navigate('/')
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : 'Failed to delete account')

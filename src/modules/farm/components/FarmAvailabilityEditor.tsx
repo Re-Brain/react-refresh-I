@@ -37,15 +37,13 @@ function FarmAvailabilityEditor({
   // keystroke. Reconciled into `draft.min_lead_days` on blur; null means "not
   // actively being typed in", so it falls back to showing the draft's value.
   const [leadDaysText, setLeadDaysText] = useState<string | null>(null)
-  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    getFarmAvailability(token)
+    getFarmAvailability()
       .then(a => {
         setCommitted(a)
         setDraft(a)
@@ -131,12 +129,10 @@ function FarmAvailabilityEditor({
 
   async function handleSave() {
     if (!draft || hasErrors) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setSaving(true)
     setSaveError(null)
     try {
-      const saved = await saveFarmAvailability(token, draft)
+      const saved = await saveFarmAvailability(draft)
       setCommitted(saved)
       setDraft(saved)
       setLeadDaysText(null)

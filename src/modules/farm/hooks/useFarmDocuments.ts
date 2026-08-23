@@ -12,13 +12,11 @@ export function useFarmDocuments(farm: Farm | null, setFarm: Dispatch<SetStateAc
 
   async function handleUpload(type: FarmDocumentType, file: File) {
     if (!farm) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setUploadingType(type)
     setDocumentError(null)
     try {
-      const updated = await uploadFarmDocument(token, file, type)
+      const updated = await uploadFarmDocument(file, type)
       setFarm(updated)
     } catch (err) {
       setDocumentError(err instanceof Error ? err.message : 'Failed to upload document')
@@ -29,13 +27,11 @@ export function useFarmDocuments(farm: Farm | null, setFarm: Dispatch<SetStateAc
 
   async function handleDelete(documentId: number) {
     if (!farm) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setDocumentError(null)
     setDeletingId(documentId)
     try {
-      const updated = await deleteFarmDocument(token, documentId)
+      const updated = await deleteFarmDocument(documentId)
       setFarm(updated)
       setDeleteConfirmId(null)
     } catch (err) {

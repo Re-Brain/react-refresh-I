@@ -12,13 +12,13 @@ import {
 export function useFarmDonations() {
   const [status, setStatus] = useState<StripeStatus | null>(null)
   const [donations, setDonations] = useState<FarmDonation[]>([])
-  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('access_token')))
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
 
-  function fetchData(token: string) {
-    Promise.all([getStripeStatus(token), getMyDonations(token)])
+  function fetchData() {
+    Promise.all([getStripeStatus(), getMyDonations()])
       .then(([nextStatus, nextDonations]) => {
         setStatus(nextStatus)
         setDonations(nextDonations)
@@ -28,26 +28,20 @@ export function useFarmDonations() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    fetchData(token)
+    fetchData()
   }, [])
 
   function retry() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setLoading(true)
     setError(null)
-    fetchData(token)
+    fetchData()
   }
 
   async function connectStripe() {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
     setConnecting(true)
     setConnectError(null)
     try {
-      const { onboarding_url } = await createStripeOnboardingLink(token)
+      const { onboarding_url } = await createStripeOnboardingLink()
       // Full top-level navigation — this is Stripe's hosted onboarding form,
       // not a route in this app.
       window.location.href = onboarding_url

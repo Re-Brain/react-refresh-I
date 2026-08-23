@@ -12,13 +12,11 @@ export function useHorseDocuments(horse: Horse | null, setHorse: Dispatch<SetSta
 
   async function handleUpload(type: DocumentType, file: File) {
     if (!horse) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setUploadingType(type)
     setDocumentError(null)
     try {
-      const updated = await uploadHorseDocument(token, horse.id, file, type)
+      const updated = await uploadHorseDocument(horse.id, file, type)
       setHorse(updated)
     } catch (err) {
       setDocumentError(err instanceof Error ? err.message : 'Failed to upload document')
@@ -29,13 +27,11 @@ export function useHorseDocuments(horse: Horse | null, setHorse: Dispatch<SetSta
 
   async function handleDelete(documentId: number) {
     if (!horse) return
-    const token = localStorage.getItem('access_token')
-    if (!token) return
 
     setDocumentError(null)
     setDeletingId(documentId)
     try {
-      const updated = await deleteHorseDocument(token, horse.id, documentId)
+      const updated = await deleteHorseDocument(horse.id, documentId)
       setHorse(updated)
       setDeleteConfirmId(null)
     } catch (err) {

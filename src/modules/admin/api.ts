@@ -1,6 +1,5 @@
 import type { Farm, FarmDocument, Horse, HorseDocument } from '../farm'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+import { apiFetch } from '../../lib/apiFetch'
 
 export type AdminFarm = Omit<Farm, 'documents'> & {
   // Always present on the admin view, unlike the owner-only optional field on Farm.
@@ -19,18 +18,14 @@ function messageFromDetail(detail: unknown, fallback: string): string {
   return fallback
 }
 
-export async function getPendingFarms(token: string): Promise<AdminFarm[]> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms?status=pending`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getPendingFarms(): Promise<AdminFarm[]> {
+  const res = await apiFetch('/admin/farms?status=pending')
   if (!res.ok) throw new Error('Failed to load pending farms.')
   return res.json()
 }
 
-export async function getAdminFarm(token: string, id: number): Promise<AdminFarm> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getAdminFarm(id: number): Promise<AdminFarm> {
+  const res = await apiFetch(`/admin/farms/${id}`)
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(body?.detail, 'Failed to load farm.'))
@@ -39,14 +34,13 @@ export async function getAdminFarm(token: string, id: number): Promise<AdminFarm
 }
 
 export async function updateFarmApproval(
-  token: string,
   id: number,
   status: Extract<AdminFarm['status'], 'active' | 'rejected'>,
   reason?: string
 ): Promise<AdminFarm> {
-  const res = await fetch(`${API_BASE_URL}/admin/farms/${id}`, {
+  const res = await apiFetch(`/admin/farms/${id}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {
@@ -56,23 +50,20 @@ export async function updateFarmApproval(
   return res.json()
 }
 
-export async function getPendingHorses(token: string): Promise<AdminHorse[]> {
-  const res = await fetch(`${API_BASE_URL}/admin/horses?status=pending`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getPendingHorses(): Promise<AdminHorse[]> {
+  const res = await apiFetch('/admin/horses?status=pending')
   if (!res.ok) throw new Error('Failed to load pending horses.')
   return res.json()
 }
 
 export async function updateHorseApproval(
-  token: string,
   id: number,
   status: Extract<AdminHorse['status'], 'approved' | 'rejected'>,
   reason?: string
 ): Promise<AdminHorse> {
-  const res = await fetch(`${API_BASE_URL}/admin/horses/${id}`, {
+  const res = await apiFetch(`/admin/horses/${id}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reason ? { status, reason } : { status }),
   })
   if (!res.ok) {

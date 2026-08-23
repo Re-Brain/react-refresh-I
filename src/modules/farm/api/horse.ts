@@ -1,6 +1,6 @@
 import type { Period, FarmAvailability } from './availability'
-
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../../../lib/apiBase'
+import { apiFetch } from '../../../lib/apiFetch'
 
 export type HorseImage = {
   id: number
@@ -83,15 +83,14 @@ function messageFromDetail(detail: unknown, fallback: string): string {
   return fallback
 }
 
-export async function getHorse(token: string, id: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getHorse(id: number): Promise<Horse> {
+  const res = await apiFetch(`/horses/${id}`)
   if (!res.ok) throw new Error('Failed to fetch horse')
   return res.json()
 }
 
-// Return all horses, or throw an error if the request fails. This is used on the home page to show a carousel of horses.
+// Return all horses, or throw an error if the request fails. This is used on
+// the home page to show a carousel of horses. Public/no-auth.
 export async function getAllHorses(): Promise<Horse[]> {
   const res = await fetch(`${API_BASE_URL}/horses`)
   if (!res.ok) throw new Error('Failed to fetch horses')
@@ -104,10 +103,8 @@ export async function getHorsePublic(id: number): Promise<Horse> {
   return res.json()
 }
 
-export async function getMyHorses(token: string): Promise<Horse[]> {
-  const res = await fetch(`${API_BASE_URL}/horses/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function getMyHorses(): Promise<Horse[]> {
+  const res = await apiFetch('/horses/me')
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to fetch horses'))
@@ -115,10 +112,10 @@ export async function getMyHorses(token: string): Promise<Horse[]> {
   return res.json()
 }
 
-export async function createHorse(token: string, data: HorseCreate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses`, {
+export async function createHorse(data: HorseCreate): Promise<Horse> {
+  const res = await apiFetch('/horses', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -128,10 +125,10 @@ export async function createHorse(token: string, data: HorseCreate): Promise<Hor
   return res.json()
 }
 
-export async function updateHorse(token: string, id: number, data: HorseUpdate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
+export async function updateHorse(id: number, data: HorseUpdate): Promise<Horse> {
+  const res = await apiFetch(`/horses/${id}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -141,11 +138,8 @@ export async function updateHorse(token: string, id: number, data: HorseUpdate):
   return res.json()
 }
 
-export async function submitHorseForReview(token: string, horseId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/submit`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function submitHorseForReview(horseId: number): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/submit`, { method: 'POST' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to submit horse for review'))
@@ -153,23 +147,19 @@ export async function submitHorseForReview(token: string, horseId: number): Prom
   return res.json()
 }
 
-export async function deleteHorse(token: string, id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/horses/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function deleteHorse(id: number): Promise<void> {
+  const res = await apiFetch(`/horses/${id}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete horse'))
   }
 }
 
-export async function uploadHorseImage(token: string, horseId: number, file: File): Promise<Horse> {
+export async function uploadHorseImage(horseId: number, file: File): Promise<Horse> {
   const formData = new FormData()
   formData.append('file', file)
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/image`, {
+  const res = await apiFetch(`/horses/${horseId}/image`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
   if (!res.ok) {
@@ -180,7 +170,6 @@ export async function uploadHorseImage(token: string, horseId: number, file: Fil
 }
 
 export async function uploadHorseDocument(
-  token: string,
   horseId: number,
   file: File,
   documentType: DocumentType
@@ -188,9 +177,8 @@ export async function uploadHorseDocument(
   const formData = new FormData()
   formData.append('file', file)
   formData.append('document_type', documentType)
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/documents`, {
+  const res = await apiFetch(`/horses/${horseId}/documents`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
   if (!res.ok) {
@@ -200,11 +188,8 @@ export async function uploadHorseDocument(
   return res.json()
 }
 
-export async function deleteHorseDocument(token: string, horseId: number, documentId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/documents/${documentId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function deleteHorseDocument(horseId: number, documentId: number): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/documents/${documentId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete document'))
@@ -212,10 +197,10 @@ export async function deleteHorseDocument(token: string, horseId: number, docume
   return res.json()
 }
 
-export async function createRaceRecord(token: string, horseId: number, data: RaceRecordCreate): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records`, {
+export async function createRaceRecord(horseId: number, data: RaceRecordCreate): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/race-records`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -225,11 +210,8 @@ export async function createRaceRecord(token: string, horseId: number, data: Rac
   return res.json()
 }
 
-export async function deleteRaceRecord(token: string, horseId: number, recordId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function deleteRaceRecord(horseId: number, recordId: number): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/race-records/${recordId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete race record'))
@@ -237,10 +219,10 @@ export async function deleteRaceRecord(token: string, horseId: number, recordId:
   return res.json()
 }
 
-export async function updateRaceRecord(token: string, horseId: number, recordId: number, data: RaceRecordUpdate): Promise<RaceRecord> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/race-records/${recordId}`, {
+export async function updateRaceRecord(horseId: number, recordId: number, data: RaceRecordUpdate): Promise<RaceRecord> {
+  const res = await apiFetch(`/horses/${horseId}/race-records/${recordId}`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   if (!res.ok) {
@@ -250,10 +232,10 @@ export async function updateRaceRecord(token: string, horseId: number, recordId:
   return res.json()
 }
 
-export async function reorderHorseImages(token: string, horseId: number, imageIds: number[]): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/images/order`, {
+export async function reorderHorseImages(horseId: number, imageIds: number[]): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/images/order`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ image_ids: imageIds }),
   })
   if (!res.ok) {
@@ -263,11 +245,8 @@ export async function reorderHorseImages(token: string, horseId: number, imageId
   return res.json()
 }
 
-export async function deleteHorseImage(token: string, horseId: number, imageId: number): Promise<Horse> {
-  const res = await fetch(`${API_BASE_URL}/horses/${horseId}/image/${imageId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export async function deleteHorseImage(horseId: number, imageId: number): Promise<Horse> {
+  const res = await apiFetch(`/horses/${horseId}/image/${imageId}`, { method: 'DELETE' })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(messageFromDetail(err.detail, 'Failed to delete image'))
