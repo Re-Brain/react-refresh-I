@@ -3,6 +3,7 @@ import { Trash2, SquarePen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { deleteHorse, type Horse } from '../api/horse'
 import { HORSE_STATUS_STYLES, HORSE_STATUS_LABELS } from '../lib/approvalStatusDisplay'
+import ConfirmDialog from '../../../components/ConfirmDialog'
 
 type Props = {
   horses: Horse[]
@@ -14,6 +15,8 @@ function HorseTable({ horses, onChange }: Props) {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const deleteConfirmHorse = horses.find(h => h.id === deleteConfirmId) ?? null
 
   async function handleDelete(id: number) {
     setDeleting(true)
@@ -69,41 +72,20 @@ function HorseTable({ horses, onChange }: Props) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
-                    {deleteConfirmId === horse.id ? (
-                      <div className="flex items-center gap-2">
-                        <span className="text-brand-muted text-xs">Delete?</span>
-                        <button
-                          onClick={() => handleDelete(horse.id)}
-                          disabled={deleting}
-                          className="text-xs font-bold text-red-600 hover:text-red-700 disabled:opacity-50"
-                        >
-                          {deleting ? 'Deleting...' : 'Yes'}
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(null)}
-                          className="text-xs font-bold text-brand-muted hover:text-brand-text"
-                        >
-                          No
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => navigate(`/dashboard/farmer/horses/${horse.id}`)}
-                          className="text-brand-muted hover:text-brand-gold transition"
-                          title="View & edit"
-                        >
-                          <SquarePen size={16} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(horse.id)}
-                          className="text-brand-muted hover:text-red-700 transition"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => navigate(`/dashboard/farmer/horses/${horse.id}`)}
+                      className="text-brand-muted hover:text-brand-gold transition"
+                      title="View & edit"
+                    >
+                      <SquarePen size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(horse.id)}
+                      className="text-brand-muted hover:text-red-700 transition"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -112,6 +94,19 @@ function HorseTable({ horses, onChange }: Props) {
         </table>
       </div>
       {error && <p className="text-red-600 text-sm">{error}</p>}
+
+      {deleteConfirmHorse && (
+        <ConfirmDialog
+          title={`Delete ${deleteConfirmHorse.name}?`}
+          message="This will permanently remove the horse's record. This action can't be undone."
+          confirmLabel="Delete"
+          confirmingLabel="Deleting…"
+          danger
+          busy={deleting}
+          onConfirm={() => handleDelete(deleteConfirmHorse.id)}
+          onCancel={() => setDeleteConfirmId(null)}
+        />
+      )}
     </div>
   )
 }
