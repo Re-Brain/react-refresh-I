@@ -1,4 +1,4 @@
-import { AlertTriangle, Heart, Users } from 'lucide-react'
+import { AlertTriangle, Heart, Mail, Users } from 'lucide-react'
 import { useFarmDonations } from '../hooks/useFarmDonations'
 
 function formatDonationDate(iso: string): string {
@@ -90,20 +90,28 @@ function DonationManagement() {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-brand-border">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead>
               <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
-                <th className="text-left px-4 py-3 font-bold">Supporter</th>
-                <th className="text-left px-4 py-3 font-bold">Amount</th>
-                <th className="text-left px-4 py-3 font-bold">Date</th>
+                <th className="w-1/3 text-left px-4 py-3 font-bold">Supporter</th>
+                <th className="w-1/3 text-left px-4 py-3 font-bold">Amount</th>
+                <th className="w-1/3 text-left px-4 py-3 font-bold">Date</th>
               </tr>
             </thead>
             <tbody>
               {donations.map(d => (
                 <tr key={d.id} className="border-b border-brand-border last:border-0">
-                  <td className="px-4 py-3 font-bold text-brand-text">{d.donor_name ?? 'Anonymous'}</td>
-                  <td className="px-4 py-3 text-brand-text">¥{d.amount_yen.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-brand-muted">{formatDonationDate(d.created_at)}</td>
+                  <td className="w-1/3 px-4 py-3 truncate">
+                    <p className="font-bold text-brand-text truncate">{d.donor_name ?? 'Anonymous'}</p>
+                    {d.donor_name && d.donor_email && (
+                      <p className="flex items-center gap-1.5 text-brand-muted text-xs mt-0.5 truncate">
+                        <Mail size={12} className="shrink-0" />
+                        <span className="truncate">{d.donor_email}</span>
+                      </p>
+                    )}
+                  </td>
+                  <td className="w-1/3 px-4 py-3 text-brand-text">¥{d.amount_yen.toLocaleString()}</td>
+                  <td className="w-1/3 px-4 py-3 text-brand-muted">{formatDonationDate(d.created_at)}</td>
                 </tr>
               ))}
             </tbody>

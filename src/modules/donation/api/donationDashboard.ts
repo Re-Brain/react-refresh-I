@@ -9,6 +9,7 @@ export type FarmDonation = {
   id: number
   amount_yen: number
   donor_name: string | null
+  donor_email: string | null
   created_at: string
 }
 

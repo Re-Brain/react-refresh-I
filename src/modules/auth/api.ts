@@ -105,18 +105,33 @@ export async function getMe(): Promise<UserMe> {
   return res.json()
 }
 
-export async function changePassword(
-  currentPassword: string,
-  newPassword: string,
-): Promise<void> {
-  const res = await apiFetch('/me/password', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
-  })
+// Authenticated: the backend knows the caller's email from the session, so
+// no email input is needed here — this just triggers a reset email to self.
+export async function requestPasswordReset(): Promise<void> {
+  const res = await apiFetch('/me/password/reset-request', { method: 'POST' })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
   if (!res.ok) {
     const error = await res.json().catch(() => null)
-    throw new Error(error?.detail ?? 'Failed to change password')
+    throw new ApiError(error?.detail ?? 'Failed to send password reset link', res.status)
+  }
+}
+
+// Public (bare fetch, no cookies) so this works even if the user's session
+// has expired by the time they click the emailed link.
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, new_password: newPassword }),
+  })
+  if (res.status === 429) {
+    throw new ApiError(formatRateLimitMessage(res), 429, getRetryAfterSeconds(res) ?? undefined)
+  }
+  if (!res.ok) {
+    const error = await res.json().catch(() => null)
+    throw new ApiError(error?.detail ?? 'This reset link is invalid or has expired', res.status)
   }
 }
 

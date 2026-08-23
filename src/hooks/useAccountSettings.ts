@@ -1,42 +1,38 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth, changePassword, deleteAccount } from '../modules/auth'
+import { useAuth, requestPasswordReset, deleteAccount } from '../modules/auth'
 
-// Owns the Settings tab's logic: the change-password form and the
+// Owns the Settings tab's logic: sending the password-reset email and the
 // delete-account flow. Deleting logs the user out and returns them home.
 export function useAccountSettings() {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' })
-  const [pwSaving, setPwSaving] = useState(false)
-  const [pwError, setPwError] = useState<string | null>(null)
-  const [pwSuccess, setPwSuccess] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [pwResetSending, setPwResetSending] = useState(false)
+  const [pwResetError, setPwResetError] = useState<string | null>(null)
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  async function handleChangePassword() {
-    setPwError(null)
-    setPwSuccess(false)
-    if (pwForm.next.length < 8) {
-      setPwError('New password must be at least 8 characters.')
-      return
-    }
-    if (pwForm.next !== pwForm.confirm) {
-      setPwError('New password and confirmation do not match.')
-      return
-    }
-    setPwSaving(true)
+  // Requesting a reset link also ends the current session immediately (the
+  // backend revokes it server-side; logging out here clears this tab's
+  // cookies right away instead of waiting for the next API call to 401) so
+  // the dashboard isn't still reachable while the email is in flight.
+  async function handleSendPasswordReset() {
+    setPwResetError(null)
+    setPwResetSending(true)
     try {
-      await changePassword(pwForm.current, pwForm.next)
-      setPwForm({ current: '', next: '', confirm: '' })
-      setPwSuccess(true)
+      await requestPasswordReset()
+      await logout()
+      navigate('/login', {
+        state: { notice: 'We sent a password reset link to your email. You have been logged out for security — use the link to set a new password, then log back in.' },
+      })
     } catch (err) {
-      setPwError(err instanceof Error ? err.message : 'Failed to change password')
-    } finally {
-      setPwSaving(false)
+      setPwResetError(err instanceof Error ? err.message : 'Failed to send password reset link')
+      setPwResetSending(false)
+      setShowResetConfirm(false)
     }
   }
 
@@ -54,7 +50,7 @@ export function useAccountSettings() {
   }
 
   return {
-    pwForm, setPwForm, pwSaving, pwError, pwSuccess, handleChangePassword,
+    showResetConfirm, setShowResetConfirm, pwResetSending, pwResetError, handleSendPasswordReset,
     showDeleteConfirm, setShowDeleteConfirm, deleting, deleteError, setDeleteError, handleDeleteAccount,
   }
 }
