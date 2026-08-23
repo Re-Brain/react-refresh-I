@@ -66,14 +66,22 @@ function messageFromDetail(detail: unknown, fallback: string): string {
   return fallback
 }
 
+// Cached for the browser session so re-visiting the home/farms list page
+// (e.g. via the back button) renders instantly with the same data instead of
+// re-fetching and showing a loading state every time.
+let activeFarmsCache: ActiveFarm[] | null = null
+
 // Return all active farms, or throw an error if the request fails. This is
 // used on the home page to show a carousel of farms. Public/no-auth, so this
 // goes straight through fetch rather than apiFetch — there's never a session
 // to refresh here.
 export async function getActiveFarms(): Promise<ActiveFarm[]> {
+  if (activeFarmsCache) return activeFarmsCache
   const res = await fetch(`${API_BASE_URL}/farms`)
   if (!res.ok) throw new Error('Failed to fetch farms')
-  return res.json()
+  const farms = await res.json()
+  activeFarmsCache = farms
+  return farms
 }
 
 // Returns the farm, or null when the backend responds 404 (no such farm).
