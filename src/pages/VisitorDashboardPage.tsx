@@ -3,11 +3,14 @@ import { useAuth } from '../modules/auth'
 import VisitorDashboardSidebar, { type VisitorSection } from '../components/VisitorDashboardSidebar'
 import { BookingsSection } from '../modules/booking'
 import { SubscriptionSection } from '../modules/donation'
+import SettingsSection from '../components/SettingsSection'
+import { useAccountSettings } from '../hooks/useAccountSettings'
 
 function VisitorDashboardPage() {
   const { user } = useAuth()
   const [activeSection, setActiveSection] = useState<VisitorSection>('bookings')
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const settings = useAccountSettings()
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text flex">
@@ -28,6 +31,7 @@ function VisitorDashboardPage() {
 
           {activeSection === 'bookings' && <BookingsSection />}
           {activeSection === 'subscription' && <SubscriptionSection userName={user?.name} />}
+          {activeSection === 'settings' && <SettingsSection settings={settings} />}
         </div>
       </main>
     </div>

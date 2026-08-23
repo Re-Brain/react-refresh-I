@@ -1,10 +1,11 @@
-import { Menu, CalendarCheck, CreditCard } from 'lucide-react'
+import { Menu, CalendarCheck, CreditCard, Settings } from 'lucide-react'
 
-export type VisitorSection = 'bookings' | 'subscription'
+export type VisitorSection = 'bookings' | 'subscription' | 'settings'
 
 const NAV_ITEMS: { key: VisitorSection; label: string; icon: React.ReactNode }[] = [
   { key: 'bookings', label: 'Bookings', icon: <CalendarCheck size={18} /> },
   { key: 'subscription', label: 'Subscription', icon: <CreditCard size={18} /> },
+  { key: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ]
 
 type VisitorDashboardSidebarProps = {
@@ -15,7 +16,7 @@ type VisitorDashboardSidebarProps = {
 }
 
 // Collapsible left nav for the visitor dashboard, styled like the farmer's.
-// Switches the main area between the Bookings and Subscription sections.
+// Switches the main area between the Bookings, Subscription, and Settings sections.
 function VisitorDashboardSidebar({ activeSection, onNavClick, open, onToggle }: VisitorDashboardSidebarProps) {
   return (
     <aside className={`${open ? 'w-56' : 'w-14'} shrink-0 bg-brand-surface border-r border-brand-border flex flex-col transition-all duration-300`}>
