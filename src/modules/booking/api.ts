@@ -129,6 +129,25 @@ export async function getMyBookings(): Promise<VisitorBooking[]> {
   return res.json()
 }
 
+export type PeriodAvailability = { capacity: number; booked: number; remaining: number }
+export type HorseAvailability = { date: string; periods: Record<Period, PeriodAvailability> }
+
+// Live per-period remaining capacity for a horse on a specific date — used to
+// grey out an already-full slot before the visitor tries to pick it, instead
+// of only finding out after submitting. Requires a logged-in session (the
+// booking page itself is already login-gated). Only reports slot fullness —
+// it doesn't know whether the farm's schedule even has that period open on
+// that weekday, so callers should intersect this with the periods already
+// known-open from the farm/horse availability data.
+export async function getHorseAvailability(horseId: number, date: string): Promise<HorseAvailability> {
+  const res = await apiFetch(`/horses/${horseId}/availability?date=${encodeURIComponent(date)}`)
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new BookingError(res.status, messageFromDetail(body?.detail, 'Failed to load availability.'))
+  }
+  return res.json()
+}
+
 export async function createBooking(data: BookingCreate): Promise<Booking> {
   const res = await apiFetch('/bookings', {
     method: 'POST',

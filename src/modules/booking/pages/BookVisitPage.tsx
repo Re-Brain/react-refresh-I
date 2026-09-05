@@ -1,17 +1,24 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { getHorseVisitSlots } from '../../farm'
+import { useAuth } from '../../auth'
 import Calendar from '../../../components/Calendar'
 import BookingForm from '../components/BookingForm'
 import { useBookVisitData } from '../hooks/useBookVisitData'
 import { useBookingForm } from '../hooks/useBookingForm'
+import { useHorseAvailability } from '../hooks/useHorseAvailability'
 
 function BookVisitPage() {
   const { horseId } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const { horse, farm, loading, error } = useBookVisitData(horseId)
+  const { horse, farm, myBookings, loading, error } = useBookVisitData(horseId)
   const form = useBookingForm(horseId)
+  // Live capacity for whichever date is currently picked — re-fetched on every
+  // date change. `availabilityNotFound` means the horse disappeared/became
+  // unapproved after this page already loaded it.
+  const { fullPeriods, notFound: availabilityNotFound } = useHorseAvailability(horseId, form.selectedDate)
 
   if (loading)
     return (
@@ -20,7 +27,10 @@ function BookVisitPage() {
       </div>
     )
 
-  if (error || !horse)
+  // A draft/pending/rejected horse isn't meant to be public yet — treat it
+  // exactly like "not found" rather than letting the booking flow proceed
+  // for a horse an admin hasn't approved.
+  if (error || !horse || horse.status !== 'approved' || availabilityNotFound)
     return (
       <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">
         {error ?? 'Horse not found'}
@@ -29,14 +39,26 @@ function BookVisitPage() {
 
   // Visit options for this horse: the farm's schedule, filtered to the periods
   // this horse takes part in (both arrive on the public horse response). Booking
-  // is open only when the farm accepts visits, is open on some weekday, and this
-  // horse has at least one offered slot.
+  // is open only when the account isn't a farm/admin account (matches the same
+  // restriction already applied to donations), the farm accepts visits, is open
+  // on some weekday, and this horse has at least one offered slot.
   const farmAvailability = horse.farm_availability
   const visitSlots = getHorseVisitSlots(farmAvailability, horse.periods)
+  const canBook = user?.role !== 'admin' && user?.role !== 'farmer'
   const bookingOpen =
+    canBook &&
     farmAvailability.enabled &&
     farmAvailability.weekdays.length > 0 &&
     visitSlots.length > 0
+
+  // Periods the visitor already has a confirmed booking for on the selected
+  // date, for this horse — greyed out in the slot picker below so they can't
+  // pick a slot the server would just reject as a duplicate.
+  const alreadyBookedPeriods = new Set(
+    myBookings
+      .filter(b => b.horse_id === Number(horseId) && b.date === form.selectedDate && b.status === 'confirmed')
+      .map(b => b.period)
+  )
 
   return (
     <div className="bg-brand-bg text-brand-text">
@@ -70,8 +92,17 @@ function BookVisitPage() {
           <div className="w-full max-w-2xl flex flex-col gap-6">
             {!bookingOpen ? (
               <div className="bg-brand-surface border border-brand-border rounded-lg p-6 text-brand-muted text-sm">
-                <span className="font-bold text-brand-text">{horse.name}</span> isn&rsquo;t
-                currently available for visits. Please check back later.
+                {!canBook ? (
+                  <>
+                    Farm accounts can&rsquo;t book a visit. Log in with a visitor account to visit{' '}
+                    <span className="font-bold text-brand-text">{horse.name}</span>.
+                  </>
+                ) : (
+                  <>
+                    <span className="font-bold text-brand-text">{horse.name}</span> isn&rsquo;t
+                    currently available for visits. Please check back later.
+                  </>
+                )}
               </div>
             ) : (
               <>
@@ -82,7 +113,14 @@ function BookVisitPage() {
                   minLeadDays={farmAvailability.min_lead_days}
                 />
 
-                {form.selectedDate && <BookingForm form={form} visitSlots={visitSlots} />}
+                {form.selectedDate && (
+                  <BookingForm
+                    form={form}
+                    visitSlots={visitSlots}
+                    alreadyBookedPeriods={alreadyBookedPeriods}
+                    fullPeriods={fullPeriods}
+                  />
+                )}
               </>
             )}
           </div>

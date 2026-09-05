@@ -47,6 +47,14 @@ export function useBookingForm(horseId: string | undefined) {
     setSubmitError(null)
   }
 
+  // Picking a different slot also clears any previous error — otherwise a
+  // stale "already booked"/"slot full" message from the last attempt keeps
+  // showing even after the visitor has changed their selection.
+  function selectSlot(slot: VisitSlot | null) {
+    setSelectedSlot(slot)
+    setSubmitError(null)
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!selectedDate || !selectedSlot) return
@@ -79,7 +87,7 @@ export function useBookingForm(horseId: string | undefined) {
     selectedDate,
     selectDate,
     selectedSlot,
-    setSelectedSlot,
+    selectSlot,
     partySize,
     setPartySize,
     note,
