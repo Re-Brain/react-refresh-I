@@ -16,8 +16,8 @@ function SubscriptionSection({ userName }: SubscriptionSectionProps) {
           Subscriptions are coming soon{userName ? `, ${userName}` : ''}!
         </p>
         <p className="text-brand-muted text-sm max-w-md">
-          Soon you&rsquo;ll be able to subscribe to your favourite farms and stay up to date on
-          their retired racehorses. Check back later.
+          Soon you&rsquo;ll be able to subscribe to your favourite farm with a recurring donation, helping support
+          the horses you care about. Check back later.
         </p>
       </div>
     </section>

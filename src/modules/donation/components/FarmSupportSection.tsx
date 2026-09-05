@@ -43,7 +43,7 @@ function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSec
           <p className="text-sm text-brand-muted max-w-md leading-relaxed">
             {!canDonate ? (
               <>
-                Farm and admin accounts can&rsquo;t make donations. Log in with a visitor account
+                Farm accounts can&rsquo;t make donations. Log in with a visitor account
                 to support <span className="font-bold text-brand-text">{farmName}</span>.
               </>
             ) : payoutsEnabled ? (
