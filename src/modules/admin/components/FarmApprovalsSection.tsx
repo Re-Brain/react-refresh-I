@@ -77,8 +77,8 @@ function FarmApprovalsSection() {
                 const missing = missingFarmDocumentTypes(f.documents)
                 return (
                 <tr key={f.id} className="border-b border-brand-border last:border-0 align-top">
-                  <td className="px-4 py-3 text-center font-bold text-brand-text">{f.name}</td>
-                  <td className="px-4 py-3 text-center text-brand-text">{f.location ?? '—'}</td>
+                  <td className="px-4 py-3 text-left font-bold text-brand-text">{f.name}</td>
+                  <td className="px-4 py-3 text-left text-brand-text">{f.location ?? '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col items-start gap-1">
                       {FARM_DOCUMENT_TYPES.map(t => {
