@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
 import { updateHorse, type Horse, type HorseUpdate } from '../api/horse'
-import { validateName, validateColor, validateDob } from '../horseValidation'
+import { validateName, validateColor, validateDob, validateStory } from '../horseValidation'
 
 // The pedigree fields (key + display label), used for both validation and the
 // edit form. Shared by the hook (validation) and HorseInfoEditor (rendering).
@@ -50,6 +50,7 @@ export function useHorseInfoForm(horse: Horse | null, setHorse: Dispatch<SetStat
     const validationError =
       validateName(formData.name ?? '', 'Name', required) ??
       validateColor(formData.color ?? '', required) ??
+      validateStory(formData.story ?? '', required) ??
       (required && !formData.gender ? 'Gender is required.' : null) ??
       PEDIGREE_FIELDS.reduce<string | null>(
         (err, { key, label }) => err ?? validateName((formData[key] as string) ?? '', label, required),

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createHorse, createRaceRecord, uploadHorseImage, uploadHorseDocument, submitHorseForReview, DOCUMENT_TYPES, type Horse, type HorseCreate, type RaceRecordCreate, type RaceRecordUpdate } from '../api/horse'
 import { recordFormIsValid } from '../components/raceRecordFields'
-import { validateName, validateColor, validateDob } from '../horseValidation'
+import { validateName, validateColor, validateDob, validateStory } from '../horseValidation'
 import { useHorseImageDraft } from './useHorseImageDraft'
 import { useHorseRecordDraft } from './useHorseRecordDraft'
 import { useHorseDocumentDraft } from './useHorseDocumentDraft'
@@ -60,6 +60,8 @@ export function useAddHorseForm() {
     if (nameError) return nameError
     const colorError = validateColor(form.color ?? '')
     if (colorError) return colorError
+    const storyError = validateStory(form.story ?? '')
+    if (storyError) return storyError
     if (!form.gender) return 'Gender is required.'
     for (const { key, label } of PEDIGREE_FIELDS) {
       const err = validateName((form[key] as string) ?? '', label)

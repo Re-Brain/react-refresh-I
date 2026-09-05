@@ -26,6 +26,11 @@ export function validateColor(value: string, required = true): string | null {
   return null
 }
 
+export function validateStory(value: string, required = true): string | null {
+  if (!value.trim()) return required ? 'Story is required.' : null
+  return null
+}
+
 export function validateDob(value: string, required = true): string | null {
   if (!value) return required ? 'Date of birth is required.' : null
   const today = new Date()

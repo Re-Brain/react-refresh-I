@@ -8,8 +8,9 @@ type HorseFormFieldsProps = {
   setForm: Dispatch<SetStateAction<HorseForm>>
 }
 
-// The add-horse text fields: basic info (name/color/dob/gender), the optional
-// story, and the required pedigree grid. Purely controlled inputs over `form`.
+// The add-horse text fields: basic info (name/color/dob/gender), the story,
+// and the pedigree grid — story and pedigree are both required before
+// submitting for review. Purely controlled inputs over `form`.
 function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
   return (
     <>
@@ -66,7 +67,7 @@ function HorseFormFields({ form, setForm }: HorseFormFieldsProps) {
 
       <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
         <p className="text-xs font-bold text-brand-muted uppercase">Story</p>
-        <p className="text-[12px] text-brand-muted normal-case">Optional. Share this horse's life story — it appears on the public page.</p>
+        <p className="text-[12px] text-brand-muted normal-case">Required before submitting for review, not to save a draft. Share this horse's life story — it appears on the public page.</p>
         <textarea
           rows={6}
           placeholder="Tell this horse's life story..."
