@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { registerFarmer, ApiError } from '../api'
 import { useRetryCountdown, formatCountdown } from '../../../hooks/useRetryCountdown'
 
@@ -12,8 +13,14 @@ function RegisterFarmerPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [farmName, setFarmName] = useState('')
   const [error, setError] = useState('')
+
+  const passwordTooShort = password.length > 0 && password.length < 8
+  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
   // Ticks down after a 429, disabling the submit button so the user isn't
   // tempted to keep clicking and re-triggering the still-active limit.
@@ -23,6 +30,14 @@ function RegisterFarmerPage() {
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     setError('')
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords don't match.")
+      return
+    }
     try {
 
       // Register the farmer, then send them to the "check your email" screen
@@ -77,13 +92,47 @@ function RegisterFarmerPage() {
           {/* Password input field */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-bold text-brand-muted">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="bg-brand-bg border border-brand-border rounded-lg px-4 py-2 text-brand-text placeholder:text-brand-muted focus:outline-none focus:border-brand-gold transition"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="bg-brand-bg border border-brand-border rounded-lg w-full px-4 py-2 pr-10 text-brand-text placeholder:text-brand-muted focus:outline-none focus:border-brand-gold transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-text"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {passwordTooShort && <p className="text-red-600 text-sm">Password must be at least 8 characters.</p>}
+          </div>
+
+          {/* Confirm Password input field */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-bold text-brand-muted">Confirm Password</label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="bg-brand-bg border border-brand-border rounded-lg w-full px-4 py-2 pr-10 text-brand-text placeholder:text-brand-muted focus:outline-none focus:border-brand-gold transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(v => !v)}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-text"
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {passwordsMismatch && <p className="text-red-600 text-sm">Passwords don't match</p>}
           </div>
 
           {/* Farm Name input field */}
@@ -104,7 +153,7 @@ function RegisterFarmerPage() {
           {/* Submit button for registration */}
           <button
             type="submit"
-            disabled={retry.secondsLeft > 0}
+            disabled={retry.secondsLeft > 0 || password.length < 8 || password !== confirmPassword}
             className="bg-brand-gold text-brand-bg font-bold py-2 rounded-lg hover:bg-brand-gold-light transition mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {retry.secondsLeft > 0 ? `Try again in ${formatCountdown(retry.secondsLeft)}` : 'Create Account'}
