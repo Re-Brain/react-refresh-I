@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { X, Info, AlertTriangle } from 'lucide-react'
+import { X, Info, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import { isFarmComplete, type Farm } from '../api/farm'
 import type { useFarmInfoForm } from '../hooks/useFarmInfoForm'
 import type { useFarmDocuments } from '../hooks/useFarmDocuments'
@@ -32,6 +32,30 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
   const missingDocs = farm ? missingFarmDocumentTypes(farm.documents) : []
   const hasPhoto = Boolean(farm && farm.images.length > 0)
   const canSubmit = Boolean(farm && isFarmComplete(farm) && hasAllFarmDocumentTypes(farm.documents) && hasPhoto)
+  const documentCount = farm ? FARM_DOCUMENT_TYPES.length - missingDocs.length : 0
+  // Same fields isFarmComplete checks — kept in sync so the checklist's
+  // "missing: ..." breakdown always matches why the item is marked undone.
+  const missingFarmDetailFields = farm
+    ? [!farm.description?.trim() && 'Description', !farm.location?.trim() && 'Location'].filter(
+        (field): field is string => Boolean(field),
+      )
+    : []
+  // Drives the always-visible checklist by the submit button, so a farmer
+  // doesn't have to hover a disabled button (which never works on touch) to
+  // find out what's left.
+  const requirements = farm
+    ? [
+        {
+          label:
+            missingFarmDetailFields.length > 0
+              ? `Farm Details — missing: ${missingFarmDetailFields.join(', ')}`
+              : 'Farm Details',
+          done: isFarmComplete(farm),
+        },
+        { label: 'At least 1 Farm Photo', done: hasPhoto },
+        { label: `Proof Documents (${documentCount}/${FARM_DOCUMENT_TYPES.length})`, done: missingDocs.length === 0 },
+      ]
+    : []
 
   return (
     <div>
@@ -49,7 +73,11 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
       {farm?.status === 'draft' && (
         <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/40 text-blue-500 rounded-lg px-4 py-3 mb-6 text-sm font-medium">
           <Info size={18} className="mt-0.5 shrink-0" />
-          <p>This farm is a draft and won&rsquo;t be visible to visitors until it&rsquo;s submitted and approved. Complete your profile, upload the required documents, and submit for review below.</p>
+          <p>
+            This farm is a draft and won&rsquo;t be visible to visitors until an admin approves it. Fill in your Farm
+            Details, add at least one Farm Photo, and upload your Proof Documents — the checklist below shows
+            exactly what&rsquo;s left before you can submit for review.
+          </p>
         </div>
       )}
 
@@ -72,11 +100,43 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
       )}
 
       <div className="flex flex-col gap-6">
+        {farm && (farm.status === 'draft' || farm.status === 'rejected') && !canSubmit && (
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-brand-muted uppercase tracking-wide">Required before you can submit</p>
+              <span className="text-xs font-bold text-brand-muted">
+                {requirements.filter(r => r.done).length}/{requirements.length} complete
+              </span>
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {requirements.map(r => (
+                <li
+                  key={r.label}
+                  className={`flex items-start gap-2 text-sm font-medium rounded-lg px-3 py-2 border ${
+                    r.done
+                      ? 'bg-green-500/10 border-green-500/40 text-green-600'
+                      : 'bg-brand-bg border-brand-border text-brand-muted'
+                  }`}
+                >
+                  {r.done ? (
+                    <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+                  ) : (
+                    <Circle size={16} className="shrink-0 mt-0.5" />
+                  )}
+                  {r.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-6">
+          <p className="text-xs font-bold text-brand-muted uppercase">
+            Farm Details <span className="text-red-600">*</span>
+          </p>
           {isEditing ? (
             <>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Farm Name</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Farm Name <span className="text-red-600">*</span></label>
                 <input
                   className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
                   value={formData.name ?? ''}
@@ -84,7 +144,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Description</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Description <span className="text-red-600">*</span></label>
                 <textarea
                   rows={3}
                   className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold resize-none"
@@ -93,7 +153,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Location</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Location <span className="text-red-600">*</span></label>
                 <input
                   className="bg-brand-bg border border-brand-border rounded-lg px-3 py-2 text-brand-text text-sm focus:outline-none focus:border-brand-gold"
                   value={formData.location ?? ''}
@@ -120,15 +180,15 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
           ) : (
             <>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Farm Name</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Farm Name <span className="text-red-600">*</span></label>
                 <p className="text-brand-text font-bold text-lg">{farm?.name ?? '—'}</p>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Description</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Description <span className="text-red-600">*</span></label>
                 <p className="text-brand-text">{farm?.description ?? '—'}</p>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-brand-muted uppercase">Location</label>
+                <label className="text-xs font-bold text-brand-muted uppercase">Location <span className="text-red-600">*</span></label>
                 <p className="text-brand-text">{farm?.location ?? '—'}</p>
               </div>
               <button
@@ -137,7 +197,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
                 title={readOnly ? 'This farm is pending review and can’t be edited right now' : undefined}
                 className="self-start bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Edit Farm Info
+                {farm?.status === 'draft' ? 'Add or Edit Farm Info' : 'Edit Farm Info'}
               </button>
             </>
           )}
@@ -146,24 +206,12 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
         {farm && <FarmDocumentManager farm={farm} documents={documents} locked={sectionsLocked} />}
 
         {farm && (farm.status === 'draft' || farm.status === 'rejected') && (
-          <div className="flex flex-col gap-3 bg-brand-surface border border-brand-border rounded-lg p-6">
+          <div className="flex flex-col items-center gap-3 p-6">
             {submit.submitError && <p className="text-red-600 text-sm font-medium">{submit.submitError}</p>}
             <button
               onClick={submit.handleSubmit}
               disabled={submit.submitting || !canSubmit}
-              title={
-                !canSubmit
-                  ? [
-                      !isFarmComplete(farm) && 'Complete your farm profile',
-                      !hasPhoto && 'Add at least one farm photo',
-                      missingDocs.length > 0 &&
-                        `Missing: ${missingDocs.map(m => FARM_DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}`,
-                    ]
-                      .filter(Boolean)
-                      .join(' — ')
-                  : undefined
-              }
-              className="self-start bg-brand-gold text-brand-bg font-bold px-6 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-brand-gold text-brand-bg font-bold px-12 py-4 rounded-lg hover:bg-brand-gold-light transition text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submit.submitting
                 ? 'Submitting...'

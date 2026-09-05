@@ -92,7 +92,7 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
     <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-xs font-bold text-brand-muted uppercase">
-          Farm Photos <span className="normal-case font-normal">({imageCount}/{FARM_IMAGE_LIMIT})</span>
+          Farm Photos <span className="text-red-600">*</span> <span className="normal-case font-normal">({imageCount}/{FARM_IMAGE_LIMIT})</span>
         </p>
         {imageCount < FARM_IMAGE_LIMIT && (
           <>
@@ -116,7 +116,7 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
       </div>
 
       <p className="text-[12px] text-brand-muted normal-case">
-        Add up to {FARM_IMAGE_LIMIT} photos of your farm. The first one is shown on your public farm page.
+        Add up to {FARM_IMAGE_LIMIT} photos of your farm. The first one is shown on your public farm page. At least one photo is required before your farm can be approved.
       </p>
 
       {imageCount === 0 || !activeImage ? (
