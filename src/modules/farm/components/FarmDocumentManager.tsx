@@ -29,7 +29,7 @@ function FarmDocumentManager({ farm, documents, locked }: FarmDocumentManagerPro
   return (
     <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
       <p className="text-xs font-bold text-brand-muted uppercase">
-        Proof Documents <span className="normal-case font-normal">({count}/3)</span>
+        Proof Documents <span className="text-red-600">*</span> <span className="normal-case font-normal">({count}/3)</span>
       </p>
       <p className="text-[12px] text-brand-muted normal-case">
         All 3 are required before your farm can be submitted for review.
