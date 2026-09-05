@@ -36,7 +36,6 @@ import {
   FarmerDashboardPage,
   FarmDetailPage,
   FarmsListPage,
-  AddHorsePage,
   HorseEditPage,
   HorseProfilePage,
   HorsesListPage,
@@ -286,16 +285,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <FarmerDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/farmer/horses/new"
-            element={
-              <ProtectedRoute>
-                <RequireActiveFarm>
-                  <AddHorsePage />
-                </RequireActiveFarm>
               </ProtectedRoute>
             }
           />

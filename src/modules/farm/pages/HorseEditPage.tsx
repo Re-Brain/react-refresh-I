@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Eye, AlertTriangle, Info, Check, X } from 'lucide-react'
 import { getHorse, DOCUMENT_TYPES, type Horse } from '../api/horse'
+import { useFarm } from '../context/useFarm'
 import { useHorseImages } from '../hooks/useHorseImages'
 import HorseImageManager from '../components/HorseImageManager'
-import { useHorseInfoForm } from '../hooks/useHorseInfoForm'
+import { useHorseInfoForm, PEDIGREE_FIELDS } from '../hooks/useHorseInfoForm'
 import HorseInfoEditor from '../components/HorseInfoEditor'
 import { useHorseRaceRecords } from '../hooks/useHorseRaceRecords'
 import HorseRaceRecordsEditor from '../components/HorseRaceRecordsEditor'
@@ -12,7 +13,6 @@ import { useHorseDocuments } from '../hooks/useHorseDocuments'
 import HorseDocumentManager from '../components/HorseDocumentManager'
 import { useHorseSubmit } from '../hooks/useHorseSubmit'
 import { hasAllDocumentTypes, missingDocumentTypes } from '../lib/horseDocuments'
-import { PEDIGREE_FIELDS } from '../hooks/useAddHorseForm'
 
 type Step = 1 | 2 | 3
 
@@ -30,9 +30,25 @@ function HorseEditPage() {
   const [step, setStep] = useState<Step>(1)
 
   // Shared horse data + load state. Each section's own state lives in its hook.
-  const [horse, setHorse] = useState<Horse | null>(null)
+  const [horse, setHorseRaw] = useState<Horse | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+
+  // The Horse Management table reads from this same list — without syncing
+  // into it here, every edit made on this page (submit, upload, info save)
+  // would only ever update this page's own local state, leaving the table
+  // showing stale data until a full page refresh re-fetches it.
+  const { setHorses } = useFarm()
+  const setHorse: Dispatch<SetStateAction<Horse | null>> = useCallback(
+    value => {
+      setHorseRaw(prev => {
+        const next = typeof value === 'function' ? (value as (p: Horse | null) => Horse | null)(prev) : value
+        if (next) setHorses(list => list.map(h => (h.id === next.id ? next : h)))
+        return next
+      })
+    },
+    [setHorses],
+  )
 
   // Image state + upload/delete/reorder logic (see useHorseImages).
   const images = useHorseImages(horse, setHorse)
@@ -56,7 +72,7 @@ function HorseEditPage() {
       .then(setHorse)
       .catch(() => setLoadError('Horse not found'))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, setHorse])
 
   if (loading) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-muted">Loading...</div>
   if (!horse) return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">{loadError ?? 'Horse not found'}</div>
@@ -107,7 +123,11 @@ function HorseEditPage() {
       {horse.status === 'draft' && (
         <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/40 text-blue-500 rounded-lg px-4 py-3 mb-6 text-sm font-medium">
           <Info size={18} className="mt-0.5 shrink-0" />
-          <p>This horse is a draft and won&rsquo;t be visible to visitors until it&rsquo;s submitted and approved. Finish it up and submit from step 3.</p>
+          <p>
+            This horse is a draft and won&rsquo;t be visible to visitors until it&rsquo;s submitted and approved.
+            Everything you add here is saved automatically — finish it up and submit for review from step 3 when
+            you&rsquo;re ready.
+          </p>
         </div>
       )}
 

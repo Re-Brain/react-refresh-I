@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AlertTriangle } from 'lucide-react'
 import { useFarm } from '../context/useFarm'
+import { createDraftHorse } from '../api/horse'
 import { useFarmInfoForm } from '../hooks/useFarmInfoForm'
 import { useFarmDocuments } from '../hooks/useFarmDocuments'
 import { useFarmSubmit } from '../hooks/useFarmSubmit'
@@ -37,6 +38,27 @@ function FarmerDashboardPage() {
     if (gatedSections.includes(key) && !farmActive) return
     sessionStorage.setItem('dashboardSection', key)
     setActiveSection(key)
+  }
+
+  // Creates the horse immediately (as a draft, mirroring how a Farm already
+  // exists right after registration) and jumps straight to its edit page —
+  // there's no separate "add" flow anymore, everything from here on is an
+  // incremental save against a horse that already exists.
+  const [addingHorse, setAddingHorse] = useState(false)
+  const [addHorseError, setAddHorseError] = useState<string | null>(null)
+
+  async function handleAddHorse() {
+    setAddHorseError(null)
+    setAddingHorse(true)
+    try {
+      const horse = await createDraftHorse()
+      setHorses(prev => [...prev, horse])
+      navigate(`/dashboard/farmer/horses/${horse.id}`)
+    } catch (err) {
+      setAddHorseError(err instanceof Error ? err.message : 'Failed to create horse')
+    } finally {
+      setAddingHorse(false)
+    }
   }
 
   return (
@@ -92,7 +114,9 @@ function FarmerDashboardPage() {
                 setHorses={setHorses}
                 horsesError={horsesError}
                 onRetry={retryHorses}
-                onAddHorse={() => navigate('/dashboard/farmer/horses/new')}
+                onAddHorse={handleAddHorse}
+                addingHorse={addingHorse}
+                addHorseError={addHorseError}
               />
             )}
 

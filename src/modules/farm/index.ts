@@ -25,7 +25,7 @@ export {
 } from './lib/approvalStatusDisplay'
 
 // hooks
-export { PEDIGREE_FIELDS } from './hooks/useAddHorseForm'
+export { PEDIGREE_FIELDS } from './hooks/useHorseInfoForm'
 
 // components
 export { GradeBadge, FinishPos } from './components/raceRecordFields'
@@ -36,7 +36,6 @@ export { default as RequireActiveFarm } from './components/RequireActiveFarm'
 export { default as FarmDetailPage } from './pages/FarmDetailPage'
 export { default as FarmsListPage } from './pages/FarmsListPage'
 export { default as FarmerDashboardPage } from './pages/FarmerDashboardPage'
-export { default as AddHorsePage } from './pages/AddHorsePage'
 export { default as HorseEditPage } from './pages/HorseEditPage'
 export { default as HorseProfilePage } from './pages/HorseProfilePage'
 export { default as HorsesListPage } from './pages/HorsesListPage'
