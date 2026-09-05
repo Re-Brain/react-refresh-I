@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function RegisterPage() {
 
@@ -35,8 +35,16 @@ function RegisterPage() {
             Farmer
             <p className="text-sm font-normal text-brand-muted mt-1">List and manage your horses</p>
           </button>
-          
+
         </div>
+
+        {/* Link to login page */}
+        <p className="text-center text-brand-muted text-sm mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-brand-gold hover:underline">
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   )
