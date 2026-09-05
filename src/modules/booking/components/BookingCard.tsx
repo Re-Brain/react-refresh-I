@@ -19,9 +19,9 @@ type BookingCardProps = {
 }
 
 // A single visit booking rendered as a card: horse + farm, when, party size,
-// status badge, and (while still pending/confirmed) an inline cancel flow.
-// Purely presentational — all state lives in the parent, which passes the
-// derived `confirming`/`busy` flags and the click handlers.
+// status badge, and (while still confirmed) an inline cancel flow. Purely
+// presentational — all state lives in the parent, which passes the derived
+// `confirming`/`busy` flags and the click handlers.
 function BookingCard({
   booking: b,
   confirming,
@@ -100,16 +100,16 @@ function BookingCard({
         </div>
       </div>
 
-      {/* Why the farmer declined/cancelled it, if they gave a reason */}
-      {(b.status === 'declined' || b.status === 'cancelled') && b.reason && (
+      {/* Why the farmer cancelled it, if they gave a reason */}
+      {b.status === 'cancelled' && b.reason && (
         <p className="text-sm text-brand-muted border-t border-brand-border pt-3">
           <span className="font-bold text-brand-text">Reason: </span>
           {b.reason}
         </p>
       )}
 
-      {/* Cancel — only while the visit is still pending/confirmed and hasn't happened yet */}
-      {(b.status === 'pending' || b.status === 'confirmed') &&
+      {/* Cancel — only while the visit is still confirmed and hasn't happened yet */}
+      {b.status === 'confirmed' &&
         !isPastVisit(b.date) &&
         (confirming ? (
           <div className="flex items-center gap-2">

@@ -8,8 +8,8 @@ import BookingStatusTabs from './BookingStatusTabs'
 import BookingCard from './BookingCard'
 
 // The Bookings section: status filter buttons and the selected status's cards,
-// with loading / error / empty states. Pending is shown by default. Owns its
-// own bookings data and cancel flow (useVisitorBookings).
+// with loading / error / empty states. Confirmed is shown by default. Owns
+// its own bookings data and cancel flow (useVisitorBookings).
 function BookingsSection() {
   const { bookings, loading, refreshing, refresh, error, actionError, handleRetry, confirmId, busyId, requestCancel, cancel, keepCancel } = useVisitorBookings()
 
@@ -17,7 +17,7 @@ function BookingsSection() {
   const [active, setActive] = useState<BookingStatus>('confirmed')
 
   // Count per status for the tab badges.
-  const counts: Record<BookingStatus, number> = { pending: 0, confirmed: 0, declined: 0, cancelled: 0 }
+  const counts: Record<BookingStatus, number> = { confirmed: 0, cancelled: 0 }
   for (const b of bookings) counts[b.status]++
 
   // Cards for the selected status, soonest visit first.

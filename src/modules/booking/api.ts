@@ -2,7 +2,9 @@ import type { Period } from '../farm'
 import { apiFetch } from '../../lib/apiFetch'
 import { formatRateLimitMessage } from '../../lib/rateLimit'
 
-export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'cancelled'
+// A booking confirms instantly at creation now — there's no farmer approval
+// step, so 'pending'/'declined' no longer exist as reachable states.
+export type BookingStatus = 'confirmed' | 'cancelled'
 
 // A confirmed booking as returned by POST /bookings. `start`/`end` are the
 // authoritative slot times the server resolved from the farm schedule — use
@@ -25,8 +27,8 @@ export type Booking = {
   party_size: number
   note: string
   status: BookingStatus
-  // Why the farmer declined/cancelled it, if they gave one. Null otherwise
-  // (including for every non-declined/cancelled booking).
+  // Why the farmer cancelled it, if they gave one. Null otherwise (including
+  // for every non-cancelled booking).
   reason: string | null
   created_at: string
 }
@@ -66,6 +68,8 @@ function defaultMessage(status: number): string {
   switch (status) {
     case 401:
       return 'Please log in to book a visit.'
+    case 403:
+      return "You're not able to book a visit with this account."
     case 404:
       return 'Horse not found.'
     case 409:
@@ -77,15 +81,11 @@ function defaultMessage(status: number): string {
   }
 }
 
-// The farmer confirms, declines, or cancels a booking at their farm (the
-// latter only valid on an already-confirmed visit). Owner-only on the server;
-// returns the updated booking. `reason` is an optional note shown to the
-// visitor — only meaningful alongside 'declined'/'cancelled'.
-export async function updateBookingStatus(
-  id: number,
-  status: Extract<BookingStatus, 'confirmed' | 'declined' | 'cancelled'>,
-  reason?: string
-): Promise<Booking> {
+// The farmer cancels a booking at their farm (a booking is already confirmed
+// the moment it's created, so this is the only status transition left for
+// them to make). Owner-only on the server; returns the updated booking.
+// `reason` is an optional note shown to the visitor.
+export async function updateBookingStatus(id: number, status: 'cancelled', reason?: string): Promise<Booking> {
   const res = await apiFetch(`/bookings/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

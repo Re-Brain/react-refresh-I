@@ -2,7 +2,7 @@ import type { BookingStatus } from '../api'
 import { STATUS_LABELS } from '../lib/bookingDisplay'
 
 // Left-to-right order of the filter buttons.
-const STATUS_ORDER: BookingStatus[] = ['confirmed', 'pending', 'declined', 'cancelled']
+const STATUS_ORDER: BookingStatus[] = ['confirmed', 'cancelled']
 
 type BookingStatusTabsProps = {
   active: BookingStatus
@@ -10,7 +10,7 @@ type BookingStatusTabsProps = {
   counts: Record<BookingStatus, number>
 }
 
-// The four status filter buttons. The active one is highlighted; each carries a
+// The status filter buttons. The active one is highlighted; each carries a
 // count of how many bookings fall under it.
 function BookingStatusTabs({ active, onSelect, counts }: BookingStatusTabsProps) {
   return (

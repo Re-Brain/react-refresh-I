@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { AlertTriangle, Mail, Users, Check, X, RefreshCw, Ban } from 'lucide-react'
+import { AlertTriangle, Mail, Users, RefreshCw, Ban } from 'lucide-react'
 import {
   getFarmBookings,
   updateBookingStatus,
@@ -13,16 +13,14 @@ type Filter = 'all' | BookingStatus
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'pending', label: 'Pending' },
   { key: 'confirmed', label: 'Confirmed' },
-  { key: 'declined', label: 'Declined' },
   { key: 'cancelled', label: 'Cancelled' },
 ]
 
-// Group order for the "All" tab — pending (needs action) first, cancelled
-// last. Single-status tabs ignore this (every row shares one status, so this
-// comparison is always a tie there) and fall straight through to the date sort.
-const STATUS_ORDER: BookingStatus[] = ['pending', 'confirmed', 'declined', 'cancelled']
+// Group order for the "All" tab — confirmed first, cancelled last. Single-
+// status tabs ignore this (every row shares one status, so this comparison is
+// always a tie there) and fall straight through to the date sort.
+const STATUS_ORDER: BookingStatus[] = ['confirmed', 'cancelled']
 
 // All visits booked at the farmer's farm, with the visitor's contact details.
 // Fetched once (soonest-first from the server) and filtered by status client-side.
@@ -32,11 +30,11 @@ function VisitorManagement() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
-  // The booking whose Confirm/Decline/Cancel is in flight, and any action error.
+  // The booking whose Cancel is in flight, and any action error.
   const [busyId, setBusyId] = useState<number | null>(null)
-  // The booking currently showing the Decline/Cancel reason prompt, and the
-  // reason text being typed for it (optional — shown to the visitor).
-  const [prompt, setPrompt] = useState<{ id: number; type: 'declined' | 'cancelled' } | null>(null)
+  // The booking (if any) currently showing the "cancel this visit?" reason
+  // prompt, and the reason text being typed for it (optional — shown to the visitor).
+  const [prompt, setPrompt] = useState<{ id: number } | null>(null)
   const [reason, setReason] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -47,11 +45,11 @@ function VisitorManagement() {
       .finally(() => setLoading(false))
   }
 
-  async function act(id: number, status: 'confirmed' | 'declined' | 'cancelled', withReason?: string) {
+  async function act(id: number, withReason?: string) {
     setBusyId(id)
     setActionError(null)
     try {
-      const updated = await updateBookingStatus(id, status, withReason)
+      const updated = await updateBookingStatus(id, 'cancelled', withReason)
       // Swap the updated booking into the list; the derived views/counts follow.
       setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)))
       setPrompt(null)
@@ -63,9 +61,9 @@ function VisitorManagement() {
     }
   }
 
-  // Open/close the Decline/Cancel reason prompt on a given booking.
-  function openPrompt(id: number, type: 'declined' | 'cancelled') {
-    setPrompt({ id, type })
+  // Open/close the cancel reason prompt on a given booking.
+  function openPrompt(id: number) {
+    setPrompt({ id })
     setReason('')
     setActionError(null)
   }
@@ -225,26 +223,9 @@ function VisitorManagement() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {b.status === 'pending' ? (
-                      <div className="flex items-center justify-start gap-2">
-                        <button
-                          onClick={() => act(b.id, 'confirmed')}
-                          disabled={busyId === b.id}
-                          className="flex items-center gap-1 bg-green-500/10 text-green-600 border border-green-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Check size={14} /> Confirm
-                        </button>
-                        <button
-                          onClick={() => openPrompt(b.id, 'declined')}
-                          disabled={busyId === b.id}
-                          className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <X size={14} /> Decline
-                        </button>
-                      </div>
-                    ) : b.status === 'confirmed' && !isPastVisit(b.date) ? (
+                    {b.status === 'confirmed' && !isPastVisit(b.date) ? (
                       <button
-                        onClick={() => openPrompt(b.id, 'cancelled')}
+                        onClick={() => openPrompt(b.id)}
                         className="flex items-center gap-1 bg-red-500/10 text-red-600 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition text-xs"
                       >
                         <Ban size={14} /> Cancel visit
@@ -270,9 +251,7 @@ function VisitorManagement() {
             onClick={e => e.stopPropagation()}
           >
             <div>
-              <h3 className="text-lg font-bold text-brand-text">
-                {prompt.type === 'declined' ? 'Decline this request?' : 'Cancel this visit?'}
-              </h3>
+              <h3 className="text-lg font-bold text-brand-text">Cancel this visit?</h3>
               <p className="text-brand-muted text-sm mt-1">
                 {promptBooking.visitor_name ?? 'This visitor'}&rsquo;s visit to see{' '}
                 <span className="font-bold text-brand-text">
@@ -296,24 +275,18 @@ function VisitorManagement() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => act(promptBooking.id, prompt.type, reason.trim())}
+                onClick={() => act(promptBooking.id, reason.trim())}
                 disabled={busyId === promptBooking.id || !reason.trim()}
                 className="flex-1 bg-red-600 text-white font-bold px-4 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {busyId === promptBooking.id
-                  ? prompt.type === 'declined'
-                    ? 'Declining…'
-                    : 'Cancelling…'
-                  : prompt.type === 'declined'
-                  ? 'Confirm decline'
-                  : 'Yes, cancel'}
+                {busyId === promptBooking.id ? 'Cancelling…' : 'Yes, cancel'}
               </button>
               <button
                 onClick={closePrompt}
                 disabled={busyId === promptBooking.id}
                 className="flex-1 text-brand-muted hover:text-brand-text font-bold px-4 py-2.5 rounded-lg border border-brand-border transition text-sm disabled:opacity-50"
               >
-                {prompt.type === 'declined' ? 'Keep pending' : 'Keep'}
+                Keep
               </button>
             </div>
           </div>
