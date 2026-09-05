@@ -79,10 +79,10 @@ function HorseApprovalsSection() {
                 const missing = missingDocumentTypes(h.documents)
                 return (
                 <tr key={h.id} className="border-b border-brand-border last:border-0 align-top">
-                  <td className="px-4 py-3 text-center font-bold text-brand-text">{h.name}</td>
-                  <td className="px-4 py-3 text-center text-brand-text">{h.farm_name ?? `Farm #${h.farm_id}`}</td>
-                  <td className="px-4 py-3 text-center text-brand-text capitalize">{h.gender ?? '—'}</td>
-                  <td className="px-4 py-3 text-center text-brand-text">{h.date_of_birth ?? '—'}</td>
+                  <td className="px-4 py-3 text-left font-bold text-brand-text">{h.name}</td>
+                  <td className="px-4 py-3 text-left text-brand-text">{h.farm_name ?? `Farm #${h.farm_id}`}</td>
+                  <td className="px-4 py-3 text-left text-brand-text capitalize">{h.gender ?? '—'}</td>
+                  <td className="px-4 py-3 text-left text-brand-text">{h.date_of_birth ?? '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col items-start gap-1">
                       {DOCUMENT_TYPES.map(t => {
