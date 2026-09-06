@@ -5,6 +5,7 @@
 export { useAuth } from './context/useAuth'
 export { AuthProvider } from './components/AuthProvider'
 export { default as ProtectedRoute } from './components/ProtectedRoute'
+export { default as GuestRoute } from './components/GuestRoute'
 export { default as LoginPage } from './pages/LoginPage'
 export { default as RegisterPage } from './pages/RegisterPage'
 export { default as RegisterFarmerPage } from './pages/RegisterFarmerPage'
