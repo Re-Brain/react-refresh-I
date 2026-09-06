@@ -18,8 +18,17 @@ const SUGGESTED_AMOUNTS = [100, 300, 500, 1000, 2000]
 // donations don't require login.
 function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSectionProps) {
   const { user } = useAuth()
-  const { amount, setAmount, submitting, error, donate } = useDonation(farmId, farmName)
+  const { amount, setAmount, submitting, error, donate, fxEstimate, loadingEstimate } = useDonation(farmId, farmName)
   const canDonate = user?.role !== 'admin' && user?.role !== 'farmer'
+  const parsedAmount = Number(amount)
+
+  // Formatted with the currency's own conventions (symbol, decimal places) —
+  // e.g. "$3.40" for USD, "₩4,200" for KRW with no decimals.
+  const formattedEstimate = fxEstimate
+    ? new Intl.NumberFormat(undefined, { style: 'currency', currency: fxEstimate.currency }).format(
+        fxEstimate.converted_amount,
+      )
+    : null
 
   return (
     <section id="support-farm" className="flex flex-col gap-6 scroll-mt-24">
@@ -98,9 +107,25 @@ function FarmSupportSection({ farmId, farmName, payoutsEnabled }: FarmSupportSec
                   className="w-full bg-brand-bg border border-brand-border rounded-lg pl-9 pr-4 py-3 text-brand-text text-lg font-bold text-center focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20 transition"
                 />
               </div>
+
+              {loadingEstimate ? (
+                <p className="text-sm text-brand-muted">Calculating estimate in your currency&hellip;</p>
+              ) : (
+                formattedEstimate && (
+                  <p className="text-sm text-brand-muted">
+                    ≈ {formattedEstimate} {fxEstimate?.currency} (estimated)
+                  </p>
+                )
+              )}
             </div>
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
+
+            {parsedAmount >= MIN_DONATION_AMOUNT && (
+              <p className="text-sm text-brand-muted -mt-2">
+                You&rsquo;ll be charged in Japanese Yen (¥{parsedAmount.toLocaleString()})
+              </p>
+            )}
 
             <button
               type="button"
