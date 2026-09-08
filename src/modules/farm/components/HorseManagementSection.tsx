@@ -9,22 +9,34 @@ type HorseManagementSectionProps = {
   horsesError: string | null
   onRetry: () => void
   onAddHorse: () => void
+  addingHorse?: boolean
+  addHorseError?: string | null
 }
 
 // Horse Management tab: the horse table plus an "Add Horse" button, or a retry
 // panel when the horses failed to load.
-function HorseManagementSection({ horses, setHorses, horsesError, onRetry, onAddHorse }: HorseManagementSectionProps) {
+function HorseManagementSection({
+  horses,
+  setHorses,
+  horsesError,
+  onRetry,
+  onAddHorse,
+  addingHorse = false,
+  addHorseError = null,
+}: HorseManagementSectionProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-brand-gold">Horse Management</h2>
         <button
           onClick={onAddHorse}
-          className="flex items-center gap-2 bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm"
+          disabled={addingHorse}
+          className="flex items-center gap-2 bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Plus size={16} /> Add Horse
+          <Plus size={16} /> {addingHorse ? 'Creating...' : 'Add Horse'}
         </button>
       </div>
+      {addHorseError && <p className="text-red-600 text-sm mb-4">{addHorseError}</p>}
       {horsesError ? (
         <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
           <div className="flex items-center gap-3">

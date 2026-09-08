@@ -15,9 +15,10 @@ function CheckEmailPage() {
           We sent a verification link to{' '}
           {email ? <span className="text-brand-text font-bold">{email}</span> : 'your email address'}.
         </p>
-        <p className="text-brand-muted mb-6">
+        <p className="text-brand-muted mb-2">
           Click the link to verify your account, then come back and log in. The link expires in 24 hours.
         </p>
+        <p className="text-brand-muted mb-6">Don&rsquo;t see it? Check your spam or junk folder.</p>
         <Link
           to="/login"
           className="inline-block bg-brand-gold text-brand-bg font-bold py-2 px-6 rounded-lg hover:bg-brand-gold-light transition"

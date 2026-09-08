@@ -48,6 +48,10 @@ function HomePage() {
     ]).finally(() => setLoading(false))
   }, [])
 
+  // A draft/pending/rejected horse isn't meant to be public yet — filter it
+  // out client-side too, rather than trusting the backend response alone.
+  const approvedHorses = horses.filter(horse => horse.status === 'approved')
+
   return (
     <div className="bg-brand-bg text-brand-text">
       
@@ -165,14 +169,14 @@ function HomePage() {
         {horsesError && <p className="text-red-600 text-sm">{horsesError}</p>}
 
         {/* Show when there are no horses listed */}
-        {!loading && !horsesError && horses.length === 0 && (
+        {!loading && !horsesError && approvedHorses.length === 0 && (
           <p className="text-brand-muted text-sm">No horses listed yet.</p>
         )}
 
-        {/* Show Carousel of horses if there are any */}
+        {/* Show Carousel of approved horses if there are any */}
         {/* Maximum at 12 horses */}
         <Carousel direction="right">
-          {horses.slice(0, 12).map(horse => (
+          {approvedHorses.slice(0, 12).map(horse => (
             <div key={horse.id} className="flex-none w-48 sm:w-56">
               <OverlayCard
                 to={`/horses/${horse.id}`}

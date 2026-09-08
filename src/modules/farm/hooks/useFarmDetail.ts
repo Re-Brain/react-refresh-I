@@ -20,9 +20,11 @@ export function useFarmDetail(id: string | undefined) {
       .then(farm => setState(farm ? { status: 'ready', farm } : { status: 'notFound' }))
       .catch(() => setState({ status: 'error' }))
 
-    // The backend has no "horses by farm" route, so fetch all and filter by farm_id.
+    // The backend has no "horses by farm" route, so fetch all and filter by
+    // farm_id — and by status, since a draft/pending/rejected horse isn't
+    // meant to be public yet even if the backend response includes one.
     getAllHorses()
-      .then(all => setHorses(all.filter(h => h.farm_id === Number(id))))
+      .then(all => setHorses(all.filter(h => h.farm_id === Number(id) && h.status === 'approved')))
       .catch(() => setHorsesError(true))
   }, [id])
 

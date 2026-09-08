@@ -37,6 +37,24 @@ function defaultMessage(status: number): string {
   }
 }
 
+export type FxEstimate = {
+  jpy_amount: number
+  currency: string
+  converted_amount: number
+  rate_date: string
+}
+
+// A purely-informational currency estimate for a yen amount — never used in
+// the actual checkout flow, which always deals in JPY. Callers should treat
+// ANY failure (unsupported currency, rate service down, network error) the
+// same way: silently don't show an estimate. This is a nice-to-have display,
+// not something that should ever surface an error or block donating.
+export async function getFxEstimate(amount: number, currency: string): Promise<FxEstimate> {
+  const res = await apiFetch(`/donations/fx-estimate?amount=${amount}&to=${encodeURIComponent(currency)}`)
+  if (!res.ok) throw new Error('Failed to load currency estimate.')
+  return res.json()
+}
+
 // Creates a Stripe Checkout Session for a one-time yen donation to a farm.
 // Works for logged-out visitors too — the session cookie (and CSRF header) is
 // only present/sent when the visitor is actually logged in.

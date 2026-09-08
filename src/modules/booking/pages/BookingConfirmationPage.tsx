@@ -1,35 +1,29 @@
 import { useLocation, Navigate, Link } from 'react-router-dom'
-import { CheckCircle2, AlertTriangle } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import type { Booking } from '../api'
 import { formatTime } from '../../farm'
 import { formatVisitDate } from '../lib/bookingDisplay'
 
-// Shown right after a visitor submits a booking request. The just-created
-// booking travels in router state (set by useBookingForm on success) — if
-// it's missing, e.g. the page was reloaded directly, there's nothing to
-// confirm, so bounce to the horse list instead of rendering a blank page.
+// Shown right after a visitor books a visit. The just-created booking travels
+// in router state (set by useBookingForm on success) — if it's missing, e.g.
+// the page was reloaded directly, there's nothing to confirm, so bounce to
+// the horse list instead of rendering a blank page. A booking is confirmed
+// the instant it's created, so this always shows the confirmed state.
 function BookingConfirmationPage() {
   const location = useLocation()
   const booking = (location.state as { booking?: Booking } | null)?.booking
 
   if (!booking) return <Navigate to="/horses" replace />
 
-  // Bookings that fit within the horse's slot capacity confirm immediately;
-  // a booking can still land 'pending' in edge cases the server holds for
-  // manual review, which keeps the original wait-for-approval copy.
-  const isConfirmed = booking.status === 'confirmed'
-
   return (
     <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center p-8">
       <div className="w-full max-w-lg bg-brand-surface border border-brand-border rounded-xl p-10 flex flex-col items-center text-center gap-4">
         <CheckCircle2 size={56} className="text-brand-gold" strokeWidth={1.5} />
 
-        <h1 className="text-2xl font-bold text-brand-text">
-          {isConfirmed ? "You're confirmed!" : 'Request sent!'}
-        </h1>
+        <h1 className="text-2xl font-bold text-brand-text">You&rsquo;re confirmed!</h1>
 
         <p className="text-brand-muted text-sm leading-relaxed">
-          Your visit{isConfirmed ? '' : ' request'} for{' '}
+          Your visit for{' '}
           <span className="font-bold text-brand-text">{booking.horse_name ?? 'this horse'}</span>
           {booking.farm_name && (
             <>
@@ -38,21 +32,8 @@ function BookingConfirmationPage() {
             </>
           )}{' '}
           on <span className="font-bold text-brand-text">{formatVisitDate(booking.date)}</span>,{' '}
-          {formatTime(booking.start)}–{formatTime(booking.end)}{' '}
-          {isConfirmed
-            ? 'is confirmed. See you then!'
-            : 'was successfully sent to the farm. Please wait for their response.'}
+          {formatTime(booking.start)}–{formatTime(booking.end)} is confirmed. See you then!
         </p>
-
-        {!isConfirmed && (
-          <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/40 text-yellow-600 rounded-lg px-4 py-3 text-sm text-left">
-            <AlertTriangle size={18} className="mt-0.5 shrink-0" />
-            <p>
-              This is still just a request — the farm hasn&rsquo;t approved it yet. Hold off on any
-              travel plans until you get their confirmation.
-            </p>
-          </div>
-        )}
 
         <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
           <Link

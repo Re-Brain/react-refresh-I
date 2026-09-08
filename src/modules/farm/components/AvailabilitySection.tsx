@@ -22,21 +22,36 @@ function AvailabilitySection({ farm, horses, horsesError, onRetryHorses }: Avail
     ? PERIODS.filter(p => farmAvail.periods[p.key].open).map(p => p.key)
     : []
 
+  // Only one of the two editors below may be open at a time — editing the
+  // farm schedule while the horse periods grid is also mid-edit (or vice
+  // versa) risks the two stepping on each other's assumptions about what's
+  // currently open.
+  const [editingSection, setEditingSection] = useState<'schedule' | 'periods' | null>(null)
+
   return (
-    <div className="max-w-3xl">
+    <div>
       <h2 className="text-2xl font-bold text-brand-gold mb-6">Visit Availability</h2>
       <p className="text-brand-muted text-sm mb-6">
         Set your farm&rsquo;s visiting days and time slots once, then choose which
         periods each horse can be met in. These settings drive the public booking page.
       </p>
 
-      {farm && <FarmAvailabilityEditor onChange={setFarmAvail} />}
+      {farm && (
+        <FarmAvailabilityEditor
+          onChange={setFarmAvail}
+          locked={editingSection === 'periods'}
+          onEditingChange={editing => setEditingSection(editing ? 'schedule' : null)}
+        />
+      )}
 
       <div className="mt-8">
         <h3 className="text-lg font-bold text-brand-text mb-1">Which horses, which periods</h3>
         <p className="text-brand-muted text-sm mb-4">
-          Each horse can be met during the periods ticked below (using the farm&rsquo;s
-          times above). Untick all to make a horse unavailable for visits.
+          Set the max number of visitors for each period below (using the farm&rsquo;s times
+          above). Set every period to 0 to make a horse unavailable for visits entirely. Only
+          horses with &ldquo;approved&rdquo; status are shown here — a draft, pending, or
+          rejected horse isn&rsquo;t visible to visitors yet, so there&rsquo;s nothing to
+          configure for it.
         </p>
         {horsesError ? (
           <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
@@ -52,7 +67,12 @@ function AvailabilitySection({ farm, horses, horsesError, onRetryHorses }: Avail
             </button>
           </div>
         ) : (
-          <HorsePeriodsGrid horses={horses} openPeriods={openPeriods} />
+          <HorsePeriodsGrid
+            horses={horses}
+            openPeriods={openPeriods}
+            locked={editingSection === 'schedule'}
+            onEditingChange={editing => setEditingSection(editing ? 'periods' : null)}
+          />
         )}
       </div>
     </div>

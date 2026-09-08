@@ -12,13 +12,15 @@ type HorseHeroProps = {
   onBook: () => void
   /** Called when the visitor clicks "Support This Horse's Farm". */
   onSupport: () => void
+  /** True when booking is blocked only by the logged-in account's type. */
+  bookingRestrictedForAccount?: boolean
 }
 
 // Full-height hero for the public horse page: framed photo (with a blurred
 // bleed behind it) on the left, and a details panel — name, meta line, sire ×
 // dam, book CTA, and thumbnail carousel — on the right. Owns its own
 // `activeImageIndex` since the selected photo is only relevant within here.
-function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
+function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAccount = false }: HorseHeroProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   // Color · date of birth · gender, skipping whichever fields are unset.
@@ -108,7 +110,12 @@ function HorseHero({ horse, bookable, onBook, onSupport }: HorseHeroProps) {
           </div>
 
           <div className="flex flex-col items-center gap-2">
-            <BookVisitButton bookable={bookable} onBook={onBook} variant="onGold" />
+            <BookVisitButton
+              bookable={bookable}
+              onBook={onBook}
+              variant="onGold"
+              restrictedForAccount={bookingRestrictedForAccount}
+            />
             {horse.farm_id !== null && (
               <SupportFarmButton onSupport={onSupport} variant="onGold" />
             )}

@@ -9,11 +9,13 @@ import HorsePedigree from '../components/HorsePedigree'
 import HorseRaceRecords from '../components/HorseRaceRecords'
 import { BookVisitButton } from '../../booking'
 import { SupportFarmButton } from '../../donation'
+import { useAuth } from '../../auth'
 
 function HorseProfilePage() {
 
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [horse, setHorse] = useState<Horse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -35,16 +37,23 @@ function HorseProfilePage() {
       </div>
     )
 
-  if (error || !horse)
+  // A draft/pending/rejected horse isn't meant to be public yet — treat it
+  // exactly like "not found" rather than rendering a full profile (with a
+  // working Book button) for a horse an admin hasn't approved.
+  if (error || !horse || horse.status !== 'approved')
     return (
       <div className="min-h-screen bg-brand-bg flex items-center justify-center text-red-600">
         {error ?? 'Horse not found'}
       </div>
     )
 
-  // Bookable when the farm has visit availability configured and this horse has slots.
+  // Bookable when the farm has visit availability configured, this horse has
+  // slots, and the account isn't a farm/admin account (matches the same
+  // restriction already applied to donations).
   const farmAvail = horse.farm_availability
+  const canBook = user?.role !== 'admin' && user?.role !== 'farmer'
   const bookable =
+    canBook &&
     farmAvail.enabled &&
     farmAvail.weekdays.length > 0 &&
     getHorseVisitSlots(farmAvail, horse.periods).length > 0
@@ -67,6 +76,7 @@ function HorseProfilePage() {
         bookable={bookable}
         onBook={() => navigate(`/book/${horse.id}`)}
         onSupport={() => navigate(`/farms/${horse.farm_id}`)}
+        bookingRestrictedForAccount={!canBook}
       />
 
       {/* Everything below the hero */}
@@ -83,6 +93,7 @@ function HorseProfilePage() {
               bookable={bookable}
               onBook={() => navigate(`/book/${horse.id}`)}
               variant="onLight"
+              restrictedForAccount={!canBook}
             />
             {horse.farm_id !== null && (
               <SupportFarmButton

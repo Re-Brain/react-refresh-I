@@ -120,11 +120,16 @@ export async function getMyHorses(): Promise<Horse[]> {
   return res.json()
 }
 
-export async function createHorse(data: HorseCreate): Promise<Horse> {
+// Creates a horse immediately — status "draft", a placeholder name ("New
+// Horse"), everything else empty — mirroring how a Farm already exists right
+// after registration, before any details are filled in. Every field from
+// here on is filled in incrementally via updateHorse/uploadHorseImage/etc.
+// against the returned id, instead of being batched into one big create call.
+export async function createDraftHorse(): Promise<Horse> {
   const res = await apiFetch('/horses', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({}),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))

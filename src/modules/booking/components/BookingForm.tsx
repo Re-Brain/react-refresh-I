@@ -1,16 +1,20 @@
-import { formatTime, getHorseVisitSlots } from '../../farm'
+import { formatTime, getHorseVisitSlots, type Period } from '../../farm'
 import type { useBookingForm } from '../hooks/useBookingForm'
 
 type BookingFormProps = {
   form: ReturnType<typeof useBookingForm>
   visitSlots: ReturnType<typeof getHorseVisitSlots>
+  /** Periods the visitor already has a confirmed booking for on the selected date. */
+  alreadyBookedPeriods: Set<Period>
+  /** Periods that are at capacity on the selected date (0 remaining). */
+  fullPeriods: Set<Period>
 }
 
 // The booking form shown once a date is picked: time-slot picker (grouped by
 // period), party size, note, and submit — or the confirmation once requested.
 // All state and the submit flow live in the useBookingForm hook.
-function BookingForm({ form, visitSlots }: BookingFormProps) {
-  const { formRef, selectedDate, selectedSlot, setSelectedSlot, partySize, setPartySize, note, setNote, submitting, submitError, handleSubmit } = form
+function BookingForm({ form, visitSlots, alreadyBookedPeriods, fullPeriods }: BookingFormProps) {
+  const { formRef, selectedDate, selectedSlot, selectSlot, partySize, setPartySize, note, setNote, submitting, submitError, handleSubmit } = form
 
   // Render the chosen day as e.g. "Saturday, 11 July 2026". Parse at local
   // midnight so the weekday doesn't shift across time zones.
@@ -39,35 +43,48 @@ function BookingForm({ form, visitSlots }: BookingFormProps) {
         <label className="text-xs font-bold text-brand-muted uppercase">
           Choose a time
         </label>
-        {visitSlots.map(({ period, slots }) => (
-          <div key={period.key} className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-brand-text">{period.label}</span>
-            <div className="flex flex-wrap gap-2">
-              {slots.map(s => {
-                const active =
-                  selectedSlot?.period === period.key &&
-                  selectedSlot.start === s.start &&
-                  selectedSlot.end === s.end
-                return (
-                  <button
-                    key={`${s.start}-${s.end}`}
-                    type="button"
-                    onClick={() =>
-                      setSelectedSlot({ period: period.key, start: s.start, end: s.end })
-                    }
-                    className={`px-4 py-2 rounded-lg text-sm font-bold border transition ${
-                      active
-                        ? 'bg-brand-gold text-white border-brand-gold'
-                        : 'border-brand-border text-brand-text hover:border-brand-gold'
-                    }`}
-                  >
-                    {formatTime(s.start)}–{formatTime(s.end)}
-                  </button>
-                )
-              })}
+        {visitSlots.map(({ period, slots }) => {
+          const periodAlreadyBooked = alreadyBookedPeriods.has(period.key)
+          const periodFull = fullPeriods.has(period.key)
+          const periodUnavailable = periodAlreadyBooked || periodFull
+          // Already-booked takes priority — it's the more specific, personal
+          // reason when both happen to apply at once.
+          const reasonText = periodAlreadyBooked
+            ? 'You already have a booking for this time.'
+            : periodFull
+            ? 'This time is fully booked.'
+            : undefined
+          return (
+            <div key={period.key} className="flex flex-col gap-2">
+              <span className="text-xs font-bold text-brand-text">{period.label}</span>
+              {reasonText && <p className="text-xs text-brand-muted">{reasonText}</p>}
+              <div className="flex flex-wrap gap-2">
+                {slots.map(s => {
+                  const active =
+                    selectedSlot?.period === period.key &&
+                    selectedSlot.start === s.start &&
+                    selectedSlot.end === s.end
+                  return (
+                    <button
+                      key={`${s.start}-${s.end}`}
+                      type="button"
+                      disabled={periodUnavailable}
+                      title={reasonText}
+                      onClick={() => selectSlot({ period: period.key, start: s.start, end: s.end })}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold border transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                        active
+                          ? 'bg-brand-gold text-white border-brand-gold'
+                          : 'border-brand-border text-brand-text hover:border-brand-gold'
+                      }`}
+                    >
+                      {formatTime(s.start)}–{formatTime(s.end)}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Party size */}

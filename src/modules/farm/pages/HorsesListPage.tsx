@@ -20,6 +20,10 @@ function HorsesListPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  // A draft/pending/rejected horse isn't meant to be public yet — filter it
+  // out client-side too, rather than trusting the backend response alone.
+  const approvedHorses = horses.filter(horse => horse.status === 'approved')
+
   return (
     <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text">
       <div className="max-w-7xl mx-auto px-8 py-10">
@@ -46,13 +50,13 @@ function HorsesListPage() {
         {error && <p className="text-red-600 text-sm">{error}</p>}
 
         {/* Show message if there are no horses */}
-        {!loading && !error && horses.length === 0 && (
+        {!loading && !error && approvedHorses.length === 0 && (
           <p className="text-brand-muted text-sm">No horses listed yet.</p>
         )}
 
-        {/* Show grid of horses if there are any */}
+        {/* Show grid of approved horses if there are any */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {horses.map(horse => (
+          {approvedHorses.map(horse => (
             <OverlayCard
               key={horse.id}
               to={`/horses/${horse.id}`}

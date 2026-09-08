@@ -18,6 +18,7 @@ import { LenisContext } from './context/LenisContext'
 import {
   useAuth,
   ProtectedRoute,
+  GuestRoute,
   LoginPage,
   RegisterPage,
   RegisterVisitorPage,
@@ -36,7 +37,6 @@ import {
   FarmerDashboardPage,
   FarmDetailPage,
   FarmsListPage,
-  AddHorsePage,
   HorseEditPage,
   HorseProfilePage,
   HorsesListPage,
@@ -266,10 +266,10 @@ function App() {
           <Route path="/horses" element={<HorsesListPage />} />
           <Route path="/farms" element={<FarmsListPage />} />
           <Route path="/farms/:id" element={<FarmDetailPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/register/visitor" element={<RegisterVisitorPage />} />
-          <Route path="/register/farmer" element={<RegisterFarmerPage />} />
+          <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+          <Route path="/register/visitor" element={<GuestRoute><RegisterVisitorPage /></GuestRoute>} />
+          <Route path="/register/farmer" element={<GuestRoute><RegisterFarmerPage /></GuestRoute>} />
           <Route path="/check-email" element={<CheckEmailPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -286,16 +286,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <FarmerDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/farmer/horses/new"
-            element={
-              <ProtectedRoute>
-                <RequireActiveFarm>
-                  <AddHorsePage />
-                </RequireActiveFarm>
               </ProtectedRoute>
             }
           />

@@ -24,8 +24,14 @@ const STEP_MIN = 15 // dropdown granularity
 // can reflect which periods are open (e.g. to disable closed periods elsewhere).
 function FarmAvailabilityEditor({
   onChange,
+  locked = false,
+  onEditingChange,
 }: {
   onChange?: (schedule: FarmAvailability) => void
+  // Disables the Edit button while some other section (e.g. the horse
+  // periods grid) is mid-edit, so only one thing can be edited at a time.
+  locked?: boolean
+  onEditingChange?: (editing: boolean) => void
 }) {
   // `committed` is what's saved on the server; `draft` is the working copy while
   // editing. Both null until the initial load resolves.
@@ -118,6 +124,7 @@ function FarmAvailabilityEditor({
     setSaveError(null)
     setLeadDaysText(null)
     setIsEditing(true)
+    onEditingChange?.(true)
   }
 
   function handleCancel() {
@@ -125,6 +132,7 @@ function FarmAvailabilityEditor({
     setSaveError(null)
     setLeadDaysText(null)
     setIsEditing(false)
+    onEditingChange?.(false)
   }
 
   async function handleSave() {
@@ -137,6 +145,7 @@ function FarmAvailabilityEditor({
       setDraft(saved)
       setLeadDaysText(null)
       setIsEditing(false)
+      onEditingChange?.(false)
       onChange?.(saved)
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save schedule.')
@@ -174,7 +183,9 @@ function FarmAvailabilityEditor({
         {!isEditing && (
           <button
             onClick={handleEdit}
-            className="bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm"
+            disabled={locked}
+            title={locked ? 'Finish editing the other section first' : undefined}
+            className="bg-brand-gold text-brand-bg font-bold px-4 py-2 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Edit schedule
           </button>

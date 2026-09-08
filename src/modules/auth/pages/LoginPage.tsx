@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { login, getMe, ApiError } from '../api'
 import { useAuth } from '../context/useAuth'
 import { useRetryCountdown, formatCountdown } from '../../../hooks/useRetryCountdown'
@@ -31,6 +32,7 @@ function LoginPage() {
   // State for email, password, and error message
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
   // Set when the backend rejects login with 403 (email not verified yet), so
@@ -105,13 +107,23 @@ function LoginPage() {
           {/* Password input field */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-bold text-brand-muted">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="bg-brand-bg border border-brand-border rounded-lg px-4 py-2 text-brand-text placeholder:text-brand-muted focus:outline-none focus:border-brand-gold transition"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="bg-brand-bg border border-brand-border rounded-lg w-full px-4 py-2 pr-10 text-brand-text placeholder:text-brand-muted focus:outline-none focus:border-brand-gold transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-text"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {/* Display error message if login fails */}
           {error && (
@@ -136,8 +148,16 @@ function LoginPage() {
           >
             {retry.secondsLeft > 0 ? `Try again in ${formatCountdown(retry.secondsLeft)}` : 'Login'}
           </button>
-          
+
         </form>
+
+        {/* Link to registration page */}
+        <p className="text-center text-brand-muted text-sm mt-4">
+          Don&rsquo;t have an account?{' '}
+          <Link to="/register" className="text-brand-gold hover:underline">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   )
