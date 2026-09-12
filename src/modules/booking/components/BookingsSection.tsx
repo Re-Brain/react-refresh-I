@@ -29,7 +29,7 @@ function BookingsSection() {
 
   if (error)
     return (
-      <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
         <div className="flex items-center gap-3">
           <AlertTriangle size={18} className="shrink-0" />
           <p>{error}</p>
@@ -59,7 +59,7 @@ function BookingsSection() {
 
   return (
     <section className="flex flex-col gap-5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-bold text-brand-text">Bookings</h2>
         <button
           onClick={refresh}
