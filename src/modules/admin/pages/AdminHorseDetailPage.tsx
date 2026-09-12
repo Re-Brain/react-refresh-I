@@ -67,7 +67,7 @@ function AdminHorseDetailPage() {
   const activeImage = horse.images[safeImageIndex]
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-brand-bg text-brand-text px-4 xs:px-6 sm:px-8 py-10 max-w-4xl mx-auto">
       <Link
         to="/admin"
         className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition"
@@ -78,7 +78,7 @@ function AdminHorseDetailPage() {
       <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-brand-gold">{horse.name}</h1>
+            <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-brand-gold">{horse.name}</h1>
             <span
               className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border shrink-0 ${HORSE_STATUS_STYLES[horse.status]}`}
             >
@@ -88,12 +88,12 @@ function AdminHorseDetailPage() {
           <p className="text-brand-muted text-sm mt-1">{horse.farm_name ?? `Farm #${horse.farm_id}`}</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => act('approved')}
             disabled={busy || missing.length > 0}
             title={missing.length > 0 ? `Missing: ${missing.map(m => DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
-            className="flex items-center gap-2 bg-green-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-green-600 text-white font-bold px-4 xs:px-5 py-2.5 rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check size={16} /> Approve
           </button>
@@ -103,7 +103,7 @@ function AdminHorseDetailPage() {
               setReason('')
             }}
             disabled={busy}
-            className="flex items-center gap-2 bg-red-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-red-600 text-white font-bold px-4 xs:px-5 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X size={16} /> Reject
           </button>
@@ -119,17 +119,17 @@ function AdminHorseDetailPage() {
 
       <div className="flex flex-col gap-6">
         {/* Images */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">
             Images <span className="normal-case font-normal">({horse.images.length}/3)</span>
           </p>
           {horse.images.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 h-72 rounded-xl border border-dashed border-brand-border text-brand-muted text-sm">
+            <div className="flex flex-col items-center justify-center gap-2 h-48 xs:h-56 sm:h-72 rounded-xl border border-dashed border-brand-border text-brand-muted text-sm">
               <ImageOff size={24} />
               No images uploaded
             </div>
           ) : (
-            <div className="relative rounded-xl overflow-hidden h-96 bg-brand-bg shadow-inner">
+            <div className="relative rounded-xl overflow-hidden h-56 xs:h-72 sm:h-96 bg-brand-bg shadow-inner">
               <img
                 key={activeImage.id}
                 src={activeImage.image_url}
@@ -176,9 +176,9 @@ function AdminHorseDetailPage() {
         </div>
 
         {/* Basic Info + Story */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 sm:grid-cols-3">
             {([['Color', horse.color], ['Gender', horse.gender], ['Date of Birth', horse.date_of_birth]] as const).map(([label, value]) => (
               <div key={label} className="flex flex-col gap-1">
                 <span className="text-xs text-brand-muted">{label}</span>
@@ -196,50 +196,56 @@ function AdminHorseDetailPage() {
         </div>
 
         {/* Pedigree */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">
             Pedigree <span className="normal-case font-normal">({filledPedigree}/{PEDIGREE_FIELDS.length} filled)</span>
           </p>
-          <table className="w-full text-sm border-collapse">
-            <tbody>
-              <tr>
-                <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle">
-                  Sire
-                </td>
-                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
-                  {horse.sire || '—'}
-                </td>
-                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_sire || '—'}</td>
-              </tr>
-              <tr>
-                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_dam || '—'}</td>
-              </tr>
-              <tr>
-                <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle">
-                  Dam
-                </td>
-                <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
-                  {horse.dam || '—'}
-                </td>
-                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_sire || '—'}</td>
-              </tr>
-              <tr>
-                <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_dam || '—'}</td>
-              </tr>
-            </tbody>
-          </table>
+          {/* This table had no scroll wrapper at all before — at narrow
+              widths it would just overflow the card directly. The card's
+              own padding already buffers it from the rounded corner, so no
+              extra chrome split is needed, just the scroll + min-w + fade. */}
+          <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] sm:mask-none">
+            <table className="w-full min-w-100 text-sm border-collapse">
+              <tbody>
+                <tr>
+                  <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle">
+                    Sire
+                  </td>
+                  <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                    {horse.sire || '—'}
+                  </td>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_sire || '—'}</td>
+                </tr>
+                <tr>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.sires_dam || '—'}</td>
+                </tr>
+                <tr>
+                  <td rowSpan={2} className="border border-brand-border bg-rose-500/10 text-center font-bold text-rose-700 px-3 w-16 align-middle">
+                    Dam
+                  </td>
+                  <td rowSpan={2} className="border border-brand-border px-4 py-3 font-bold text-brand-text align-middle w-1/3">
+                    {horse.dam || '—'}
+                  </td>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_sire || '—'}</td>
+                </tr>
+                <tr>
+                  <td className="border border-brand-border px-4 py-2 text-brand-muted">{horse.dams_dam || '—'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Race Records */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">
             Race Records <span className="normal-case font-normal">({horse.race_records.length})</span>
           </p>
           {horse.race_records.length === 0 ? (
             <p className="text-sm text-brand-muted">No race records added.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse uppercase">
+            <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+              <table className="w-full min-w-200 text-sm border-collapse uppercase">
                 <thead>
                   <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
                     <th className="text-left px-3 py-2 font-bold">Date</th>
@@ -272,7 +278,7 @@ function AdminHorseDetailPage() {
         </div>
 
         {/* Proof Documents */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Proof Documents</p>
           <div className="flex flex-col gap-3">
             {DOCUMENT_TYPES.map(({ key, label }) => {
@@ -280,7 +286,7 @@ function AdminHorseDetailPage() {
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
+                  className="flex flex-col xs:flex-row xs:items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <FileText size={16} className="text-brand-muted shrink-0" />
@@ -320,7 +326,7 @@ function AdminHorseDetailPage() {
           onClick={() => setShowRejectPrompt(false)}
         >
           <div
-            className="bg-brand-surface border border-brand-border rounded-xl p-6 w-full max-w-md flex flex-col gap-4"
+            className="bg-brand-surface border border-brand-border rounded-xl p-4 xs:p-6 w-full max-w-md flex flex-col gap-4"
             onClick={e => e.stopPropagation()}
           >
             <div>
