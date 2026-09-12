@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Menu } from 'lucide-react'
 import { useFarm } from '../context/useFarm'
 import { createDraftHorse } from '../api/horse'
 import { useFarmInfoForm } from '../hooks/useFarmInfoForm'
@@ -22,7 +22,12 @@ function FarmerDashboardPage() {
   const [activeSection, setActiveSection] = useState<Section>(
     (sessionStorage.getItem('dashboardSection') as Section) ?? 'farm-info'
   )
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  // Desktop keeps its long-standing "starts expanded" default. On mobile the
+  // sidebar is a full-screen overlay drawer (see DashboardSidebar), so
+  // starting it open would cover the page the instant you land here — this
+  // is a plain client-rendered SPA with no SSR, so `window` is always
+  // available for this one-time check.
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)
 
   // Farm + horses data (fetched once, shared across all farmer routes — see
   // FarmProvider), the farm-info form, and the settings-tab logic.
@@ -38,6 +43,11 @@ function FarmerDashboardPage() {
     if (gatedSections.includes(key) && !farmActive) return
     sessionStorage.setItem('dashboardSection', key)
     setActiveSection(key)
+    // On mobile the sidebar is an overlay drawer — picking a section should
+    // close it same as tapping the backdrop would, rather than leaving it
+    // covering the content it just navigated to. Desktop's expanded/collapsed
+    // state is untouched by navigation, same as before.
+    if (window.innerWidth < 1024) setSidebarOpen(false)
   }
 
   // Creates the horse immediately (as a draft, mirroring how a Farm already
@@ -71,7 +81,20 @@ function FarmerDashboardPage() {
         farmActive={farmActive}
       />
 
-      <main className="flex-1 p-8">
+      {/* min-w-0 overrides a flex item's default min-width:auto, which would
+          otherwise let a wide descendant (e.g. a table's min-w) stretch this
+          whole flex item — and the page along with it — instead of staying
+          contained so that content's own overflow-x-auto can do its job. */}
+      <main className="flex-1 min-w-0 p-4 xs:p-6 sm:p-8">
+        {/* Only way to open the drawer on mobile — its own toggle button
+            lives inside the sidebar, which starts off-screen there. */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden flex items-center gap-2 text-brand-muted hover:text-brand-gold font-bold text-sm mb-4 transition"
+        >
+          <Menu size={20} /> Menu
+        </button>
+
         {loading ? (
           <p className="text-brand-muted text-sm">Loading…</p>
         ) : loadError ? (

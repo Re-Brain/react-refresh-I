@@ -68,8 +68,8 @@ function StripeReturnPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-bg flex items-center justify-center p-8">
-      <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-xl p-10 flex flex-col items-center text-center gap-4">
+    <div className="min-h-screen bg-brand-bg flex items-center justify-center p-4 xs:p-6 sm:p-8">
+      <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-xl p-6 xs:p-8 sm:p-10 flex flex-col items-center text-center gap-4">
         {phase === 'checking' && (
           <>
             <Loader2 size={48} className="text-brand-gold animate-spin" strokeWidth={1.5} />

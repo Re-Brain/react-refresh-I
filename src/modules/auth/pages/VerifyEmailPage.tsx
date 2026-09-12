@@ -33,18 +33,18 @@ function VerifyEmailPage() {
   }, [token])
 
   return (
-    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md text-center">
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center px-4 xs:px-6 sm:px-8">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 xs:p-8 w-full max-w-md text-center">
         {status === 'verifying' && (
           <>
-            <h1 className="text-3xl font-bold text-brand-gold mb-4">Verifying...</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Verifying...</h1>
             <p className="text-brand-muted">Hang on while we verify your email address.</p>
           </>
         )}
 
         {status === 'success' && (
           <>
-            <h1 className="text-3xl font-bold text-brand-gold mb-4">Email verified</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Email verified</h1>
             <p className="text-brand-muted mb-6">Your email has been verified. You can now log in.</p>
             <Link
               to="/login"
@@ -57,7 +57,7 @@ function VerifyEmailPage() {
 
         {status === 'error' && (
           <>
-            <h1 className="text-3xl font-bold text-brand-gold mb-4">Verification failed</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Verification failed</h1>
             <p className="text-red-600 text-sm mb-6">{error}</p>
             <p className="text-brand-muted text-sm">
               Please contact support if you need a new verification link.

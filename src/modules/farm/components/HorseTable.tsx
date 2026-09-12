@@ -38,8 +38,13 @@ function HorseTable({ horses, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="overflow-x-auto rounded-lg border border-brand-border">
-        <table className="w-full text-sm">
+      <div className="rounded-lg border border-brand-border overflow-hidden">
+        {/* Scroll lives on its own inner element, separate from the rounded
+            border above (see HorseRaceRecords for why), with a min-w so the
+            table actually overflows and scrolls instead of squeezing all 7
+            columns down to illegible widths on a narrow screen. */}
+        <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+        <table className="w-full min-w-160 text-sm">
           <thead>
             <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
               <th className="text-left px-4 py-3 font-bold">ID</th>
@@ -92,6 +97,7 @@ function HorseTable({ horses, onChange }: Props) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       {error && <p className="text-red-600 text-sm">{error}</p>}
 

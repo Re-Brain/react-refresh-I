@@ -23,9 +23,9 @@ function SettingsSection({ settings }: SettingsSectionProps) {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="text-2xl font-bold text-brand-gold mb-6">Settings</h2>
+      <h2 className="text-xl xs:text-2xl font-bold text-brand-gold mb-6">Settings</h2>
 
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4 mb-6">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4 mb-6">
         <h3 className="text-lg font-bold text-brand-text flex items-center gap-2">
           <Lock size={18} /> Change Password
         </h3>
@@ -51,7 +51,7 @@ function SettingsSection({ settings }: SettingsSectionProps) {
         />
       )}
 
-      <div className="bg-brand-surface border border-red-500/40 rounded-lg p-6 flex flex-col gap-4">
+      <div className="bg-brand-surface border border-red-500/40 rounded-lg p-4 xs:p-6 flex flex-col gap-4">
         <h3 className="text-lg font-bold text-red-600 flex items-center gap-2">
           <AlertTriangle size={18} /> Delete Account
         </h3>

@@ -199,7 +199,7 @@ function App() {
   return (
     <LenisContext.Provider value={lenisRef}>
       <nav
-        className={`sticky top-0 z-50 flex items-center justify-between gap-6 px-8 py-3 text-sm font-bold transition-colors duration-300 ${
+        className={`sticky top-0 z-50 flex items-center justify-between gap-6 px-4 xs:px-6 sm:px-8 py-3 text-sm font-bold transition-colors duration-300 ${
           menuOpen
             ? 'bg-transparent text-white border-b border-transparent'
             : 'bg-brand-surface text-brand-text border-b border-brand-border'
@@ -209,9 +209,9 @@ function App() {
           <Link
             to="/"
             onClick={() => setMenuOpen(false)}
-            className="flex items-center gap-2 text-2xl font-extrabold tracking-tight hover:text-brand-gold transition"
+            className="flex items-center gap-2 text-lg xs:text-2xl font-extrabold tracking-tight hover:text-brand-gold transition"
           >
-            <HorseshoeIcon className="h-10 w-10 shrink-0" />
+            <HorseshoeIcon className="h-8 w-8 xs:h-10 xs:w-10 shrink-0" />
             <span className="leading-none">Furlong</span>
           </Link>
         </div>
@@ -235,7 +235,7 @@ function App() {
           menuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       >
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-16 gap-y-4 px-8 pt-28 pb-16 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-16 gap-y-4 px-4 xs:px-6 sm:px-8 pt-28 pb-16 md:grid-cols-2">
           <MenuItem to="/">Home</MenuItem>
           <MenuItem to="/horses">Champions</MenuItem>
           <MenuItem to="/farms">Farms</MenuItem>

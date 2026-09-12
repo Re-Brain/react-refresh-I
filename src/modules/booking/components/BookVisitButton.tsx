@@ -43,7 +43,7 @@ function BookVisitButton({ bookable, onBook, variant = 'onLight', restrictedForA
     <button
       type="button"
       onClick={onBook}
-      className={`text-sm font-bold uppercase tracking-[0.2em] px-12 py-3.5 rounded-full shadow-md hover:scale-[1.03] transition ${BUTTON_STYLES[variant]}`}
+      className={`text-sm font-bold uppercase tracking-[0.2em] px-8 xs:px-10 sm:px-12 py-3.5 rounded-full shadow-md hover:scale-[1.03] transition ${BUTTON_STYLES[variant]}`}
     >
       Book a Visit
     </button>

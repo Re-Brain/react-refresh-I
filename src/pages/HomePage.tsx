@@ -56,8 +56,8 @@ function HomePage() {
     <div className="bg-brand-bg text-brand-text">
       
       {/* Hero Section For First Impression which fills in full screen*/}
-      <section className="relative min-h-[calc(100vh-3.25rem)] flex items-center justify-center overflow-hidden">
-        
+      <section className="relative min-h-[max(420px,calc(100vh-3.25rem))] flex items-center justify-center overflow-hidden">
+
         {/* Background image of hero */}
         <img
           src="https://images.unsplash.com/photo-1599635406076-0f40532a59fc?fm=jpg&q=80&w=1920&auto=format&fit=crop"
@@ -67,25 +67,25 @@ function HomePage() {
 
         {/* Sologan Text of the Hero*/}
         <div className="absolute inset-0 bg-linear-to-t from-[#0f2a1f]/85 via-[#1f4d3a]/45 to-[#1f4d3a]/25" />
-        <div className="relative z-10 px-6 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg max-w-4xl mx-auto">
+        <div className="relative z-10 px-4 xs:px-6 text-center">
+          <h1 className="text-2xl xs:text-4xl sm:text-5xl md:text-6xl 2xl:text-7xl font-bold text-white drop-shadow-lg max-w-4xl 2xl:max-w-5xl mx-auto">
             Life Beyond the Track
           </h1>
-          <p className="mt-4 text-lg sm:text-xl text-white/90 drop-shadow">
+          <p className="mt-4 text-sm xs:text-lg sm:text-xl text-white/90 drop-shadow">
             Discover the champions who once ruled the track — book a visit, or support their care from afar.
           </p>
         </div>
       </section>
 
       {/* Mission Blurb - short "why this exists" statement before anything else */}
-      <section className="max-w-4xl mx-auto px-8 py-20 sm:py-24 text-center">
+      <section className="max-w-4xl mx-auto px-4 xs:px-6 sm:px-8 py-20 sm:py-24 text-center">
         <h2
           style={{ fontFamily: 'var(--font-story-title)' }}
-          className="text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold mb-6"
+          className="text-2xl xs:text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold mb-6"
         >
           Why Furlong
         </h2>
-        <p className="text-brand-muted text-lg sm:text-xl leading-relaxed">
+        <p className="text-brand-muted text-base xs:text-lg sm:text-xl leading-relaxed">
           Every year, thousands of racehorses retire from the track into the care of farms
           across the country — whether they're out to pasture or still earning their keep at
           stud. Furlong is where you find them — browse the farms already caring for these
@@ -96,10 +96,10 @@ function HomePage() {
 
       {/* How It Works - 3-step explainer for first-time visitors */}
       <section className="bg-brand-surface border-y border-brand-border">
-        <div className="max-w-6xl mx-auto px-8 py-20 sm:py-24">
+        <div className="max-w-6xl mx-auto px-4 xs:px-6 sm:px-8 py-20 sm:py-24">
           <h2
             style={{ fontFamily: 'var(--font-story-title)' }}
-            className="text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold text-center mb-16"
+            className="text-2xl xs:text-3xl sm:text-4xl font-semibold tracking-wide text-brand-gold text-center mb-16"
           >
             How It Works
           </h2>
@@ -117,13 +117,13 @@ function HomePage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-8 py-16 sm:py-20">
+      <div className="max-w-7xl mx-auto px-4 xs:px-6 sm:px-8 py-16 sm:py-20">
 
         {/* Farms Section Zone */}
 
         {/* Farms Section Header - Header text & Button link to the list of all farms  */}
-        <div className="flex items-baseline justify-between mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold">Farms Open to Visitors</h1>
+        <div className="flex flex-col items-start gap-3 xs:flex-row xs:items-baseline xs:justify-between mb-8">
+          <h1 className="text-xl xs:text-2xl sm:text-3xl 2xl:text-4xl font-extrabold text-brand-gold">Farms Open to Visitors</h1>
           <Link to="/farms" className="text-xs sm:text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-4 py-1.5 hover:bg-brand-gold hover:text-brand-bg transition shrink-0">Browse all farms</Link>
         </div>
 
@@ -144,7 +144,7 @@ function HomePage() {
         {/* Maximum at 12 farms */}
         <Carousel>
           {farms.slice(0, 12).map(farm => (
-            <div key={farm.id} className="flex-none w-48 sm:w-56">
+            <div key={farm.id} className="flex-none w-40 xs:w-48 sm:w-56">
               <OverlayCard
                 to={`/farms/${farm.id}`}
                 imageUrl={farm.images?.[0]?.image_url}
@@ -157,9 +157,9 @@ function HomePage() {
         {/* Horses Section Content */}
 
         {/* Horses Section Header - Header text & Button link to the list of all horses  */}
-        <div className="flex items-baseline justify-between mb-8 mt-16">
+        <div className="flex flex-col-reverse items-start gap-3 xs:flex-row xs:items-baseline xs:justify-between mb-8 mt-16">
           <Link to="/horses" className="text-xs sm:text-sm font-bold text-brand-gold border border-brand-gold rounded-full px-4 py-1.5 hover:bg-brand-gold hover:text-brand-bg transition shrink-0">Meet every champion</Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold">Champions in Retirement</h1>
+          <h1 className="text-xl xs:text-2xl sm:text-3xl 2xl:text-4xl font-extrabold text-brand-gold">Champions in Retirement</h1>
         </div>
 
         {/* Show when the horse content is loading */}
@@ -177,7 +177,7 @@ function HomePage() {
         {/* Maximum at 12 horses */}
         <Carousel direction="right">
           {approvedHorses.slice(0, 12).map(horse => (
-            <div key={horse.id} className="flex-none w-48 sm:w-56">
+            <div key={horse.id} className="flex-none w-40 xs:w-48 sm:w-56">
               <OverlayCard
                 to={`/horses/${horse.id}`}
                 imageUrl={horse.images[0]?.image_url}
@@ -191,7 +191,7 @@ function HomePage() {
             otherwise only appear once you're already on a horse's or farm's
             page */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-16">
-          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
+          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-6 xs:p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
             <div
               aria-hidden
               className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
@@ -201,7 +201,7 @@ function HomePage() {
             </span>
             <h2
               style={{ fontFamily: 'var(--font-story-title)' }}
-              className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
+              className="text-xl xs:text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
             >
               Meet a Retired Champion
             </h2>
@@ -217,7 +217,7 @@ function HomePage() {
             </Link>
           </div>
 
-          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
+          <div className="relative overflow-hidden bg-brand-surface border border-brand-border rounded-2xl shadow-sm p-6 xs:p-8 lg:p-12 flex flex-col items-center gap-4 text-center">
             <div
               aria-hidden
               className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-brand-gold/30 via-brand-gold to-brand-gold/30"
@@ -227,7 +227,7 @@ function HomePage() {
             </span>
             <h2
               style={{ fontFamily: 'var(--font-story-title)' }}
-              className="text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
+              className="text-xl xs:text-2xl sm:text-3xl font-semibold tracking-wide text-brand-gold"
             >
               Support a Retired Champion
             </h2>

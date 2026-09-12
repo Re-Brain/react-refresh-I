@@ -59,8 +59,8 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-2xl font-bold text-brand-gold">Farm Info</h2>
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <h2 className="text-xl xs:text-2xl font-bold text-brand-gold">Farm Info</h2>
         {farm && (
           <span
             className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border ${FARM_STATUS_STYLES[farm.status]}`}
@@ -102,7 +102,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
       <div className="flex flex-col gap-6">
         {farm && (farm.status === 'draft' || farm.status === 'rejected') && !canSubmit && (
           <div className="bg-brand-surface border border-brand-border rounded-lg p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-bold text-brand-muted uppercase tracking-wide">Required before you can submit</p>
               <span className="text-xs font-bold text-brand-muted">
                 {requirements.filter(r => r.done).length}/{requirements.length} complete
@@ -129,7 +129,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
             </ul>
           </div>
         )}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-6">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-6">
           <p className="text-xs font-bold text-brand-muted uppercase">
             Farm Details <span className="text-red-600">*</span>
           </p>
@@ -211,7 +211,7 @@ function FarmInfoSection({ farm, setFarm, info, documents, submit }: FarmInfoSec
             <button
               onClick={submit.handleSubmit}
               disabled={submit.submitting || !canSubmit}
-              className="bg-brand-gold text-brand-bg font-bold px-12 py-4 rounded-lg hover:bg-brand-gold-light transition text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-brand-gold text-brand-bg font-bold px-8 xs:px-10 sm:px-12 py-4 rounded-lg hover:bg-brand-gold-light transition text-base xs:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submit.submitting
                 ? 'Submitting...'

@@ -86,7 +86,7 @@ function HorseEditPage() {
   const missingDocs = missingDocumentTypes(horse.documents)
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-brand-bg text-brand-text px-4 xs:px-6 sm:px-8 py-10 max-w-4xl mx-auto">
 
       {/* Back button to navigate to the previous page in the browser history. */}
       <button
@@ -97,8 +97,8 @@ function HorseEditPage() {
       </button>
 
       {/* Header section displaying the horse's name and a link to preview the public page for the horse. */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-brand-gold">{horse.name}</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-xl xs:text-2xl font-bold text-brand-gold">{horse.name}</h1>
         {horse.status === 'approved' ? (
           <Link
             to={`/horses/${horse.id}`}
@@ -186,7 +186,7 @@ function HorseEditPage() {
 
       {step === 3 && (
         <div className="flex flex-col gap-6">
-          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-5">
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-5">
             <div>
               <p className="text-xs font-bold text-brand-muted uppercase mb-2">Basic Info</p>
               <p className="text-lg font-bold text-brand-text">{horse.name}</p>
@@ -264,7 +264,7 @@ function HorseEditPage() {
           </div>
 
           {(horse.status === 'draft' || horse.status === 'rejected') && (
-            <div className="flex flex-col gap-3 bg-brand-surface border border-brand-border rounded-lg p-6">
+            <div className="flex flex-col gap-3 bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6">
               {submit.submitError && <p className="text-red-600 text-sm font-medium">{submit.submitError}</p>}
               <button
                 onClick={submit.handleSubmit}
@@ -287,7 +287,7 @@ function HorseEditPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-brand-border">
+      <div className="flex flex-wrap items-center justify-end gap-3 pt-6 mt-6 border-t border-brand-border">
         {step > 1 && (
           <button
             type="button"

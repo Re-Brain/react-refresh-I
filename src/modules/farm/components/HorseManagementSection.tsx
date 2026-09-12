@@ -26,8 +26,8 @@ function HorseManagementSection({
 }: HorseManagementSectionProps) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-brand-gold">Horse Management</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <h2 className="text-xl xs:text-2xl font-bold text-brand-gold">Horse Management</h2>
         <button
           onClick={onAddHorse}
           disabled={addingHorse}
@@ -38,7 +38,7 @@ function HorseManagementSection({
       </div>
       {addHorseError && <p className="text-red-600 text-sm mb-4">{addHorseError}</p>}
       {horsesError ? (
-        <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
           <div className="flex items-center gap-3">
             <AlertTriangle size={18} className="shrink-0" />
             <p>{horsesError}</p>

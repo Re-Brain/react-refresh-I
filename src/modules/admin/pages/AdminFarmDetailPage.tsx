@@ -59,7 +59,7 @@ function AdminFarmDetailPage() {
   const activeImage = farm.images[safeImageIndex]
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text px-8 py-10 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-brand-bg text-brand-text px-4 xs:px-6 sm:px-8 py-10 max-w-4xl mx-auto">
       <Link
         to="/admin"
         className="flex items-center gap-2 text-brand-muted hover:text-brand-gold text-sm font-bold mb-8 transition"
@@ -70,7 +70,7 @@ function AdminFarmDetailPage() {
       <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-brand-gold">{farm.name}</h1>
+            <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-brand-gold">{farm.name}</h1>
             <span
               className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full border shrink-0 ${FARM_STATUS_STYLES[farm.status]}`}
             >
@@ -80,12 +80,12 @@ function AdminFarmDetailPage() {
           <p className="text-brand-muted text-sm mt-1">{farm.location ?? 'No location set'}</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => act('active')}
             disabled={busy || missing.length > 0}
             title={missing.length > 0 ? `Missing: ${missing.map(m => FARM_DOCUMENT_TYPES.find(t => t.key === m)?.label).join(', ')}` : undefined}
-            className="flex items-center gap-2 bg-green-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-green-600 text-white font-bold px-4 xs:px-5 py-2.5 rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check size={16} /> Approve
           </button>
@@ -95,7 +95,7 @@ function AdminFarmDetailPage() {
               setReason('')
             }}
             disabled={busy}
-            className="flex items-center gap-2 bg-red-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-red-600 text-white font-bold px-4 xs:px-5 py-2.5 rounded-lg hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X size={16} /> Reject
           </button>
@@ -111,17 +111,17 @@ function AdminFarmDetailPage() {
 
       <div className="flex flex-col gap-6">
         {/* Images */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">
             Photos <span className="normal-case font-normal">({farm.images.length}/3)</span>
           </p>
           {farm.images.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 h-72 rounded-xl border border-dashed border-brand-border text-brand-muted text-sm">
+            <div className="flex flex-col items-center justify-center gap-2 h-48 xs:h-56 sm:h-72 rounded-xl border border-dashed border-brand-border text-brand-muted text-sm">
               <ImageOff size={24} />
               No images uploaded
             </div>
           ) : (
-            <div className="relative rounded-xl overflow-hidden h-96 bg-brand-bg shadow-inner">
+            <div className="relative rounded-xl overflow-hidden h-56 xs:h-72 sm:h-96 bg-brand-bg shadow-inner">
               <img
                 key={activeImage.id}
                 src={activeImage.image_url}
@@ -168,7 +168,7 @@ function AdminFarmDetailPage() {
         </div>
 
         {/* Basic Info */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
@@ -195,7 +195,7 @@ function AdminFarmDetailPage() {
         </div>
 
         {/* Proof Documents */}
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
           <p className="text-xs font-bold text-brand-muted uppercase">Proof Documents</p>
           <div className="flex flex-col gap-3">
             {FARM_DOCUMENT_TYPES.map(({ key, label }) => {
@@ -203,7 +203,7 @@ function AdminFarmDetailPage() {
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
+                  className="flex flex-col xs:flex-row xs:items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <FileText size={16} className="text-brand-muted shrink-0" />
@@ -243,7 +243,7 @@ function AdminFarmDetailPage() {
           onClick={() => setShowRejectPrompt(false)}
         >
           <div
-            className="bg-brand-surface border border-brand-border rounded-xl p-6 w-full max-w-md flex flex-col gap-4"
+            className="bg-brand-surface border border-brand-border rounded-xl p-4 xs:p-6 w-full max-w-md flex flex-col gap-4"
             onClick={e => e.stopPropagation()}
           >
             <div>

@@ -30,7 +30,7 @@ function AvailabilitySection({ farm, horses, horsesError, onRetryHorses }: Avail
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-brand-gold mb-6">Visit Availability</h2>
+      <h2 className="text-xl xs:text-2xl font-bold text-brand-gold mb-6">Visit Availability</h2>
       <p className="text-brand-muted text-sm mb-6">
         Set your farm&rsquo;s visiting days and time slots once, then choose which
         periods each horse can be met in. These settings drive the public booking page.
@@ -54,7 +54,7 @@ function AvailabilitySection({ farm, horses, horsesError, onRetryHorses }: Avail
           configure for it.
         </p>
         {horsesError ? (
-          <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
             <div className="flex items-center gap-3">
               <AlertTriangle size={18} className="shrink-0" />
               <p>{horsesError}</p>

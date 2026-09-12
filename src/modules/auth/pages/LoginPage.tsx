@@ -77,11 +77,11 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md">
-        
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center px-4 xs:px-6 sm:px-8">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 xs:p-8 w-full max-w-md">
+
         {/* Page title */}
-        <h1 className="text-3xl font-bold text-brand-gold mb-6 text-center">Login</h1>
+        <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-6 text-center">Login</h1>
 
         {notice && (
           <p className="bg-brand-gold/10 border border-brand-gold/40 text-brand-text text-sm rounded-lg px-4 py-3 mb-4">

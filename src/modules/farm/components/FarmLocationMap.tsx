@@ -11,10 +11,10 @@ function FarmLocationMap({ farm }: FarmLocationMapProps) {
 
   return (
     <section className="relative left-1/2 right-1/2 mx-[-50vw] w-screen bg-brand-gold py-16 lg:py-20">
-      <div className="max-w-6xl mx-auto px-8 flex flex-col gap-6">
+      <div className="max-w-6xl mx-auto px-4 xs:px-6 sm:px-8 flex flex-col gap-6">
         <h2
           style={{ fontFamily: 'var(--font-story-title)' }}
-          className="text-3xl lg:text-4xl font-semibold tracking-wide text-white text-right"
+          className="text-2xl xs:text-3xl lg:text-4xl font-semibold tracking-wide text-white text-right"
         >
           Find Us
         </h2>

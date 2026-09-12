@@ -8,9 +8,9 @@ function CheckEmailPage() {
   const email = (location.state as { email?: string } | null)?.email
 
   return (
-    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold text-brand-gold mb-4">Check your email</h1>
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center px-4 xs:px-6 sm:px-8">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 xs:p-8 w-full max-w-md text-center">
+        <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Check your email</h1>
         <p className="text-brand-muted mb-2">
           We sent a verification link to{' '}
           {email ? <span className="text-brand-text font-bold">{email}</span> : 'your email address'}.

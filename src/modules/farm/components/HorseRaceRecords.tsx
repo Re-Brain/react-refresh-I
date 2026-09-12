@@ -43,57 +43,66 @@ function HorseRaceRecords({ records }: HorseRaceRecordsProps) {
     <section className="flex flex-col gap-6 py-4">
       <h2
         style={{ fontFamily: 'var(--font-story-title)' }}
-        className="text-3xl lg:text-4xl font-semibold tracking-wide text-brand-gold text-left"
+        className="text-2xl xs:text-3xl lg:text-4xl font-semibold tracking-wide text-brand-gold text-left"
       >
         Race Record
       </h2>
-      <div className="bg-brand-surface border-4 border-brand-border rounded-xl shadow-xl p-6 overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
-              <th className="text-left px-3 py-2 font-bold">Date</th>
-              <th className="text-left px-3 py-2 font-bold">Course</th>
-              <th className="text-left px-3 py-2 font-bold">Race</th>
-              <th className="text-left px-3 py-2 font-bold">FP</th>
-              <th className="text-left px-3 py-2 font-bold">Track</th>
-              <th className="text-left px-3 py-2 font-bold">Dist.</th>
-              <th className="text-left px-3 py-2 font-bold">Cond.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...records]
-              .sort((a, b) => b.race_date.localeCompare(a.race_date) || b.id - a.id)
-              .map((r: RaceRecord) => (
-                <tr
-                  key={r.id}
-                  className="border-b border-brand-border hover:bg-brand-bg/40 transition"
-                >
-                  <td className="px-3 py-2 text-brand-muted whitespace-nowrap">
-                    {r.race_date}
-                  </td>
-                  <td className="px-3 py-2 text-brand-text">
-                    {r.course}
-                  </td>
-                  <td className="px-3 py-2 text-brand-text whitespace-nowrap">
-                    {r.race_name}
-                    <GradeBadge grade={r.grade} />
-                  </td>
-                  <td className="px-3 py-2 text-center">
-                    <FinishPos pos={r.finish_position} />
-                  </td>
-                  <td className="px-3 py-2 text-brand-muted">
-                    {r.track}
-                  </td>
-                  <td className="px-3 py-2 text-brand-muted">
-                    {r.distance}M
-                  </td>
-                  <td className="px-3 py-2 text-brand-muted">
-                    {r.condition}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+      <div className="bg-brand-surface border-4 border-brand-border rounded-xl shadow-xl p-4 xs:p-6">
+        {/* Scrolling lives on its own inner element, separate from the
+            rounded/bordered card above — scrolling the table used to clip
+            text and badges right against the outer border's curve, which
+            read as broken rather than "scroll for more". The fade mask
+            gives an explicit hint that there's more to scroll to instead of
+            an abrupt cut; not needed once the table fits without scrolling
+            (lg and up). */}
+        <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
+                <th className="text-left px-3 py-2 font-bold">Date</th>
+                <th className="text-left px-3 py-2 font-bold">Course</th>
+                <th className="text-left px-3 py-2 font-bold">Race</th>
+                <th className="text-left px-3 py-2 font-bold">FP</th>
+                <th className="text-left px-3 py-2 font-bold">Track</th>
+                <th className="text-left px-3 py-2 font-bold">Dist.</th>
+                <th className="text-left px-3 py-2 font-bold">Cond.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...records]
+                .sort((a, b) => b.race_date.localeCompare(a.race_date) || b.id - a.id)
+                .map((r: RaceRecord) => (
+                  <tr
+                    key={r.id}
+                    className="border-b border-brand-border hover:bg-brand-bg/40 transition"
+                  >
+                    <td className="px-3 py-2 text-brand-muted whitespace-nowrap">
+                      {r.race_date}
+                    </td>
+                    <td className="px-3 py-2 text-brand-text">
+                      {r.course}
+                    </td>
+                    <td className="px-3 py-2 text-brand-text whitespace-nowrap">
+                      {r.race_name}
+                      <GradeBadge grade={r.grade} />
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <FinishPos pos={r.finish_position} />
+                    </td>
+                    <td className="px-3 py-2 text-brand-muted">
+                      {r.track}
+                    </td>
+                    <td className="px-3 py-2 text-brand-muted">
+                      {r.distance}M
+                    </td>
+                    <td className="px-3 py-2 text-brand-muted">
+                      {r.condition}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   )

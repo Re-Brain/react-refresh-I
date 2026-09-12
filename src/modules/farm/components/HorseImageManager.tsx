@@ -33,8 +33,8 @@ function HorseImageManager({ horse, images, locked }: HorseImageManagerProps) {
   const activeImage = horse.images[safeImageIndex]
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold text-brand-muted uppercase">Images <span className="normal-case font-normal">({imageCount}/3)</span></p>
 
         {imageCount < 3 && (
@@ -64,7 +64,7 @@ function HorseImageManager({ horse, images, locked }: HorseImageManagerProps) {
           No images uploaded
         </div>
       ) : (
-        <div className="group relative rounded-xl overflow-hidden h-96">
+        <div className="group relative rounded-xl overflow-hidden h-56 xs:h-72 sm:h-96">
           <img
             key={activeImage.id}
             src={activeImage.image_url}
@@ -149,7 +149,7 @@ function HorseImageManager({ horse, images, locked }: HorseImageManagerProps) {
 
       {/* Reorder controls */}
       {imageCount > 1 && (
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => handleReorderImage(-1)}

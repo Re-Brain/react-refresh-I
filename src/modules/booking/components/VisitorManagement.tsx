@@ -113,7 +113,7 @@ function VisitorManagement() {
 
   if (error)
     return (
-      <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
         <div className="flex items-center gap-3">
           <AlertTriangle size={18} className="shrink-0" />
           <p>{error}</p>
@@ -175,8 +175,13 @@ function VisitorManagement() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-brand-border">
-          <table className="w-full text-sm">
+        <div className="rounded-lg border border-brand-border overflow-hidden">
+          {/* Scroll lives on its own inner element, separate from the
+              rounded border above (see HorseRaceRecords for why), with a
+              min-w so the table overflows and scrolls instead of squeezing
+              its 6 columns down on a narrow screen. */}
+          <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+          <table className="w-full min-w-175 text-sm">
             <thead>
               <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
                 <th className="text-left px-4 py-3 font-bold">Visitor</th>
@@ -238,6 +243,7 @@ function VisitorManagement() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
@@ -247,7 +253,7 @@ function VisitorManagement() {
           onClick={closePrompt}
         >
           <div
-            className="bg-brand-surface border border-brand-border rounded-xl p-6 w-full max-w-md flex flex-col gap-4"
+            className="bg-brand-surface border border-brand-border rounded-xl p-4 xs:p-6 w-full max-w-md flex flex-col gap-4"
             onClick={e => e.stopPropagation()}
           >
             <div>

@@ -10,8 +10,8 @@ function DonateCancelPage() {
   const donation = readPendingDonation()
 
   return (
-    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center p-8">
-      <div className="w-full max-w-lg bg-brand-surface border border-brand-border rounded-xl p-10 flex flex-col items-center text-center gap-4">
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center p-4 xs:p-6 sm:p-8">
+      <div className="w-full max-w-lg bg-brand-surface border border-brand-border rounded-xl p-6 xs:p-8 sm:p-10 flex flex-col items-center text-center gap-4">
         <XCircle size={56} className="text-brand-muted" strokeWidth={1.5} />
 
         <h1 className="text-2xl font-bold text-brand-text">Donation cancelled</h1>

@@ -30,7 +30,7 @@ function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAcc
 
   return (
     <section className="grid lg:grid-cols-[1.4fr_1fr] min-h-[calc(100vh-3.25rem)]">
-      <div className="relative bg-brand-bg flex items-center justify-center min-h-[45vh] lg:min-h-0 overflow-hidden p-6 lg:p-10">
+      <div className="relative order-2 lg:order-1 bg-brand-bg flex items-center justify-center min-h-[45vh] lg:min-h-0 overflow-hidden p-4 xs:p-6 lg:p-10">
         {/* Blurred, zoomed copy of the photo fills the space instead of black
             bars, so the empty area picks up the image's own colours. */}
         {horse.images.length > 0 && (
@@ -66,7 +66,7 @@ function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAcc
       </div>
 
       {/* Details panel */}
-      <div className="relative flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-10 lg:p-16 overflow-hidden">
+      <div className="relative order-1 lg:order-2 flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-6 xs:p-8 sm:p-10 lg:p-16 overflow-hidden">
         {/* The photo bleeds in, heavily blurred, then fades into the panel. */}
         {horse.images.length > 0 && (
           <>
@@ -84,10 +84,14 @@ function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAcc
           </>
         )}
 
-        {/* Horse name and meta line */}
-        <div className="relative z-1 flex flex-col items-center gap-5">
+        {/* Horse name and meta line. mt-10 clears the fixed Back button
+            pinned at top-20 — now that this panel renders first on mobile
+            (see order-1 above), its heading would otherwise land right
+            under that button. Not needed at lg, where the button sits over
+            the photo panel instead. */}
+        <div className="relative z-1 flex flex-col items-center gap-5 mt-10 lg:mt-0">
           <div className="flex flex-col items-center gap-3">
-            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
               <span className="text-amber-300">{horse.name.charAt(0)}</span>
               {horse.name.slice(1)}
             </h1>
@@ -100,7 +104,7 @@ function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAcc
           </div>
 
           {/* Sire × Dam */}
-          <div className="text-lg lg:text-xl leading-relaxed">
+          <div className="text-base xs:text-lg lg:text-xl leading-relaxed">
             <p className="font-semibold">{horse.sire || '—'}</p>
             <p className="text-white/50 text-base my-1">×</p>
             <p className="font-semibold">{horse.dam || '—'}</p>
@@ -129,7 +133,7 @@ function HorseHero({ horse, bookable, onBook, onSupport, bookingRestrictedForAcc
                   key={img.id}
                   onClick={() => setActiveImageIndex(i)}
                   aria-label={`View image ${i + 1}`}
-                  className={`flex-none w-40 h-28 rounded-md overflow-hidden border-2 transition ${
+                  className={`flex-none w-28 h-20 xs:w-40 xs:h-28 rounded-md overflow-hidden border-2 transition ${
                     i === activeImageIndex
                       ? 'border-white'
                       : 'border-white/30 opacity-70 hover:opacity-100'

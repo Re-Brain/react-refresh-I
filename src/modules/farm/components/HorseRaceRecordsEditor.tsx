@@ -39,8 +39,8 @@ function HorseRaceRecordsEditor({ horse, races, locked, imageBusy }: HorseRaceRe
   )
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold text-brand-muted uppercase">Race Record</p>
         {!isEditingRaces ? (
           <button
@@ -64,8 +64,12 @@ function HorseRaceRecordsEditor({ horse, races, locked, imageBusy }: HorseRaceRe
           </button>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse uppercase">
+      {/* min-w so this 8-9 column table actually overflows and scrolls
+          instead of squeezing every column illegibly at narrow widths; the
+          card's own padding already buffers the scroll from the rounded
+          corner, so just a fade hint is needed, not a full chrome split. */}
+      <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+        <table className="w-full min-w-200 text-sm border-collapse uppercase">
           <thead>
             <tr className="border-b border-brand-border text-brand-muted text-xs uppercase">
               <th className="text-left px-3 py-2 font-bold">Date</th>

@@ -156,7 +156,7 @@ function FarmAvailabilityEditor({
 
   if (loading) {
     return (
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 text-brand-muted text-sm">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 text-brand-muted text-sm">
         Loading schedule…
       </div>
     )
@@ -164,7 +164,7 @@ function FarmAvailabilityEditor({
 
   if (loadError || !committed) {
     return (
-      <div className="bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg p-6 text-sm font-medium">
+      <div className="bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg p-4 xs:p-6 text-sm font-medium">
         {loadError ?? 'Failed to load schedule.'}
       </div>
     )
@@ -174,8 +174,8 @@ function FarmAvailabilityEditor({
   const view = isEditing ? draft ?? committed : committed
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-2">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <CalendarClock size={18} className="text-brand-gold" />
           <h3 className="text-lg font-bold text-brand-text">Farm schedule</h3>
@@ -261,7 +261,7 @@ function FarmAvailabilityEditor({
           <div className="flex flex-wrap gap-2">
             {WEEKDAY_LABELS.map((label, day) => {
               const on = view.weekdays.includes(day)
-              const base = `w-14 rounded-lg py-2 text-center text-sm font-bold border transition ${
+              const base = `w-11 xs:w-14 rounded-lg py-2 text-center text-sm font-bold border transition ${
                 on
                   ? 'bg-brand-gold text-brand-bg border-brand-gold'
                   : 'border-brand-border text-brand-text'
@@ -311,7 +311,7 @@ function FarmAvailabilityEditor({
                     </span>
                   </label>
                 ) : (
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-sm font-bold text-brand-text">
                       {def.label}{' '}
                       <span className="text-brand-muted font-normal">
@@ -326,7 +326,7 @@ function FarmAvailabilityEditor({
 
                 {isEditing && sched.open && (
                   <div className="flex flex-col gap-1 pl-7">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {/* Start: any time in the window except the very last slot */}
                       <select
                         value={sched.start}
@@ -368,7 +368,7 @@ function FarmAvailabilityEditor({
 
       {isEditing && (
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleSave}
               disabled={hasErrors || saving}
