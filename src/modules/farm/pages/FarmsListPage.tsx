@@ -22,7 +22,7 @@ function FarmsListPage() {
 
   return (
     <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text">
-      <div className="max-w-7xl mx-auto px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 xs:px-6 sm:px-8 py-10">
 
         {/* Back button — uses real history-back navigation (not a Link to a
             hardcoded path) so it restores the previous page's scroll
@@ -35,7 +35,7 @@ function FarmsListPage() {
         </button>
 
         {/* Page title */}
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-gold mb-8">
+        <h1 className="text-xl xs:text-2xl sm:text-3xl 2xl:text-4xl font-extrabold text-brand-gold mb-8">
           Farms Open to Visitors
         </h1>
 
@@ -51,7 +51,7 @@ function FarmsListPage() {
         )}
 
         {/* Show grid of farms if there are any */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4 xs:gap-6">
           {farms.map(farm => (
             <OverlayCard
               key={farm.id}
