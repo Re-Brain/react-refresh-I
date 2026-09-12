@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @theme {
+  /* Sits between the unstyled base tier and Tailwind's default `sm`
+     (640px) — lets genuinely narrow devices (flip-phone cover screens,
+     ~240-320px) get a distinct compact treatment, while mainstream phones
+     (Galaxy S8/S20 at 360px and up, most iPhones) still get the roomier
+     tier. 360 rather than the more obvious 400 specifically so 360px-wide
+     Android phones — a very common width — land on the roomy side. */
+  --breakpoint-xs: 360px;
+
   --font-title: 'Fraunces', serif;
   --font-subtitle: 'Inter', sans-serif;
   --font-caption: 'Inter', sans-serif;

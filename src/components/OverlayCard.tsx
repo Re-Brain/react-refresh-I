@@ -40,7 +40,7 @@ function OverlayCard({ to, imageUrl, title }: OverlayCardProps) {
         </div>
       )}
       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-      <h3 className="absolute bottom-0 left-0 right-0 p-3 text-white font-bold text-xl uppercase tracking-wide">
+      <h3 className="absolute bottom-0 left-0 right-0 p-3 text-white font-bold text-base xs:text-xl uppercase tracking-wide">
         {title}
       </h3>
     </Link>
