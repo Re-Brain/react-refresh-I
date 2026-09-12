@@ -31,7 +31,7 @@ function BookingForm({ form, visitSlots, alreadyBookedPeriods, fullPeriods }: Bo
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="scroll-mt-24 bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-5"
+      className="scroll-mt-24 bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-5"
     >
       <p className="text-sm text-brand-muted">
         Visiting on{' '}

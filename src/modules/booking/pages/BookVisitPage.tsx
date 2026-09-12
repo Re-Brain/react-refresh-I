@@ -72,9 +72,15 @@ function BookVisitPage() {
 
       {/* Full-screen split: green heading panel on the left, calendar + form on the right. */}
       <section className="grid lg:grid-cols-2 min-h-[calc(100vh-4rem-1px)]">
-        {/* Left: context heading, pinned on large screens while the right column scrolls. */}
-        <div className="bg-brand-gold text-white flex items-center p-10 lg:p-16 lg:sticky lg:top-16 lg:self-start lg:h-[calc(100vh-4rem-1px)]">
-          <h1 className="text-left text-4xl lg:text-6xl font-extrabold tracking-wide leading-tight">
+        {/* min-w-0 overrides a grid item's default min-width:auto — without
+            it, wrapping text (or any wide descendant) can force this item,
+            the grid, and the whole page wider instead of actually wrapping
+            to fit the available column width. */}
+        <div className="min-w-0 bg-brand-gold text-white flex items-center p-6 xs:p-8 sm:p-10 lg:p-16 lg:sticky lg:top-16 lg:self-start lg:h-[calc(100vh-4rem-1px)]">
+          {/* mt-10 clears the fixed Back button pinned at top-20 — this
+              heading renders first on mobile, so it would otherwise land
+              right under that button. Not needed at lg. */}
+          <h1 className="text-left text-2xl xs:text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-wide leading-tight mt-10 lg:mt-0">
             Book a visit to meet
             <br />
             <span className="text-amber-300">{horse.name}</span>
@@ -88,10 +94,10 @@ function BookVisitPage() {
         </div>
 
         {/* Right: pick a date, then fill in the visit details. */}
-        <div className="flex items-center justify-center p-8 lg:p-16">
+        <div className="min-w-0 flex items-center justify-center p-4 xs:p-6 sm:p-8 lg:p-16">
           <div className="w-full max-w-2xl flex flex-col gap-6">
             {!bookingOpen ? (
-              <div className="bg-brand-surface border border-brand-border rounded-lg p-6 text-brand-muted text-sm">
+              <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 text-brand-muted text-sm">
                 {!canBook ? (
                   <>
                     Farm accounts can&rsquo;t book a visit. Log in with a visitor account to visit{' '}

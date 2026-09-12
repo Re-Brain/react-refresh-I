@@ -62,7 +62,7 @@ function Calendar({
   }
 
   return (
-    <div className="w-full bg-brand-surface border border-brand-border rounded-lg p-6">
+    <div className="w-full bg-brand-surface border border-brand-border rounded-lg p-3 xs:p-4 sm:p-6">
       {/* Month header with navigation */}
       <div className="flex items-center justify-between mb-4">
         <button
@@ -91,7 +91,7 @@ function Calendar({
         {WEEKDAYS.map(d => (
           <div
             key={d}
-            className="text-center text-xs font-bold uppercase text-brand-muted py-1"
+            className="text-center text-[10px] xs:text-xs font-bold uppercase text-brand-muted py-1"
           >
             {d}
           </div>
@@ -101,7 +101,7 @@ function Calendar({
       {/* Day cells */}
       <div className="grid grid-cols-7 gap-1">
         {cells.map((day, i) => {
-          if (day === null) return <div key={`blank-${i}`} className="h-14" />
+          if (day === null) return <div key={`blank-${i}`} className="h-10 xs:h-12 sm:h-14" />
           const iso = isoDate(view.year, view.month, day)
           const cellDate = new Date(view.year, view.month, day)
           const isPast = cellDate < today
@@ -123,7 +123,7 @@ function Calendar({
               disabled={disabled}
               onClick={() => onSelect(iso)}
               title={title}
-              className={`h-14 rounded-lg text-base font-bold transition ${
+              className={`h-10 xs:h-12 sm:h-14 rounded-lg text-sm xs:text-base font-bold transition ${
                 isSelected
                   ? 'bg-brand-gold text-white'
                   : disabled
