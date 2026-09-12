@@ -18,8 +18,8 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
   const { isEditing, setIsEditing, formData, setFormData, saving, error, handleEditClick, handleSave } = info
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold text-brand-muted uppercase">Basic Info</p>
         {!isEditing && (
           <button
@@ -34,7 +34,7 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
         )}
       </div>
       {isEditing ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
           {([['name', 'Name'], ['color', 'Color']] as const).map(([key, label]) => (
             <div key={key} className="flex flex-col gap-1">
               <label className="text-xs text-brand-muted">{label}</label>
@@ -72,7 +72,7 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
           {([['Name', horse.name], ['Color', horse.color], ['Date of Birth', horse.date_of_birth], ['Gender', horse.gender]] as const).map(([label, value]) => (
             <div key={label} className="flex flex-col gap-1">
               <span className="text-xs text-brand-muted">{label}</span>
@@ -99,7 +99,7 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
 
       <p className="text-xs font-bold text-brand-muted uppercase mt-2 pt-4 border-t border-brand-border">Pedigree</p>
       {isEditing ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
           {PEDIGREE_FIELDS.map(({ key, label }) => (
             <div key={key} className="flex flex-col gap-1">
               <label className="text-xs text-brand-muted">{label}</label>
@@ -113,7 +113,12 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
           ))}
         </div>
       ) : (
-        <table className="w-full text-sm border-collapse">
+        // This table had no scroll wrapper at all before — at narrow widths
+        // it would just overflow the card directly. The card's own padding
+        // already buffers it from the rounded corner, so no extra chrome
+        // split is needed here, just the scroll + min-w + fade.
+        <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] sm:mask-none">
+        <table className="w-full min-w-100 text-sm border-collapse">
           <tbody>
             <tr>
               <td rowSpan={2} className="border border-brand-border bg-blue-500/10 text-center font-bold text-blue-700 px-3 w-16 align-middle">
@@ -149,6 +154,7 @@ function HorseInfoEditor({ horse, info, locked, imageBusy }: HorseInfoEditorProp
             </tr>
           </tbody>
         </table>
+        </div>
       )}
 
       {isEditing && (
