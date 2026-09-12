@@ -31,7 +31,7 @@ function FarmDetailPage() {
 
       {state.status === 'notFound' && (
         <div className="min-h-[calc(100vh-3.25rem)] flex flex-col items-center justify-center gap-2">
-          <h1 className="text-3xl font-bold text-brand-gold">Farm not found</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-brand-gold">Farm not found</h1>
           <p className="text-brand-muted text-sm">
             We couldn't find a farm with that ID.
           </p>
@@ -46,7 +46,7 @@ function FarmDetailPage() {
           <FarmHero farm={state.farm} />
 
           {/* About + Horses */}
-          <div className="max-w-6xl mx-auto px-8 py-10 flex flex-col gap-12">
+          <div className="max-w-6xl mx-auto px-4 xs:px-6 sm:px-8 py-10 flex flex-col gap-12">
             <FarmStory description={state.farm.description} />
             <FarmLocationMap farm={state.farm} />
             <FarmResidents horses={horses} horsesError={horsesError} />

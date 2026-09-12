@@ -53,7 +53,7 @@ function FarmHero({ farm }: FarmHeroProps) {
       </button>
 
       {/* Left: details panel */}
-      <div className="relative order-2 lg:order-1 flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-10 lg:p-16 overflow-hidden">
+      <div className="relative lg:order-1 flex flex-col items-center justify-center text-center gap-7 bg-brand-gold text-white p-6 xs:p-8 sm:p-10 lg:p-16 overflow-hidden">
         {hasImages && (
           <div
             aria-hidden
@@ -66,9 +66,12 @@ function FarmHero({ farm }: FarmHeroProps) {
           className="absolute inset-0 bg-linear-to-b from-brand-gold/40 via-brand-gold/70 to-brand-gold"
         />
 
-        <div className="relative z-1 flex flex-col items-center gap-6">
+        {/* mt-10 clears the fixed Back button pinned at top-20 — this panel
+            renders first on mobile, so its heading would otherwise land
+            right under that button. Not needed at lg. */}
+        <div className="relative z-1 flex flex-col items-center gap-6 mt-10 lg:mt-0">
           <div className="flex flex-col items-center gap-4">
-            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-wide uppercase leading-none">
               <span className="text-amber-300">{farm.name.charAt(0)}</span>
               {farm.name.slice(1)}
             </h1>
@@ -82,7 +85,7 @@ function FarmHero({ farm }: FarmHeroProps) {
           <button
             type="button"
             onClick={scrollToDonate}
-            className="flex items-center gap-2 bg-white text-brand-gold font-bold uppercase tracking-[0.2em] text-sm px-12 py-3.5 rounded-full shadow-md hover:bg-brand-bg hover:scale-[1.03] transition"
+            className="flex items-center gap-2 bg-white text-brand-gold font-bold uppercase tracking-[0.2em] text-sm px-8 xs:px-10 sm:px-12 py-3.5 rounded-full shadow-md hover:bg-brand-bg hover:scale-[1.03] transition"
           >
             <Heart size={16} fill="currentColor" /> Donate
           </button>
@@ -95,7 +98,7 @@ function FarmHero({ farm }: FarmHeroProps) {
                   key={img.id}
                   onClick={() => setActiveImageIndex(i)}
                   aria-label={`View photo ${i + 1}`}
-                  className={`flex-none w-32 h-24 rounded-md overflow-hidden border-2 transition ${
+                  className={`flex-none w-24 h-20 xs:w-32 xs:h-24 rounded-md overflow-hidden border-2 transition ${
                     i === activeImageIndex
                       ? 'border-white'
                       : 'border-white/30 opacity-70 hover:opacity-100'
@@ -116,7 +119,7 @@ function FarmHero({ farm }: FarmHeroProps) {
 
       {/* Right: framed photo on a blurred backdrop, or an empty state
           when the farm hasn't shared any photos yet. */}
-      <div className="relative order-1 lg:order-2 bg-brand-bg flex items-center justify-center min-h-[45vh] lg:min-h-0 overflow-hidden p-6 lg:p-10">
+      <div className="relative lg:order-2 bg-brand-bg flex items-center justify-center min-h-[45vh] lg:min-h-0 overflow-hidden p-4 xs:p-6 lg:p-10">
         {hasImages ? (
           <>
             <div
