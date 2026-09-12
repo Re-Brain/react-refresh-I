@@ -89,8 +89,8 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
   }
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold text-brand-muted uppercase">
           Farm Photos <span className="text-red-600">*</span> <span className="normal-case font-normal">({imageCount}/{FARM_IMAGE_LIMIT})</span>
         </p>
@@ -124,7 +124,7 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
           No photos uploaded
         </div>
       ) : (
-        <div className="group relative rounded-xl overflow-hidden h-96 bg-brand-bg">
+        <div className="group relative rounded-xl overflow-hidden h-56 xs:h-72 sm:h-96 bg-brand-bg">
           {/* Blurred fill of the same photo so the letterbox gaps read as a
               soft border around the image instead of flat empty bars. */}
           <div
@@ -216,7 +216,7 @@ function FarmImageManager({ farm, onChange, disabled = false }: Props) {
 
       {/* Reorder controls */}
       {imageCount > 1 && (
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => handleReorderImage(-1)}

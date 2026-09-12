@@ -27,7 +27,7 @@ function FarmDocumentManager({ farm, documents, locked }: FarmDocumentManagerPro
   const count = FARM_DOCUMENT_TYPES.filter(t => farm.documents?.some(d => d.document_type === t.key)).length
 
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex flex-col gap-4">
+    <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex flex-col gap-4">
       <p className="text-xs font-bold text-brand-muted uppercase">
         Proof Documents <span className="text-red-600">*</span> <span className="normal-case font-normal">({count}/3)</span>
       </p>
@@ -46,7 +46,7 @@ function FarmDocumentManager({ farm, documents, locked }: FarmDocumentManagerPro
           return (
             <div
               key={key}
-              className="flex items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
+              className="flex flex-col xs:flex-row xs:items-center justify-between gap-3 bg-brand-bg border border-brand-border rounded-lg px-4 py-3"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <FileText size={16} className="text-brand-muted shrink-0" />

@@ -20,7 +20,7 @@ function DonationManagement() {
 
   if (error)
     return (
-      <div className="flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-600 rounded-lg px-4 py-3 text-sm font-medium">
         <div className="flex items-center gap-3">
           <AlertTriangle size={18} className="shrink-0" />
           <p>{error}</p>
@@ -39,7 +39,7 @@ function DonationManagement() {
   return (
     <div className="flex flex-col gap-6">
       {!status?.payouts_enabled && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-surface border border-brand-border rounded-lg p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6">
           <div className="flex items-start gap-3">
             <AlertTriangle size={20} className="text-yellow-500 shrink-0 mt-0.5" />
             <div>
@@ -57,7 +57,7 @@ function DonationManagement() {
             type="button"
             onClick={connectStripe}
             disabled={connecting}
-            className="flex items-center gap-2 bg-brand-gold text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 shrink-0"
+            className="flex items-center gap-2 bg-brand-gold text-white font-bold px-4 xs:px-6 py-2.5 rounded-lg hover:bg-brand-gold-light transition text-sm disabled:opacity-50 shrink-0"
           >
             {connecting ? 'Redirecting…' : status?.connected ? 'Finish setup' : 'Connect Stripe'}
           </button>
@@ -72,7 +72,7 @@ function DonationManagement() {
       )}
 
       {status?.payouts_enabled && (
-        <div className="bg-brand-surface border border-brand-border rounded-lg p-6 flex items-center gap-4">
+        <div className="bg-brand-surface border border-brand-border rounded-lg p-4 xs:p-6 flex items-center gap-4">
           <span className="flex items-center justify-center w-12 h-12 rounded-full bg-brand-gold/10 text-brand-gold shrink-0">
             <Heart size={22} fill="currentColor" />
           </span>
@@ -89,33 +89,41 @@ function DonationManagement() {
           <p className="text-brand-muted text-sm">No donations yet.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-brand-border">
-          <table className="w-full text-sm table-fixed">
+        <div className="rounded-lg border border-brand-border overflow-hidden">
+          {/* Scroll lives on its own inner element, separate from the
+              rounded border above (see HorseRaceRecords for why). Natural
+              (non-fixed) column widths + a min-w so the table scrolls
+              instead of the old table-fixed/w-1/3 approach, which squeezed
+              the supporter column so hard that its own `truncate` was
+              silently cutting off donor names/emails. */}
+          <div className="overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] lg:mask-none">
+          <table className="w-full min-w-125 text-sm">
             <thead>
               <tr className="bg-brand-surface border-b border-brand-border text-brand-muted text-xs uppercase">
-                <th className="w-1/3 text-left px-4 py-3 font-bold">Supporter</th>
-                <th className="w-1/3 text-left px-4 py-3 font-bold">Amount</th>
-                <th className="w-1/3 text-left px-4 py-3 font-bold">Date</th>
+                <th className="text-left px-4 py-3 font-bold">Supporter</th>
+                <th className="text-left px-4 py-3 font-bold">Amount</th>
+                <th className="text-left px-4 py-3 font-bold">Date</th>
               </tr>
             </thead>
             <tbody>
               {donations.map(d => (
                 <tr key={d.id} className="border-b border-brand-border last:border-0">
-                  <td className="w-1/3 px-4 py-3 truncate">
-                    <p className="font-bold text-brand-text truncate">{d.donor_name ?? 'Anonymous'}</p>
+                  <td className="px-4 py-3">
+                    <p className="font-bold text-brand-text">{d.donor_name ?? 'Anonymous'}</p>
                     {d.donor_name && d.donor_email && (
-                      <p className="flex items-center gap-1.5 text-brand-muted text-xs mt-0.5 truncate">
+                      <p className="flex items-center gap-1.5 text-brand-muted text-xs mt-0.5">
                         <Mail size={12} className="shrink-0" />
-                        <span className="truncate">{d.donor_email}</span>
+                        {d.donor_email}
                       </p>
                     )}
                   </td>
-                  <td className="w-1/3 px-4 py-3 text-brand-text">¥{d.amount_yen.toLocaleString()}</td>
-                  <td className="w-1/3 px-4 py-3 text-brand-muted">{formatDonationDate(d.created_at)}</td>
+                  <td className="px-4 py-3 text-brand-text whitespace-nowrap">¥{d.amount_yen.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-brand-muted whitespace-nowrap">{formatDonationDate(d.created_at)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
