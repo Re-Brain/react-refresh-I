@@ -39,11 +39,11 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center">
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md text-center">
+    <div className="min-h-[calc(100vh-3.25rem)] bg-brand-bg text-brand-text flex items-center justify-center px-4 xs:px-6 sm:px-8">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 xs:p-8 w-full max-w-md text-center">
         {success ? (
           <>
-            <h1 className="text-3xl font-bold text-brand-gold mb-4">Password reset</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Password reset</h1>
             <p className="text-brand-muted mb-6">Your password has been changed. You can now log in.</p>
             <Link
               to="/login"
@@ -54,7 +54,7 @@ function ResetPasswordPage() {
           </>
         ) : !token ? (
           <>
-            <h1 className="text-3xl font-bold text-brand-gold mb-4">Invalid link</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4">Invalid link</h1>
             <p className="text-red-600 text-sm mb-6">This reset link is missing a token.</p>
             <p className="text-brand-muted text-sm">
               Please request a new reset link from your account settings.
@@ -62,7 +62,7 @@ function ResetPasswordPage() {
           </>
         ) : (
           <form onSubmit={handleSubmit} className="text-left">
-            <h1 className="text-3xl font-bold text-brand-gold mb-4 text-center">Reset your password</h1>
+            <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-4 text-center">Reset your password</h1>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold text-brand-muted uppercase">New Password</label>

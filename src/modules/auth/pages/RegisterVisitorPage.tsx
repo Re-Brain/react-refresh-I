@@ -52,11 +52,11 @@ function RegisterVisitorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text flex items-center justify-center">
-      <div className="bg-brand-surface border border-brand-border rounded-lg p-8 w-full max-w-md">
-        
+    <div className="min-h-screen bg-brand-bg text-brand-text flex items-center justify-center px-4 xs:px-6 sm:px-8">
+      <div className="bg-brand-surface border border-brand-border rounded-lg p-6 xs:p-8 w-full max-w-md">
+
         {/* Page title */}
-        <h1 className="text-3xl font-bold text-brand-gold mb-1 text-center">Visitor Register</h1>
+        <h1 className="text-2xl xs:text-3xl font-bold text-brand-gold mb-1 text-center">Visitor Register</h1>
         
         {/* Page subtitle */}
         <p className="text-brand-muted text-center mb-6">Create your visitor account</p>
