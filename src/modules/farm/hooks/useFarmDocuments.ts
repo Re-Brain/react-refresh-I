@@ -1,10 +1,10 @@
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { useState } from 'react'
 import { uploadFarmDocument, deleteFarmDocument, type Farm, type FarmDocumentType } from '../api/farm'
 
 // Owns upload/delete for the caller's own farm documents. Unlike images, each
 // of the 3 slots is independent, so the busy state is per-type rather than a
 // single boolean. Mirrors useHorseDocuments.
-export function useFarmDocuments(farm: Farm | null, setFarm: Dispatch<SetStateAction<Farm | null>>) {
+export function useFarmDocuments(farm: Farm | null, setFarm: (farm: Farm | null) => void) {
   const [uploadingType, setUploadingType] = useState<FarmDocumentType | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [documentError, setDocumentError] = useState<string | null>(null)

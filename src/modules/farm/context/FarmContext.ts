@@ -4,7 +4,7 @@ import type { Horse } from '../api/horse'
 
 export type FarmContextType = {
   farm: Farm | null
-  setFarm: Dispatch<SetStateAction<Farm | null>>
+  setFarm: (farm: Farm | null) => void
   horses: Horse[]
   setHorses: Dispatch<SetStateAction<Horse[]>>
   loading: boolean

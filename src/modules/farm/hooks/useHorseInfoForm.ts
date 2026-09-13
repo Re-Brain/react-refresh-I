@@ -4,7 +4,11 @@ import { validateName, validateColor, validateDob, validateStory } from '../hors
 
 // The pedigree fields (key + display label), used for both validation and the
 // edit form. Shared by the hook (validation) and HorseInfoEditor (rendering).
-export const PEDIGREE_FIELDS: { key: keyof HorseUpdate; label: string }[] = [
+// Typed as a literal union (not the broader `keyof HorseUpdate`) so
+// `horse[key]`/`formData[key]` are known to be strings, not e.g. race_records.
+type PedigreeFieldKey = 'sire' | 'dam' | 'sires_sire' | 'dams_sire' | 'sires_dam' | 'dams_dam'
+
+export const PEDIGREE_FIELDS: { key: PedigreeFieldKey; label: string }[] = [
   { key: 'sire', label: 'Sire' },
   { key: 'dam', label: 'Dam' },
   { key: 'sires_sire', label: "Sire's Sire" },

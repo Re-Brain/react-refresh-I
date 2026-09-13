@@ -1,4 +1,3 @@
-import type { Dispatch, SetStateAction } from 'react'
 import { X, Info, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import { isFarmComplete, type Farm } from '../api/farm'
 import type { useFarmInfoForm } from '../hooks/useFarmInfoForm'
@@ -12,7 +11,7 @@ import { FARM_DOCUMENT_TYPES } from '../api/farm'
 
 type FarmInfoSectionProps = {
   farm: Farm | null
-  setFarm: Dispatch<SetStateAction<Farm | null>>
+  setFarm: (farm: Farm | null) => void
   info: ReturnType<typeof useFarmInfoForm>
   documents: ReturnType<typeof useFarmDocuments>
   submit: ReturnType<typeof useFarmSubmit>

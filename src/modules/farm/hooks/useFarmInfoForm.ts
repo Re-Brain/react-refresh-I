@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { useState } from 'react'
 import { updateMyFarm, type Farm, type FarmUpdate } from '../api/farm'
 
 // "Farm name" / "Farm name and Description" / "Farm name, Description, and Location"
@@ -10,7 +10,7 @@ function joinWithAnd(items: string[]): string {
 
 // Owns the farm-info edit state and save logic. `handleSave` diffs the form
 // against the current farm and sends only the fields that changed.
-export function useFarmInfoForm(farm: Farm | null, setFarm: Dispatch<SetStateAction<Farm | null>>) {
+export function useFarmInfoForm(farm: Farm | null, setFarm: (farm: Farm | null) => void) {
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<FarmUpdate>({})
   const [saving, setSaving] = useState(false)
